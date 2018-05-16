@@ -13,12 +13,11 @@ npm install graphql-constraint-directive
 
 ## Usage
 ```js
+const ConstraintDirective = require('graphql-constraint-directive')
 const express = require('express')
 const bodyParser = require('body-parser')
 const { graphqlExpress } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools')
-const request = require('supertest')
-const ConstraintDirective = require('graphql-constraint-directive')
 const typeDefs = `
   type Query {
     books: [Book]
