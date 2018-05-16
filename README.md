@@ -55,7 +55,7 @@ Restrict to a maximum length
 Ensure value starts with foo
 
 #### endsWith
-```@constraint(startsWith: "foo")```
+```@constraint(endsWith: "foo")```
 Ensure value ends with foo
 
 #### contains
