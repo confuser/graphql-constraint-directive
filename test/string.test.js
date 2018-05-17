@@ -652,5 +652,40 @@ describe('@constraint String', function () {
           'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be in UUID format')
       })
     })
+
+    describe('#unknown', function () {
+      let request
+
+      before(function () {
+        const typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String
+        }
+        type Mutation {
+          createBook(input: BookInput): Book
+        }
+        input BookInput {
+          title: String! @constraint(format: "test")
+        }`
+
+        request = setup(typeDefs)
+      })
+
+      it('should fail', async function () {
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({
+            query, variables: { input: { title: 'a' } }
+          })
+
+        strictEqual(statusCode, 400)
+        strictEqual(body.errors[0].message,
+          'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Invalid format type test')
+      })
+    })
   })
 })
