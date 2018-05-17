@@ -7,49 +7,102 @@ describe('@constraint String', function () {
       title
     }
   }`
+  const argQuery = `mutation createBook($title: String) {
+    createBook(title: $title) {
+      title
+    }
+  }`
 
-  describe('#minLength', function () {
-    let request
+  describe.only('#minLength', function () {
+    describe('Input Field Definition', function () {
+      let request
 
-    before(function () {
-      const typeDefs = `
-      type Query {
-        books: [Book]
-      }
-      type Book {
-        title: String
-      }
-      type Mutation {
-        createBook(input: BookInput): Book
-      }
-      input BookInput {
-        title: String! @constraint(minLength: 3)
-      }`
+      before(function () {
+        const typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String
+        }
+        type Mutation {
+          createBook(input: BookInput): Book
+        }
+        input BookInput {
+          title: String! @constraint(minLength: 3)
+        }`
 
-      request = setup(typeDefs)
+        request = setup(typeDefs)
+      })
+
+      it('should pass', async function () {
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'he💩' } }
+          })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
+      it('should fail', async function () {
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a💩' } }
+          })
+
+        strictEqual(statusCode, 400)
+        strictEqual(body.errors[0].message,
+          'Variable "$input" got invalid value {"title":"a💩"}; Expected type ConstraintString at value.title; Must be at least 3 characters in length')
+      })
     })
 
-    it('should pass', async function () {
-      const { body, statusCode } = await request
-        .post('/graphql')
-        .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'he💩' } }
-        })
+    describe('Argument Definition', function () {
+      let request
 
-      strictEqual(statusCode, 200)
-      deepStrictEqual(body, { data: { createBook: null } })
-    })
+      before(function () {
+        const typeDefs = `
+          type Query {
+            books: [Book]
+          }
+          type Book {
+            title: String
+          }
+          type Mutation {
+            createBook(title: String @constraint(minLength: 3)): Book
+          }`
 
-    it('should fail', async function () {
-      const { body, statusCode } = await request
-        .post('/graphql')
-        .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
-        })
+        request = setup(typeDefs)
+      })
 
-      strictEqual(statusCode, 400)
-      strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value {"title":"a💩"}; Expected type ConstraintString at value.title; Must be at least 3 characters in length')
+      it('should pass', async function () {
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({
+            query: argQuery, variables: { title: 'he💩' }
+          })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
+      it('should fail', async function () {
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({
+            query: argQuery, variables: { title: 'a💩' }
+          })
+
+        console.dir(body, { depth: null })
+
+        strictEqual(statusCode, 400)
+        strictEqual(body.errors[0].message,
+          'Variable "$input" got invalid value {"title":"a💩"}; Expected type ConstraintString at value.title; Must be at least 3 characters in length')
+      })
     })
   })
 

@@ -15,7 +15,8 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
     return new GraphQLDirective({
       name: directiveName,
       locations: [
-        DirectiveLocation.INPUT_FIELD_DEFINITION
+        DirectiveLocation.INPUT_FIELD_DEFINITION,
+        DirectiveLocation.ARGUMENT_DEFINITION
       ],
       args: {
         /* Strings */
@@ -39,6 +40,10 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
   }
 
   visitInputFieldDefinition (field) {
+    this.wrapType(field)
+  }
+
+  visitArgumentDefinition (field) {
     this.wrapType(field)
   }
 
