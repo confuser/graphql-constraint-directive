@@ -1,5 +1,10 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const setup = require('./setup')
+const formatError = (error) => {
+  const { message, code, fieldName, context } = error.originalError
+
+  return { message, code, fieldName, context }
+}
 
 describe('@constraint Int', function () {
   const query = `mutation createBook($input: BookInput) {
@@ -9,10 +14,8 @@ describe('@constraint Int', function () {
   }`
 
   describe('#min', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -26,11 +29,11 @@ describe('@constraint Int', function () {
         title: Int! @constraint(min: 3)
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 3 } }
@@ -41,7 +44,7 @@ describe('@constraint Int', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 2 } }
@@ -51,13 +54,27 @@ describe('@constraint Int', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":2}; Expected type ConstraintNumber at value.title; Must be at least 3')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 2 } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be at least 3',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'min', value: 3 }]
+      })
+    })
   })
 
   describe('#max', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -71,11 +88,11 @@ describe('@constraint Int', function () {
         title: Int! @constraint(max: 3)
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 2 } }
@@ -86,7 +103,7 @@ describe('@constraint Int', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 4 } }
@@ -96,13 +113,27 @@ describe('@constraint Int', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":4}; Expected type ConstraintNumber at value.title; Must be no greater than 3')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 4 } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be no greater than 3',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'max', value: 3 }]
+      })
+    })
   })
 
   describe('#exclusiveMin', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -116,11 +147,11 @@ describe('@constraint Int', function () {
         title: Int! @constraint(exclusiveMin: 3)
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({
@@ -132,7 +163,7 @@ describe('@constraint Int', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({
@@ -143,13 +174,27 @@ describe('@constraint Int', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":3}; Expected type ConstraintNumber at value.title; Must be greater than 3')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 3 } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be greater than 3',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'exclusiveMin', value: 3 }]
+      })
+    })
   })
 
   describe('#exclusiveMax', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -163,11 +208,11 @@ describe('@constraint Int', function () {
         title: Int! @constraint(exclusiveMax: 3)
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({
@@ -179,7 +224,7 @@ describe('@constraint Int', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({
@@ -190,13 +235,27 @@ describe('@constraint Int', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":3}; Expected type ConstraintNumber at value.title; Must be no greater than 3')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 3 } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be no greater than 3',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'exclusiveMax', value: 3 }]
+      })
+    })
   })
 
   describe('#multipleOf', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -210,11 +269,11 @@ describe('@constraint Int', function () {
         title: Int! @constraint(multipleOf: 2)
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 10 } }
@@ -225,7 +284,7 @@ describe('@constraint Int', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 7 } }
@@ -234,6 +293,22 @@ describe('@constraint Int', function () {
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":7}; Expected type ConstraintNumber at value.title; Must be a multiple of 2')
+    })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 7 } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be a multiple of 2',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'multipleOf', value: 2 }]
+      })
     })
   })
 })

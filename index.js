@@ -43,14 +43,16 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
   }
 
   wrapType (field) {
+    const fieldName = field.astNode.name.value
+
     if (field.type instanceof GraphQLNonNull && field.type.ofType === GraphQLString) {
-      field.type = new ConstraintStringType(field.type.ofType, this.args)
+      field.type = new ConstraintStringType(fieldName, field.type.ofType, this.args)
     } else if (field.type === GraphQLString) {
-      field.type = new ConstraintStringType(field.type, this.args)
+      field.type = new ConstraintStringType(fieldName, field.type, this.args)
     } else if (field.type instanceof GraphQLNonNull && (field.type.ofType === GraphQLFloat || field.type.ofType === GraphQLInt)) {
-      field.type = new ConstraintNumberType(field.type.ofType, this.args)
+      field.type = new ConstraintNumberType(fieldName, field.type.ofType, this.args)
     } else if (field.type === GraphQLFloat || field.type === GraphQLInt) {
-      field.type = new ConstraintNumberType(field.type, this.args)
+      field.type = new ConstraintNumberType(fieldName, field.type, this.args)
     } else {
       throw new Error(`Not a scalar type: ${field.type}`)
     }

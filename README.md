@@ -103,3 +103,27 @@ Ensure value is less than
 #### multipleOf
 ```@constraint(multipleOf: 10)```
 Ensure value is a multiple
+
+### ConstraintDirectiveError
+Each validation error throws a `ConstraintDirectiveError`. Combined with a formatError function, this can be used to customise error messages.
+
+```js
+{
+  code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+  fieldName: 'theFieldName',
+  context: [ { arg: 'argument name which failed', value: 'value of argument' } ]
+}
+```
+
+```js
+const formatError = function (error) {
+  if (error.originalError && error.originalError.code === 'ERR_GRAPHQL_CONSTRAINT_VALIDATION') {
+    // return a custom object
+  }
+
+  return error
+}
+
+app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
+
+```

@@ -1,5 +1,10 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const setup = require('./setup')
+const formatError = (error) => {
+  const { message, code, fieldName, context } = error.originalError
+
+  return { message, code, fieldName, context }
+}
 
 describe('@constraint String', function () {
   const query = `mutation createBook($input: BookInput) {
@@ -9,10 +14,8 @@ describe('@constraint String', function () {
   }`
 
   describe('#minLength', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -26,11 +29,11 @@ describe('@constraint String', function () {
         title: String! @constraint(minLength: 3)
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 'he💩' } }
@@ -41,7 +44,7 @@ describe('@constraint String', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 'a💩' } }
@@ -51,13 +54,27 @@ describe('@constraint String', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":"a💩"}; Expected type ConstraintString at value.title; Must be at least 3 characters in length')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 'a💩' } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be at least 3 characters in length',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'minLength', value: 3 }]
+      })
+    })
   })
 
   describe('#maxLength', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -71,11 +88,11 @@ describe('@constraint String', function () {
         title: String! @constraint(maxLength: 3)
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 'a💩' } }
@@ -86,7 +103,7 @@ describe('@constraint String', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 'fob💩' } }
@@ -96,13 +113,27 @@ describe('@constraint String', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":"fob💩"}; Expected type ConstraintString at value.title; Must be no more than 3 characters in length')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 'fob💩' } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be no more than 3 characters in length',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'maxLength', value: 3 }]
+      })
+    })
   })
 
   describe('#startsWith', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -116,11 +147,11 @@ describe('@constraint String', function () {
         title: String! @constraint(startsWith: "💩")
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: '💩foo' } }
@@ -131,23 +162,36 @@ describe('@constraint String', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'bar💩' } }
-        })
+        .send({ query, variables: { input: { title: 'bar💩' } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":"bar💩"}; Expected type ConstraintString at value.title; Must start with 💩')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 'bar💩' } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must start with 💩',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'startsWith', value: '💩' }]
+      })
+    })
   })
 
   describe('#endsWith', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -161,11 +205,11 @@ describe('@constraint String', function () {
         title: String! @constraint(endsWith: "💩")
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 'a💩' } }
@@ -176,7 +220,7 @@ describe('@constraint String', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: '💩bar' } }
@@ -186,13 +230,27 @@ describe('@constraint String', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":"💩bar"}; Expected type ConstraintString at value.title; Must end with 💩')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: '💩bar' } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must end with 💩',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'endsWith', value: '💩' }]
+      })
+    })
   })
 
   describe('#contains', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -206,11 +264,11 @@ describe('@constraint String', function () {
         title: String! @constraint(contains: "💩")
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 'a💩o' } }
@@ -221,7 +279,7 @@ describe('@constraint String', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 'fobar' } }
@@ -231,13 +289,27 @@ describe('@constraint String', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":"fobar"}; Expected type ConstraintString at value.title; Must contain 💩')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 'foobar' } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must contain 💩',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'contains', value: '💩' }]
+      })
+    })
   })
 
   describe('#notContains', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -251,11 +323,11 @@ describe('@constraint String', function () {
         title: String! @constraint(notContains: "foo")
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: '💩' } }
@@ -266,7 +338,7 @@ describe('@constraint String', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: '💩foobar' } }
@@ -276,13 +348,27 @@ describe('@constraint String', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":"💩foobar"}; Expected type ConstraintString at value.title; Must not contain foo')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: '💩foobar' } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must not contain foo',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'notContains', value: 'foo' }]
+      })
+    })
   })
 
   describe('#pattern', function () {
-    let request
-
     before(function () {
-      const typeDefs = `
+      this.typeDefs = `
       type Query {
         books: [Book]
       }
@@ -296,11 +382,11 @@ describe('@constraint String', function () {
         title: String! @constraint(pattern: "^[0-9a-zA-Z]*$")
       }`
 
-      request = setup(typeDefs)
+      this.request = setup(this.typeDefs)
     })
 
     it('should pass', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: 'afoo' } }
@@ -311,7 +397,7 @@ describe('@constraint String', function () {
     })
 
     it('should fail', async function () {
-      const { body, statusCode } = await request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
         .send({ query, variables: { input: { title: '£££' } }
@@ -321,14 +407,28 @@ describe('@constraint String', function () {
       strictEqual(body.errors[0].message,
         'Variable "$input" got invalid value {"title":"£££"}; Expected type ConstraintString at value.title; Must match ^[0-9a-zA-Z]*$')
     })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: '💩bar' } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must match ^[0-9a-zA-Z]*$',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'pattern', value: '^[0-9a-zA-Z]*$' }]
+      })
+    })
   })
 
   describe('#format', function () {
     describe('#byte', function () {
-      let request
-
       before(function () {
-        const typeDefs = `
+        this.typeDefs = `
         type Query {
           books: [Book]
         }
@@ -342,11 +442,11 @@ describe('@constraint String', function () {
           title: String! @constraint(format: "byte")
         }`
 
-        request = setup(typeDefs)
+        this.request = setup(this.typeDefs)
       })
 
       it('should pass', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -358,7 +458,7 @@ describe('@constraint String', function () {
       })
 
       it('should fail', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -369,13 +469,27 @@ describe('@constraint String', function () {
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {"title":"£££"}; Expected type ConstraintString at value.title; Must be in byte format')
       })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: '£££' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in byte format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'byte' }]
+        })
+      })
     })
 
     describe('#date-time', function () {
-      let request
-
       before(function () {
-        const typeDefs = `
+        this.typeDefs = `
         type Query {
           books: [Book]
         }
@@ -389,11 +503,11 @@ describe('@constraint String', function () {
           title: String! @constraint(format: "date-time")
         }`
 
-        request = setup(typeDefs)
+        this.request = setup(this.typeDefs)
       })
 
       it('should pass', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -405,7 +519,7 @@ describe('@constraint String', function () {
       })
 
       it('should fail', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -416,13 +530,27 @@ describe('@constraint String', function () {
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be a date in RFC 3339 format')
       })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be a date in RFC 3339 format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'date-time' }]
+        })
+      })
     })
 
     describe('#email', function () {
-      let request
-
       before(function () {
-        const typeDefs = `
+        this.typeDefs = `
         type Query {
           books: [Book]
         }
@@ -436,11 +564,11 @@ describe('@constraint String', function () {
           title: String! @constraint(format: "email")
         }`
 
-        request = setup(typeDefs)
+        this.request = setup(this.typeDefs)
       })
 
       it('should pass', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -452,7 +580,7 @@ describe('@constraint String', function () {
       })
 
       it('should fail', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -463,13 +591,27 @@ describe('@constraint String', function () {
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be in email format')
       })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in email format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'email' }]
+        })
+      })
     })
 
     describe('#ipv4', function () {
-      let request
-
       before(function () {
-        const typeDefs = `
+        this.typeDefs = `
         type Query {
           books: [Book]
         }
@@ -483,11 +625,11 @@ describe('@constraint String', function () {
           title: String! @constraint(format: "ipv4")
         }`
 
-        request = setup(typeDefs)
+        this.request = setup(this.typeDefs)
       })
 
       it('should pass', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -499,7 +641,7 @@ describe('@constraint String', function () {
       })
 
       it('should fail', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -510,13 +652,27 @@ describe('@constraint String', function () {
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be in IP v4 format')
       })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in IP v4 format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'ipv4' }]
+        })
+      })
     })
 
     describe('#ipv6', function () {
-      let request
-
       before(function () {
-        const typeDefs = `
+        this.typeDefs = `
         type Query {
           books: [Book]
         }
@@ -530,11 +686,11 @@ describe('@constraint String', function () {
           title: String! @constraint(format: "ipv6")
         }`
 
-        request = setup(typeDefs)
+        this.request = setup(this.typeDefs)
       })
 
       it('should pass', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -546,7 +702,7 @@ describe('@constraint String', function () {
       })
 
       it('should fail', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -557,13 +713,27 @@ describe('@constraint String', function () {
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be in IP v6 format')
       })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in IP v6 format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'ipv6' }]
+        })
+      })
     })
 
     describe('#uri', function () {
-      let request
-
       before(function () {
-        const typeDefs = `
+        this.typeDefs = `
         type Query {
           books: [Book]
         }
@@ -577,11 +747,11 @@ describe('@constraint String', function () {
           title: String! @constraint(format: "uri")
         }`
 
-        request = setup(typeDefs)
+        this.request = setup(this.typeDefs)
       })
 
       it('should pass', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -593,7 +763,7 @@ describe('@constraint String', function () {
       })
 
       it('should fail', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -604,13 +774,27 @@ describe('@constraint String', function () {
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be in URI format')
       })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in URI format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'uri' }]
+        })
+      })
     })
 
     describe('#uuid', function () {
-      let request
-
       before(function () {
-        const typeDefs = `
+        this.typeDefs = `
         type Query {
           books: [Book]
         }
@@ -624,11 +808,11 @@ describe('@constraint String', function () {
           title: String! @constraint(format: "uuid")
         }`
 
-        request = setup(typeDefs)
+        this.request = setup(this.typeDefs)
       })
 
       it('should pass', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -640,7 +824,7 @@ describe('@constraint String', function () {
       })
 
       it('should fail', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -651,13 +835,27 @@ describe('@constraint String', function () {
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be in UUID format')
       })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in UUID format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'uuid' }]
+        })
+      })
     })
 
     describe('#unknown', function () {
-      let request
-
       before(function () {
-        const typeDefs = `
+        this.typeDefs = `
         type Query {
           books: [Book]
         }
@@ -671,11 +869,11 @@ describe('@constraint String', function () {
           title: String! @constraint(format: "test")
         }`
 
-        request = setup(typeDefs)
+        this.request = setup(this.typeDefs)
       })
 
       it('should fail', async function () {
-        const { body, statusCode } = await request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
@@ -685,6 +883,22 @@ describe('@constraint String', function () {
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Invalid format type test')
+      })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Invalid format type test',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'test' }]
+        })
       })
     })
   })
