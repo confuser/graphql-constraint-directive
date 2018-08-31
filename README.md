@@ -77,6 +77,7 @@ Ensure value is in a particular format
 Supported formats:
 - byte: Base64
 - date-time: RFC 3339
+- date: ISO 8601
 - email
 - ipv4
 - ipv6

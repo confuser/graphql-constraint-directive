@@ -528,7 +528,7 @@ describe('@constraint String', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be a date in RFC 3339 format')
+          'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be a date-time in RFC 3339 format')
       })
 
       it('should throw custom error', async function () {
@@ -540,10 +540,71 @@ describe('@constraint String', function () {
 
         strictEqual(statusCode, 400)
         deepStrictEqual(body.errors[0], {
-          message: 'Must be a date in RFC 3339 format',
+          message: 'Must be a date-time in RFC 3339 format',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
           fieldName: 'title',
           context: [{ arg: 'format', value: 'date-time' }]
+        })
+      })
+    })
+
+    describe('#date', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String
+        }
+        type Mutation {
+          createBook(input: BookInput): Book
+        }
+        input BookInput {
+          title: String! @constraint(format: "date")
+        }`
+
+        this.request = setup(this.typeDefs)
+      })
+
+      it('should pass', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({
+            query, variables: { input: { title: '2018-05-16' } }
+          })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
+      it('should fail', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({
+            query, variables: { input: { title: 'a' } }
+          })
+
+        strictEqual(statusCode, 400)
+        strictEqual(body.errors[0].message,
+          'Variable "$input" got invalid value {"title":"a"}; Expected type ConstraintString at value.title; Must be a date in ISO 8601 format')
+      })
+
+      it('should throw custom error', async function () {
+        const request = setup(this.typeDefs, formatError)
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a' } } })
+
+        strictEqual(statusCode, 400)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be a date in ISO 8601 format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'date' }]
         })
       })
     })
