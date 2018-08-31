@@ -1,6 +1,7 @@
 const formats = [
   'byte',
   'date-time',
+  'date',
   'email',
   'ipv4',
   'ipv6',
