@@ -46,11 +46,11 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
     const fieldName = field.astNode.name.value
 
     if (field.type instanceof GraphQLNonNull && field.type.ofType === GraphQLString) {
-      field.type = new ConstraintStringType(fieldName, field.type.ofType, this.args)
+      field.type = new GraphQLNonNull(new ConstraintStringType(fieldName, field.type.ofType, this.args))
     } else if (field.type === GraphQLString) {
       field.type = new ConstraintStringType(fieldName, field.type, this.args)
     } else if (field.type instanceof GraphQLNonNull && (field.type.ofType === GraphQLFloat || field.type.ofType === GraphQLInt)) {
-      field.type = new ConstraintNumberType(fieldName, field.type.ofType, this.args)
+      field.type = new GraphQLNonNull(new ConstraintNumberType(fieldName, field.type.ofType, this.args))
     } else if (field.type === GraphQLFloat || field.type === GraphQLInt) {
       field.type = new ConstraintNumberType(fieldName, field.type, this.args)
     } else {
