@@ -85,7 +85,7 @@ describe('@constraint Int', function () {
         createBook(input: BookInput): Book
       }
       input BookInput {
-        title: Int! @constraint(max: 3)
+        title: Int @constraint(max: 3)
       }`
 
       this.request = setup(this.typeDefs)
