@@ -7,17 +7,19 @@
 Allows using @constraint as a directive to validate input data. Inspired by [Constraints Directives RFC](https://github.com/APIs-guru/graphql-constraints-spec) and OpenAPI
 
 ## Install
+
 ```
 npm install graphql-constraint-directive
 ```
 
 ## Usage
+
 ```js
-const ConstraintDirective = require('graphql-constraint-directive')
-const express = require('express')
-const bodyParser = require('body-parser')
-const { graphqlExpress } = require('apollo-server-express')
-const { makeExecutableSchema } = require('graphql-tools')
+const ConstraintDirective = require("graphql-constraint-directive");
+const express = require("express");
+const bodyParser = require("body-parser");
+const { graphqlExpress } = require("apollo-server-express");
+const { makeExecutableSchema } = require("graphql-tools");
 const typeDefs = `
   type Query {
     books: [Book]
@@ -30,51 +32,62 @@ const typeDefs = `
   }
   input BookInput {
     title: String! @constraint(minLength: 5, format: "email")
-  }`
+  }`;
 const schema = makeExecutableSchema({
-  typeDefs, schemaDirectives: { constraint: ConstraintDirective }
-})
-const app = express()
+  typeDefs,
+  schemaDirectives: { constraint: ConstraintDirective }
+});
+const app = express();
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }))
-
+app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
 ```
 
 ## API
+
 ### String
+
 #### minLength
-```@constraint(minLength: 5)```
+
+`@constraint(minLength: 5)`
 Restrict to a minimum length
 
 #### maxLength
-```@constraint(maxLength: 5)```
+
+`@constraint(maxLength: 5)`
 Restrict to a maximum length
 
 #### startsWith
-```@constraint(startsWith: "foo")```
+
+`@constraint(startsWith: "foo")`
 Ensure value starts with foo
 
 #### endsWith
-```@constraint(endsWith: "foo")```
+
+`@constraint(endsWith: "foo")`
 Ensure value ends with foo
 
 #### contains
-```@constraint(contains: "foo")```
+
+`@constraint(contains: "foo")`
 Ensure value contains foo
 
 #### notContains
-```@constraint(notContains: "foo")```
+
+`@constraint(notContains: "foo")`
 Ensure value does not contain foo
 
 #### pattern
-```@constraint(pattern: "^[0-9a-zA-Z]*$")```
+
+`@constraint(pattern: "^[0-9a-zA-Z]*$")`
 Ensure value matches regex, e.g. alphanumeric
 
 #### format
-```@constraint(format: "email")```
+
+`@constraint(format: "email")`
 Ensure value is in a particular format
 
 Supported formats:
+
 - byte: Base64
 - date-time: RFC 3339
 - date: ISO 8601
@@ -85,27 +98,34 @@ Supported formats:
 - uuid
 
 ### Int/Float
+
 #### min
-```@constraint(min: 3)```
+
+`@constraint(min: 3)`
 Ensure value is greater than or equal to
 
 #### max
-```@constraint(max: 3)```
+
+`@constraint(max: 3)`
 Ensure value is less than or equal to
 
 #### exclusiveMin
-```@constraint(exclusiveMin: 3)```
+
+`@constraint(exclusiveMin: 3)`
 Ensure value is greater than
 
 #### exclusiveMax
-```@constraint(exclusiveMax: 3)```
+
+`@constraint(exclusiveMax: 3)`
 Ensure value is less than
 
 #### multipleOf
-```@constraint(multipleOf: 10)```
+
+`@constraint(multipleOf: 10)`
 Ensure value is a multiple
 
 ### ConstraintDirectiveError
+
 Each validation error throws a `ConstraintDirectiveError`. Combined with a formatError function, this can be used to customise error messages.
 
 ```js
@@ -117,14 +137,71 @@ Each validation error throws a `ConstraintDirectiveError`. Combined with a forma
 ```
 
 ```js
-const formatError = function (error) {
-  if (error.originalError && error.originalError.code === 'ERR_GRAPHQL_CONSTRAINT_VALIDATION') {
+const formatError = function(error) {
+  if (
+    error.originalError &&
+    error.originalError.code === "ERR_GRAPHQL_CONSTRAINT_VALIDATION"
+  ) {
     // return a custom object
   }
 
-  return error
-}
+  return error;
+};
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
-
+app.use("/graphql", bodyParser.json(), graphqlExpress({ schema, formatError }));
 ```
+
+## Customization
+
+By default, the constraint directive uses [validator.js](https://www.npmjs.com/package/validator)
+You can pass your own `validator` in the GraphQL context object, conforming to this API:
+
+- `isLength(value)`
+- `contains(value)`
+- `isDateTime(value)`
+- `isDate(value)`
+- `isIPv6(value)`
+- `isIPv4(value)`
+- `isEmail(value)`
+- `isByte(value)`
+- `isUri(value)`
+- `isUUID(value)`
+
+Note: All the above methods expect value to be a string.
+
+The default validator is wrapped as follows:
+
+```js
+const validator = {
+  isLength: $validator.isLength,
+  contains: $validator.contains,
+  isDateTime: $validator.isRFC3339,
+  isDate: $validator.isISO8601,
+  isIPv6: value => $validator.isIP(value, 6),
+  isIPv4: value => $validator.isIP(value, 4),
+  isEmail: $validator.isEmail,
+  isByte: $validator.isBase64,
+  isUri: $validator.isURL,
+  isUUID: $validator.isUUID
+};
+```
+
+### Validation messages
+
+You can set a `validationError` function map on the GraphQL context object to provide your own validator error handlers.
+
+- `format(key, value)`
+- `string(name, msg, args[])
+- `number(name, msg, args[])
+
+The format validators will call: `validationError.format('date', value)`
+
+The `string` and `number` validators will call the error handler like this:
+
+```js
+validationError.string(name, `Must match ${args.pattern}`, [
+  { arg: "pattern", value: args.pattern }
+]);
+```
+
+Note that the third argument contains a list where each object has an `arg` entry that indicates the constraint that failed. You can use this as a key to lookup in your own validation error message map to return or output a localized error message as you see fit.
