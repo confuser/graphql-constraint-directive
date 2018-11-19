@@ -115,6 +115,22 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
   //   return new ConstraintListType(opts);
   // }
 
+  // TODO
+  wrapListString(opts = {}) {
+    const { type, ofType } = opts;
+    if (type instanceof GraphQLList && ofType === GraphQLString) {
+      // validate
+    }
+  }
+
+  // TODO
+  wrapListNumber(opts = {}) {
+    const { type, ofType } = opts;
+    if (type instanceof GraphQLList && ofType === GraphQLNumber) {
+      // validate
+    }
+  }
+
   wrapNonNullString(opts = {}) {
     const { type, ofType, field } = opts;
     if (type instanceof GraphQLNonNull && ofType === GraphQLString) {

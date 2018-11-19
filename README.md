@@ -205,3 +205,99 @@ validationError.string(name, `Must match ${args.pattern}`, [
 ```
 
 Note that the third argument contains a list where each object has an `arg` entry that indicates the constraint that failed. You can use this as a key to lookup in your own validation error message map to return or output a localized error message as you see fit.
+
+## Validating Complex types
+
+### Object
+
+Validate:
+
+- Two fields must have same value (password, confirmedPassword) ie. `same`
+- When one field is set to sth, another field can only have specific set of values (ie. `when`)
+
+We can use `Yup` for full object validation
+
+### Lists
+
+Validate:
+
+- Number of items in list
+- Particular items allowed in list
+- ...
+
+Lists are defined as modifiers on other types. We should be able to at least validate lists of `String`, `Int` and `Float` for starters.
+
+A schema definition like: `type: [User!]!` would result in:
+
+`type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User)))`
+
+```js
+  // TODO
+  wrapListString(opts = {}) {
+    const { type, ofType } = opts;
+    if (type instanceof GraphQLList && ofType === GraphQLString) {
+      // validate?
+    }
+  }
+
+  // TODO
+  wrapListNumber(opts = {}) {
+    const { type, ofType } = opts;
+    if (type instanceof GraphQLList && ofType === GraphQLNumber) {
+      // validate?
+    }
+  }
+```
+
+A scalar has a `parseValue` function which returns a `ValueNode` from a `Source`:
+
+```ts
+export type ValueNode =
+  | VariableNode
+  | IntValueNode
+  | FloatValueNode
+  | StringValueNode
+  | BooleanValueNode
+  | NullValueNode
+  | EnumValueNode
+  | ListValueNode
+  | ObjectValueNode;
+```
+
+As we can see, such a value can be a `ListValueNode`:
+
+```ts
+export interface ListValueNode {
+  readonly kind: "ListValue";
+  readonly loc?: Location;
+  readonly values: ReadonlyArray<ValueNode>;
+}
+```
+
+For an object return value
+
+```ts
+export interface ObjectValueNode {
+  readonly kind: "ObjectValue";
+  readonly loc?: Location;
+  readonly fields: ReadonlyArray<ObjectFieldNode>;
+}
+```
+
+with fields:
+
+```ts
+export interface ObjectFieldNode {
+  readonly kind: "ObjectField";
+  readonly loc?: Location;
+  readonly name: NameNode;
+  readonly value: ValueNode;
+}
+```
+
+## Resources
+
+- [GraphQL List - How to use arrays in GraphQL schema (GraphQL Modifiers)](https://graphqlmastery.com/blog/graphql-list-how-to-use-arrays-in-graphql-schema)
+- [Deep dive into GraphQL type system](https://github.com/mugli/learning-graphql/blob/master/7.%20Deep%20Dive%20into%20GraphQL%20Type%20System.md)
+- [Life of a GraphQL Query — Validation](https://medium.com/@cjoudrey/life-of-a-graphql-query-validation-18a8fb52f189)
+- [Graphql validated types](https://www.npmjs.com/package/graphql-validated-types)
