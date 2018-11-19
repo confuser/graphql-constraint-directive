@@ -4,7 +4,8 @@ const {
   GraphQLInt,
   GraphQLFloat,
   GraphQLNonNull,
-  GraphQLString
+  GraphQLString,
+  GraphQLBoolean
 } = require("graphql");
 const { SchemaDirectiveVisitor } = require("graphql-tools");
 const ConstraintStringType = require("./scalars/string");
@@ -48,6 +49,8 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
         format: { type: GraphQLString },
 
         /* Numbers (Int/Float) */
+        positive: { type: GraphQLBoolean },
+        negative: { type: GraphQLBoolean },
         min: { type: GraphQLFloat },
         max: { type: GraphQLFloat },
         exclusiveMin: { type: GraphQLFloat },
@@ -57,6 +60,14 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
     });
   }
 
+  // visitInputObject(object) {
+  //   this.objTypeName = object.name;
+  //   this.fields = object.getFields();
+  // }
+
+  // We could likely set which type of complex type is currently being visited
+  // then the scalars for that complex type can be validated as a whole
+  // when leaf visitors are done and returns to parent visitor
   visitInputFieldDefinition(field) {
     this.wrapType(field);
   }
@@ -69,13 +80,17 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
     return new ConstraintNumberType({ name, type, validator }, this.args);
   }
 
+  // TODO: extract into class
   wrapType(field) {
     const fieldName = field.astNode.name.value;
     const { type } = field;
     const { ofType } = type;
+    const { fields, objTypeName } = this;
     const opts = {
       name: fieldName,
       field,
+      fields,
+      objTypeName,
       type,
       ofType,
       validator: this.validator
@@ -87,6 +102,18 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
       this.wrapNumber(opts) ||
       this.notScalarError(type);
   }
+
+  // wrapList(opts) {
+  //   const { type, ofType, field } = opts;
+  //   if (type instanceof GraphQLList) {
+  //     // validate list
+  //     new GraphQLList(this.createConstraintListType(opts));
+  //   }
+  // }
+
+  // createConstraintListType(opts = {}) {
+  //   return new ConstraintListType(opts);
+  // }
 
   wrapNonNullString(opts = {}) {
     const { type, ofType, field } = opts;

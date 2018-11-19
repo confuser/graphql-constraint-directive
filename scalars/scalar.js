@@ -1,7 +1,7 @@
 const { GraphQLScalarType } = require("graphql");
 const validate = require("./validate");
 
-module.exports = class ConstraintBaseType extends GraphQLScalarType {
+module.exports = class ConstraintScalarType extends GraphQLScalarType {
   constructor({ name, value, className, typeName, type, validator }, args) {
     super({
       name: className,

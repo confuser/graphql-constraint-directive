@@ -1,6 +1,6 @@
-const ConstraintBaseType = require("./base");
+const ConstraintScalarType = require("./scalar");
 
-module.exports = class ConstraintStringType extends ConstraintBaseType {
+module.exports = class ConstraintStringType extends ConstraintScalarType {
   constructor({ name, type, validator }, args) {
     super(
       {

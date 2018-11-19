@@ -1,4 +1,4 @@
 module.exports = {
-  number: require("./number"),
-  string: require("./string")
+  number: require("./number").validate,
+  string: require("./string").validate
 };
