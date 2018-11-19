@@ -217,6 +217,51 @@ Validate:
 
 We can use `Yup` for full object validation
 
+When visiting an object, we could keep perhaps track of the fields contained within.
+Then we continually check off each field being visited, setting parsed value on `fieldNameValueMap` . When all fields for the object have been "checked off", we call a callback to do full object validation on all parsed values collected.
+
+Example: Yup object validation
+
+```js
+visitInputObject(object) {
+  const objValidator = createObjectValidator(object)
+  this.stack.push(objValidator)
+}
+
+class ObjectValidator {
+  constructor(object) {
+    this.objTypeName = object.name;
+    this.object = object
+    const fields = object.getFields();
+    this.fields = fields
+    this.fieldNames = Object.keys(fields)
+    this.fieldNameValueMap = {}
+  }
+
+  get shape() {
+    return this.fieldNames.reduce((acc, name) => {
+      const { field, fieldType, value } = this.fieldNameValueMap[name]
+      const fieldSchema = yup[fieldType]()
+      acc[name] = fieldSchema
+      return acc
+    }, {})
+  }
+
+  get schema() {
+    return yup.object().shape(this.shape)
+  }
+
+  validate() {
+    // validate all fields of object in fieldNameValueMap
+    return this.schema.validate()
+  }
+}
+```
+
+For it to work "for real", we need to push each such validator on a stack so that each field uses the one at the top of the stack. Then when done validating, remove it from the stack...
+
+Pretty complicated, but should be possible!
+
 ### Lists
 
 Validate:
