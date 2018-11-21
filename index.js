@@ -8,14 +8,20 @@ const {
   GraphQLBoolean
 } = require("graphql");
 const { SchemaDirectiveVisitor } = require("graphql-tools");
-const ConstraintStringType = require("./scalars/string");
-const ConstraintNumberType = require("./scalars/number");
+const {
+  ConstraintStringType,
+  ConstraintNumberType,
+  ConstraintListType
+} = require("./scalars");
 const $validator = require("validator");
 
 // wrap your own validator using the same API
 const validator = {
   isLength: $validator.isLength,
   contains: $validator.contains,
+  isAlpha: $validator.isAlpha,
+  isAlphanumeric: $validator.isAlphanumeric,
+  isCreditCard: $validator.isCreditCard,
   isDateTime: $validator.isRFC3339,
   isDate: $validator.isISO8601,
   isIPv6: value => $validator.isIP(value, 6),
@@ -72,6 +78,10 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
     this.wrapType(field);
   }
 
+  createConstraintListType({ name, type, validator }) {
+    return new ConstraintListType({ name, type, validator }, this.args);
+  }
+
   createConstraintStringType({ name, type, validator }) {
     return new ConstraintStringType({ name, type, validator }, this.args);
   }
@@ -96,38 +106,44 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
       validator: this.validator
     };
 
-    this.wrapNonNullString(opts) ||
-      this.wrapString(opts) ||
-      this.wrapNonNullNumber(opts) ||
-      this.wrapNumber(opts) ||
+    this.handleString(opts) ||
+      this.handleNumber(opts) ||
+      this.handleList(opts) ||
       this.notScalarError(type);
   }
 
-  // wrapList(opts) {
-  //   const { type, ofType, field } = opts;
-  //   if (type instanceof GraphQLList) {
-  //     // validate list
-  //     new GraphQLList(this.createConstraintListType(opts));
-  //   }
-  // }
+  handleString(opts) {
+    return this.wrapNonNullString(opts) || this.wrapString(opts);
+  }
 
-  // createConstraintListType(opts = {}) {
-  //   return new ConstraintListType(opts);
-  // }
+  handleNumber(opts) {
+    return this.wrapNonNullNumber(opts) || this.wrapNumber(opts);
+  }
 
-  // TODO
-  wrapListString(opts = {}) {
-    const { type, ofType } = opts;
-    if (type instanceof GraphQLList && ofType === GraphQLString) {
-      // validate
+  handleList(opts) {
+    return this.wrapNonNullList(opts) || this.wrapList(opts);
+  }
+
+  wrapNonNullList(opts = {}) {
+    const { ofType } = opts;
+    if (
+      type instanceof GraphQLNonNull &&
+      type instanceof GraphQLList &&
+      (ofType === GraphQLNumber || ofType === GraphQLString)
+    ) {
+      field.type = this.createConstraintListType({ ...opts, type: ofType });
+      return true;
     }
   }
 
-  // TODO
-  wrapListNumber(opts = {}) {
-    const { type, ofType } = opts;
-    if (type instanceof GraphQLList && ofType === GraphQLNumber) {
-      // validate
+  wrapList(opts = {}) {
+    const { type } = opts;
+    if (
+      type instanceof GraphQLList &&
+      (ofType === GraphQLNumber || ofType === GraphQLString)
+    ) {
+      field.type = this.createConstraintListType({ ...opts, type });
+      return true;
     }
   }
 

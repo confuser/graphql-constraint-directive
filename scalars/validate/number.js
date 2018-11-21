@@ -1,6 +1,6 @@
 const { handleError } = require("./error");
 
-function validate(name, args, value, opts = {}) {
+export function validate(name, args, value, opts = {}) {
   return new NumberValidator(name, args, value, opts).validate();
 }
 

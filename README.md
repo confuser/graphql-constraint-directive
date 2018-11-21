@@ -96,6 +96,9 @@ Supported formats:
 - ipv6
 - uri
 - uuid
+- alpha
+- alpha-numeric
+- credit-card
 
 ### Int/Float
 
@@ -175,6 +178,9 @@ The default validator is wrapped as follows:
 const validator = {
   isLength: $validator.isLength,
   contains: $validator.contains,
+  isAlpha: $validator.isAlpha,
+  isAlphanumeric: $validator.isAlphanumeric,
+  isCreditCard: $validator.isCreditCard,
   isDateTime: $validator.isRFC3339,
   isDate: $validator.isISO8601,
   isIPv6: value => $validator.isIP(value, 6),
@@ -270,29 +276,13 @@ Validate:
 - Particular items allowed in list
 - ...
 
+List validations now have experimental support via `handleList` method of the `ConstraintDirective` class.
+
 Lists are defined as modifiers on other types. We should be able to at least validate lists of `String`, `Int` and `Float` for starters.
 
 A schema definition like: `type: [User!]!` would result in:
 
 `type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User)))`
-
-```js
-  // TODO
-  wrapListString(opts = {}) {
-    const { type, ofType } = opts;
-    if (type instanceof GraphQLList && ofType === GraphQLString) {
-      // validate?
-    }
-  }
-
-  // TODO
-  wrapListNumber(opts = {}) {
-    const { type, ofType } = opts;
-    if (type instanceof GraphQLList && ofType === GraphQLNumber) {
-      // validate?
-    }
-  }
-```
 
 A scalar has a `parseValue` function which returns a `ValueNode` from a `Source`:
 

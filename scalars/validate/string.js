@@ -1,14 +1,14 @@
 const formats = require("./formats");
 const { handleError } = require("./error");
 
-function validate(name, args, value, opts = {}) {
+export function validate(name, args, value, opts = {}) {
   return new StringValidator(name, args, value, opts).validate();
 }
 
 class StringValidator {
   constructor(name, args, value, opts = {}) {
     const validationError = opts.validationError || handleError;
-    const { contains, isLength } = opts.validator;
+    const { contains, isLength, isAlpha, isAlphanumeric } = opts.validator;
     this.contains = contains;
     this.isLength = isLength;
     this.validationError = validationError;
