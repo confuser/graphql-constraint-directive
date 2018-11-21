@@ -278,6 +278,10 @@ Validate:
 
 List validations now have experimental support via `handleList` method of the `ConstraintDirective` class.
 
+- `includes` each list value must exactly match one of the `includes` items
+- `excludes` none of list values may match any of the `excludes` items
+- `matches` each list value must pass one of the matches constraints (such as `minLength: 3`)
+
 Lists are defined as modifiers on other types. We should be able to at least validate lists of `String`, `Int` and `Float` for starters.
 
 A schema definition like: `type: [User!]!` would result in:

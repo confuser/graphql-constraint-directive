@@ -8,7 +8,7 @@ export function validate(name, args, value, opts = {}) {
 class StringValidator {
   constructor(name, args, value, opts = {}) {
     const validationError = opts.validationError || handleError;
-    const { contains, isLength, isAlpha, isAlphanumeric } = opts.validator;
+    const { contains, isLength } = opts.validator;
     this.contains = contains;
     this.isLength = isLength;
     this.validationError = validationError;
