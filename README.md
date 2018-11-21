@@ -212,6 +212,81 @@ validationError.string(name, `Must match ${args.pattern}`, [
 
 Note that the third argument contains a list where each object has an `arg` entry that indicates the constraint that failed. You can use this as a key to lookup in your own validation error message map to return or output a localized error message as you see fit.
 
+## Reusing validators
+
+You can re-use the core validators as follows:
+
+```js
+import {
+  string,
+  number,
+  list
+} from "graphql-constraint-directive/scalars/validate";
+import { validationError } from "graphql-constraint-directive/scalars/error";
+import { validator } from "graphql-constraint-directive/validator";
+
+const field = "name";
+const args = { minLength: 4, maxLength: 40 };
+value = "John Smith";
+
+string.validate(name, args, value, { validator, validationError });
+```
+
+One idea that comes to mind is to wrap a TypeORM `@Entity` class with validation for each field by decorating with a `validate` method, similar to [class-validator](https://github.com/typestack/class-validator).
+
+```js
+@Entity
+class Person {
+  name: string;
+}
+```
+
+Generate the entities metadata via [graphGenTypeorm](https://github.com/jjwtay/graphGenTypeorm)
+
+Then using the `field.directives` of `@constraints`
+
+```js
+  const columns = getColumns(type);
+  return {
+    name: type.directives.Entity.name || name,
+    columns: Object.keys(columns).reduce((columns, fieldName) => {
+      const field = type.fields[fieldName];
+      return {
+        ...columns,
+        [fieldName]: {
+          ...field.directives,
+          primary: isPrimary(fieldName, type),
+          // ...
+        }
+      }
+    }
+  }
+```
+
+Then [Generate entity classes via connection entities metadata](https://github.com/typeorm/typeorm/issues/3141)
+
+```js
+import { Entity } from 'typeorm'
+
+const identity = (value: any) => value
+
+function entityClasses(connection: Connection, entityStore = {}, decorate: Function = identity) {
+    const entityMetaDatas: any[] = ...connection.entityMetaDatas
+    const { propertiesMap } = entityMetaDatas
+    const entityNames = Object.keys(propertiesMap)
+
+    return entityNames.reduce((acc, name) => {
+        // create blank @Entity decorated class
+        const entityClazz = Entity(class {})
+        // decorate entity class further and add class to map
+        acc[name] = decorate(entityClazz, propertiesMap[name], propertiesMap)
+        return acc
+    }, entityStore)
+}
+```
+
+And pass a custom `decorator` function which uses the `directives` entry of each field metadata to add validation logic for that field (such as by storing metadata internally on class in `$validationMetadata`), then finally add a `validate()` function for the entire class which iterates through the `validationMetadata`, examines the field value of each and calls the validator with metadata and field value.
+
 ## Validating Complex types
 
 ### Object
