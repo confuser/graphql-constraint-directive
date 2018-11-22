@@ -232,6 +232,8 @@ value = "John Smith";
 string.validate(name, args, value, { validator, validationError });
 ```
 
+## Example: TypeORM Entity validation
+
 One idea that comes to mind is to wrap a TypeORM `@Entity` class with validation for each field by decorating with a `validate` method, similar to [class-validator](https://github.com/typestack/class-validator).
 
 ```js
@@ -340,6 +342,15 @@ The above functionality is available as:
 
 ```js
 import { buildEntityClasses } from "graphql-constraint-directive/typeorm";
+
+// ...
+let postRepository = connection.getRepository < Post > "Post";
+
+let post = new Post();
+post.title = "A new Post";
+post.text = "bla bla bla";
+
+await postRepository.save(post);
 ```
 
 ## Validating Complex types

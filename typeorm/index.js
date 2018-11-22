@@ -7,6 +7,14 @@ import { mapper, decorators } from "graphql-constraint-directive";
 
 import * as classDecorators from "class-validator/build/decorators";
 
+// class decorator to add validate() method to a class
+export const Validator = target => {
+  target.prototype.validate = async function() {
+    return await validate(this);
+  };
+  //we add it to the prototype, so every instance has access to the `bam` property
+};
+
 const decorators = {
   ...decorators,
   ...classDecorators
@@ -37,6 +45,7 @@ export const buildEntityClasses = (
   opts = {}
 ) => {
   const merge = opts.merge || deepmerge;
+  const classDecorators = opts.classDecorators || [Entity, Validator];
 
   const entityMetaDatas = connection.entityMetaDatas.reduce((acc, metaData) => {
     const { targetName } = metaData;
@@ -50,13 +59,17 @@ export const buildEntityClasses = (
 
   const entityNames = Object.keys(entityMetaDatas);
 
+  const pipe = (...fns) => x => fns.reduce((v, f) => f(v), x);
+
   return entityNames.reduce((acc, entityName) => {
     const metaData = entityMetaDatas[entityName];
     const { propertiesMap } = metaData;
     // create blank @Entity decorated class
-    const entityClazz = Entity(class {});
+    // todo: use composition using list of class decorators
+    const entityClazz = class {};
+    const decoratedEntityClass = pipe(...classDecorators)(entityClazz);
     // decorate entity class further and add class to map
-    acc[entityName] = decorate(entityClazz, propertiesMap, entityName);
+    acc[entityName] = decorate(decoratedEntityClass, propertiesMap, entityName);
     return acc;
   }, entityStore);
 };
