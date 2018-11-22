@@ -1,4 +1,5 @@
 import { Entity } from "typeorm";
+import { validate } from "class-validator";
 const deepmerge = require("deepmerge");
 
 const identity = value => value;
@@ -9,8 +10,8 @@ import * as classDecorators from "class-validator/build/decorators";
 
 // class decorator to add validate() method to a class
 export const Validator = target => {
-  target.prototype.validate = async function() {
-    return await validate(this);
+  target.prototype.validate = async function(opts) {
+    return await validate(this, opts);
   };
   //we add it to the prototype, so every instance has access to the `bam` property
 };
