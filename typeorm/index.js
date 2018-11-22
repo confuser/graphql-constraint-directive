@@ -1,6 +1,6 @@
 import { Entity } from "typeorm";
 
-const identity = (value: any) => value;
+const identity = value => value;
 
 import { mapper, decorators } from "graphql-constraint-directive";
 
@@ -32,7 +32,13 @@ export function buildEntityClasses(
   entityStore = {},
   decorate = identity
 ) {
-  const entityMetaDatas = connection.entityMetaDatas.flatMap();
+  const entityMetaDatas = connection.entityMetaDatas.reduce((acc, data) => {
+    return {
+      ...acc,
+      ...data
+    };
+  }, {});
+
   const { propertiesMap } = entityMetaDatas;
   const entityNames = Object.keys(propertiesMap);
 

@@ -300,7 +300,15 @@ function buildEntityClasses(
   entityStore = {},
   decorate: Function = identity
 ) {
-  const entityMetaDatas: any[] = connection.entityMetaDatas.flatMap();
+  const entityMetaDatas: any[] = connection.entityMetaDatas.reduce(
+    (acc, data) => {
+      return {
+        ...acc,
+        ...data
+      };
+    },
+    {}
+  );
   const { propertiesMap } = entityMetaDatas;
   const entityNames = Object.keys(propertiesMap);
 
