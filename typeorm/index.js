@@ -1,4 +1,4 @@
-import { Entity } from "typeorm";
+import { BaseEntity } from "typeorm";
 import { validate } from "class-validator";
 const deepmerge = require("deepmerge");
 
@@ -13,8 +13,21 @@ export const Validator = target => {
   target.prototype.validate = async function(opts) {
     return await validate(this, opts);
   };
-  //we add it to the prototype, so every instance has access to the `bam` property
 };
+
+// extending BaseExtentity automatically adds save method as well
+export const RepoSaver = target => {
+  return ({ connection, targetName }) => {
+    const targetName = targetName || target.constructor.name;
+    const repository = connection.getRepository(targetName);
+    target.prototype.save = async function(opts) {
+      return await repository.save(this, opts);
+    };
+    return target;
+  };
+};
+
+const pipe = (...fns) => x => fns.reduce((v, f) => f(v), x);
 
 const decorators = {
   ...decorators,
@@ -22,7 +35,7 @@ const decorators = {
 };
 
 export const decorate = (entityClazz, propertiesMap, entityName) => {
-  const entityField = entityClazz[name];
+  const entityField = entityClazz[entityName];
   const propNames = Object.keys(propertiesMap);
   propNames.map(propName => {
     const propertyMap = propertiesMap[propName];
@@ -46,7 +59,7 @@ export const buildEntityClasses = (
   opts = {}
 ) => {
   const merge = opts.merge || deepmerge;
-  const classDecorators = opts.classDecorators || [Entity, Validator];
+  const classDecorators = opts.classDecorators || [Validator];
 
   const entityMetaDatas = connection.entityMetaDatas.reduce((acc, metaData) => {
     const { targetName } = metaData;
@@ -60,14 +73,12 @@ export const buildEntityClasses = (
 
   const entityNames = Object.keys(entityMetaDatas);
 
-  const pipe = (...fns) => x => fns.reduce((v, f) => f(v), x);
-
   return entityNames.reduce((acc, entityName) => {
     const metaData = entityMetaDatas[entityName];
     const { propertiesMap } = metaData;
     // create blank @Entity decorated class
     // todo: use composition using list of class decorators
-    const entityClazz = class {};
+    const entityClazz = class extends BaseEntity {};
     const decoratedEntityClass = pipe(...classDecorators)(entityClazz);
     // decorate entity class further and add class to map
     acc[entityName] = decorate(decoratedEntityClass, propertiesMap, entityName);
