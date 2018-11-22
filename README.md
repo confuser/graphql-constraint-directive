@@ -265,8 +265,11 @@ Then using the `field.directives` of `@constraints`
 
 Then [Generate entity classes via connection entities metadata](https://github.com/typeorm/typeorm/issues/3141)
 
+See: [Entity configuration via JSON Schema](https://github.com/typeorm/typeorm/issues/1818)
+
 ```js
 import { Entity } from "typeorm";
+const deepmerge = require("deepmerge");
 
 const identity = (value: any) => value;
 
@@ -279,18 +282,20 @@ const decorators = {
   ...classDecorators
 };
 
-const decorate = (entityClazz, propertyMap, name) => {
-  const decoratorMap = mapper.mapToClassValidators(
-    propertyMap.directives.constraints
-  );
+const decorate = (entityClazz, propertiesMap, entityName) => {
   const entityField = entityClazz[name];
-  const decoratorKeys = Object.keys(decoratorMap);
-  const propKeys = Object.keys(propertyMap);
-  propKeys.map(propKey => {
-    decoratorKeys.map(decKey => {
-      const decorateArgs = decoratorMap[decKey];
-      const decorate = decorators[decKey];
-      decorate(...decorateArgs)(entityField, propKey);
+  const propNames = Object.keys(propertiesMap);
+  propNames.map(propName => {
+    const propertyMap = propertiesMap[propName];
+    const decoratorMap = mapper.mapToClassValidators(
+      propertyMap.directives.constraints
+    );
+    const decoratorKeys = Object.keys(decoratorMap);
+    decoratorKeys.map(decName => {
+      const decorateArgs = decoratorMap[decName];
+      const decorator = decorators[decName];
+      const decorate = decorator(...decorateArgs);
+      decorate(entityField, propName);
     });
   });
 };
@@ -298,26 +303,32 @@ const decorate = (entityClazz, propertyMap, name) => {
 function buildEntityClasses(
   connection: Connection,
   entityStore = {},
-  decorate: Function = identity
+  decorate: Function = identity,
+  opts = {}
 ) {
+  const merge = opts.merge || deepmerge;
   const entityMetaDatas: any[] = connection.entityMetaDatas.reduce(
-    (acc, data) => {
-      return {
-        ...acc,
-        ...data
-      };
+    (acc, metaData) => {
+      const { targetName } = metaData;
+      // targetName is the entity (class) name
+      // merge metadata for entity
+      acc[targetName] = merge({
+        ...(acc[targetName] || {}),
+        ...metaData
+      });
     },
     {}
   );
-  const { propertiesMap } = entityMetaDatas;
-  const entityNames = Object.keys(propertiesMap);
 
-  return entityNames.reduce((acc, name) => {
+  const entityNames = Object.keys(entityMetaDatas);
+
+  return entityNames.reduce((acc, entityName) => {
+    const metaData = entityMetaDatas[entityName];
+    const { propertiesMap } = metaData;
     // create blank @Entity decorated class
     const entityClazz = Entity(class {});
-    const propertyMap = propertiesMap[name];
     // decorate entity class further and add class to map
-    acc[name] = decorate(entityClazz, propertyMap, name);
+    acc[entityName] = decorate(entityClazz, propertiesMap, entityName);
     return acc;
   }, entityStore);
 }
