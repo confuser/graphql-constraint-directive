@@ -17,4 +17,6 @@ formats.forEach(format => {
   fns[format] = require("./" + format);
 });
 
+fns["url"] = fns["uri"];
+
 module.exports = fns;

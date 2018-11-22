@@ -266,26 +266,62 @@ Then using the `field.directives` of `@constraints`
 Then [Generate entity classes via connection entities metadata](https://github.com/typeorm/typeorm/issues/3141)
 
 ```js
-import { Entity } from 'typeorm'
+import { Entity } from "typeorm";
 
-const identity = (value: any) => value
+const identity = (value: any) => value;
 
-function entityClasses(connection: Connection, entityStore = {}, decorate: Function = identity) {
-    const entityMetaDatas: any[] = ...connection.entityMetaDatas
-    const { propertiesMap } = entityMetaDatas
-    const entityNames = Object.keys(propertiesMap)
+import { mapper, decorators } from "graphql-constraint-directive";
 
-    return entityNames.reduce((acc, name) => {
-        // create blank @Entity decorated class
-        const entityClazz = Entity(class {})
-        // decorate entity class further and add class to map
-        acc[name] = decorate(entityClazz, propertiesMap[name], propertiesMap)
-        return acc
-    }, entityStore)
+import * as classDecorators from "class-validator/build/decorators";
+
+const decorators = {
+  ...decorators,
+  ...classDecorators
+};
+
+const decorate = (entityClazz, propertyMap, name) => {
+  const decoratorMap = mapper.mapToClassValidators(
+    propertyMap.directives.constraints
+  );
+  const entityField = entityClazz[name];
+  const decoratorKeys = Object.keys(decoratorMap);
+  const propKeys = Object.keys(propertyMap);
+  propKeys.map(propKey => {
+    decoratorKeys.map(decKey => {
+      const decorateArgs = decoratorMap[decKey];
+      const decorate = decorators[decKey];
+      decorate(...decorateArgs)(entityField, propKey);
+    });
+  });
+};
+
+function buildEntityClasses(
+  connection: Connection,
+  entityStore = {},
+  decorate: Function = identity
+) {
+  const entityMetaDatas: any[] = connection.entityMetaDatas.flatMap();
+  const { propertiesMap } = entityMetaDatas;
+  const entityNames = Object.keys(propertiesMap);
+
+  return entityNames.reduce((acc, name) => {
+    // create blank @Entity decorated class
+    const entityClazz = Entity(class {});
+    const propertyMap = propertiesMap[name];
+    // decorate entity class further and add class to map
+    acc[name] = decorate(entityClazz, propertyMap, name);
+    return acc;
+  }, entityStore);
 }
 ```
 
 And pass a custom `decorator` function which uses the `directives` entry of each field metadata to add validation logic for that field (such as by storing metadata internally on class in `$validationMetadata`), then finally add a `validate()` function for the entire class which iterates through the `validationMetadata`, examines the field value of each and calls the validator with metadata and field value.
+
+The above functionality is available as:
+
+```js
+import { buildEntityClasses } from "graphql-constraint-directive/typeorm";
+```
 
 ## Validating Complex types
 

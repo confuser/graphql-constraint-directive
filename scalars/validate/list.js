@@ -34,10 +34,10 @@ class ListValidator {
   }
 
   sizeRange() {
-    const min = this.args.min || 0;
-    const max = this.args.max || 99999;
+    const minSize = this.args.minSize || 0;
+    const maxSize = this.args.maxSize || 99999;
     const { length } = this.values;
-    return length <= max && length >= min;
+    return length <= maxSize && length >= minSize;
   }
 
   // test if each list value passes any matchDefinition using StringValidator or NumberValidator

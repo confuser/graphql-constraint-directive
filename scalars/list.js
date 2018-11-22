@@ -1,4 +1,4 @@
-const { GraphQLList } = require("graphql");
+const { ConstraintScalarType } = require("./scalar");
 
 module.exports = class ConstraintListType extends ConstraintScalarType {
   constructor({ name, type, validator }, args) {
