@@ -4,7 +4,8 @@ const {
   GraphQLInt,
   GraphQLFloat,
   GraphQLNonNull,
-  GraphQLString
+  GraphQLString,
+  defaultFieldResolver
 } = require('graphql')
 const { SchemaDirectiveVisitor } = require('graphql-tools')
 const ConstraintStringType = require('./scalars/string')
@@ -15,6 +16,7 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
     return new GraphQLDirective({
       name: directiveName,
       locations: [
+        DirectiveLocation.FIELD_DEFINITION,
         DirectiveLocation.INPUT_FIELD_DEFINITION
       ],
       args: {
@@ -39,6 +41,10 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
   }
 
   visitInputFieldDefinition (field) {
+    this.wrapType(field)
+  }
+
+  visitFieldDefinition (field) {
     this.wrapType(field)
   }
 
