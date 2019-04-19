@@ -4,8 +4,7 @@ const {
   GraphQLInt,
   GraphQLFloat,
   GraphQLNonNull,
-  GraphQLString,
-  defaultFieldResolver
+  GraphQLString
 } = require('graphql')
 const { SchemaDirectiveVisitor } = require('graphql-tools')
 const ConstraintStringType = require('./scalars/string')
