@@ -6,7 +6,7 @@ const formatError = (error) => {
   return { message, code, fieldName, context }
 }
 
-describe('@constraint Int', function () {
+describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
   const query = `mutation createBook($input: BookInput) {
     createBook(input: $input) {
       title
@@ -303,6 +303,293 @@ describe('@constraint Int', function () {
         .send({ query, variables: { input: { title: 7 } } })
 
       strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be a multiple of 2',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'multipleOf', value: 2 }]
+      })
+    })
+  })
+})
+
+describe('@constraint Int in FIELD_DEFINITION', function () {
+  const query = `query {
+    books {
+      title
+    }
+  }`
+  const resolvers = function (data) {
+    return {
+      Query: {
+        books () {
+          return data
+        }
+      }
+    }
+  }
+
+  describe('#min', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(min: 2)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 2}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 1}, {title: 2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be at least 2')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 1}, {title: 2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be at least 2',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'min', value: 2 }]
+      })
+    })
+  })
+
+  describe('#max', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(max: 2)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 1}, {title: 2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 2}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be no greater than 2')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 2}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be no greater than 2',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'max', value: 2 }]
+      })
+    })
+  })
+
+  describe('#exclusiveMin', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(exclusiveMin: 2)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 3}, {title: 4}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 2}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be greater than 2')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 2}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be greater than 2',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'exclusiveMin', value: 2 }]
+      })
+    })
+  })
+
+  describe('#exclusiveMax', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(exclusiveMax: 2)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 0}, {title: 1}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 1}, {title: 2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be no greater than 2')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 1}, {title: 2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be no greater than 2',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'exclusiveMax', value: 2 }]
+      })
+    })
+  })
+
+  describe('#multipleOf', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(multipleOf: 2)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 2}, {title: 4}, {title: 6}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 1}, {title: 2}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be a multiple of 2')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 1}, {title: 2}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
       deepStrictEqual(body.errors[0], {
         message: 'Must be a multiple of 2',
         code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',

@@ -8,7 +8,11 @@ module.exports = class ConstraintStringType extends GraphQLScalarType {
     super({
       name: `ConstraintString`,
       serialize (value) {
-        return type.serialize(value)
+        value = type.serialize(value)
+
+        validate(fieldName, args, value)
+
+        return value
       },
       parseValue (value) {
         value = type.serialize(value)

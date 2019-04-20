@@ -5,9 +5,11 @@ const { makeExecutableSchema } = require('graphql-tools')
 const request = require('supertest')
 const ConstraintDirective = require('../')
 
-module.exports = function (typeDefs, formatError) {
+module.exports = function (typeDefs, formatError, resolvers) {
   const schema = makeExecutableSchema({
-    typeDefs, schemaDirectives: { constraint: ConstraintDirective }
+    typeDefs,
+    schemaDirectives: { constraint: ConstraintDirective },
+    resolvers
   })
   const app = express()
 
