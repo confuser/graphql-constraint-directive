@@ -383,6 +383,43 @@ describe('@constraint Int in FIELD_DEFINITION', function () {
     })
   })
 
+  describe('#min0', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(min: 0)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 1}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: -1}, {title: 2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be at least 0')
+    })
+  })
+
   describe('#max', function () {
     before(function () {
       this.typeDefs = `
