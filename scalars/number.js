@@ -49,7 +49,7 @@ function validate (fieldName, args, value) {
   }
   if (args.exclusiveMax !== undefined && value >= args.exclusiveMax) {
     throw new ValidationError(fieldName,
-      `Must be no greater than ${args.exclusiveMax}`,
+      `Must be less than ${args.exclusiveMax}`,
       [{ arg: 'exclusiveMax', value: args.exclusiveMax }])
   }
 
