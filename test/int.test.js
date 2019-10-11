@@ -233,7 +233,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value {"title":3}; Expected type ConstraintNumber at value.title; Must be no greater than 3')
+        'Variable "$input" got invalid value {"title":3}; Expected type ConstraintNumber at value.title; Must be less than 3')
     })
 
     it('should throw custom error', async function () {
@@ -245,7 +245,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       deepStrictEqual(body.errors[0], {
-        message: 'Must be no greater than 3',
+        message: 'Must be less than 3',
         code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
         fieldName: 'title',
         context: [{ arg: 'exclusiveMax', value: 3 }]
@@ -383,6 +383,43 @@ describe('@constraint Int in FIELD_DEFINITION', function () {
     })
   })
 
+  describe('#min0', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(min: 0)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 1}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: -1}, {title: 2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be at least 0')
+    })
+  })
+
   describe('#max', function () {
     before(function () {
       this.typeDefs = `
@@ -434,6 +471,43 @@ describe('@constraint Int in FIELD_DEFINITION', function () {
         fieldName: 'title',
         context: [{ arg: 'max', value: 2 }]
       })
+    })
+  })
+
+  describe('#max0', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(max: 0)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 0}, {title: -2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: -2}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be no greater than 0')
     })
   })
 
@@ -491,6 +565,43 @@ describe('@constraint Int in FIELD_DEFINITION', function () {
     })
   })
 
+  describe('#exclusiveMin0', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(exclusiveMin: 0)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 1}, {title: 4}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 0}, {title: 3}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be greater than 0')
+    })
+  })
+
   describe('#exclusiveMax', function () {
     before(function () {
       this.typeDefs = `
@@ -524,7 +635,7 @@ describe('@constraint Int in FIELD_DEFINITION', function () {
         .send({ query })
 
       strictEqual(statusCode, 200)
-      strictEqual(body.errors[0].message, 'Must be no greater than 2')
+      strictEqual(body.errors[0].message, 'Must be less than 2')
     })
 
     it('should throw custom error', async function () {
@@ -537,11 +648,48 @@ describe('@constraint Int in FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body.errors[0], {
-        message: 'Must be no greater than 2',
+        message: 'Must be less than 2',
         code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
         fieldName: 'title',
         context: [{ arg: 'exclusiveMax', value: 2 }]
       })
+    })
+  })
+
+  describe('#exclusiveMax0', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(exclusiveMax: 0)
+      }
+      `
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: -1}, {title: -2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 0}, {title: -2}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be less than 0')
     })
   })
 
