@@ -19,6 +19,9 @@ const bodyParser = require('body-parser')
 const { graphqlExpress } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools')
 const typeDefs = `
+  scalar ConstraintString
+  scalar ConstraintNumber
+  
   directive @constraint(
     # String constraints
     minLength: Int
