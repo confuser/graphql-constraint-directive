@@ -18,8 +18,21 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { graphqlExpress } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools')
+const typeDefs = `
+  type Query {
+    books: [Book]
+  }
+  type Book {
+    title: String
+  }
+  type Mutation {
+    createBook(input: BookInput): Book
+  }
+  input BookInput {
+    title: String! @constraint(minLength: 5, format: "email")
+  }`
 const schema = makeExecutableSchema({
-  typeDefs: [constraintDirectiveTypeDefs, yourTypeDefs],
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
   schemaTransforms: [constraintDirective()]
 })
 const app = express()
