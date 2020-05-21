@@ -3,12 +3,12 @@ const bodyParser = require('body-parser')
 const { graphqlExpress } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools')
 const request = require('supertest')
-const ConstraintDirective = require('../')
+const { constraintDirective, constraintDirectiveTypeDefs } = require('../')
 
 module.exports = function (typeDefs, formatError, resolvers) {
   const schema = makeExecutableSchema({
-    typeDefs,
-    schemaDirectives: { constraint: ConstraintDirective },
+    typeDefs: [ constraintDirectiveTypeDefs, typeDefs ],
+    schemaTransforms: [constraintDirective()],
     resolvers
   })
   const app = express()

@@ -2,9 +2,9 @@ const { GraphQLScalarType } = require('graphql')
 const ValidationError = require('../lib/error')
 
 module.exports = class ConstraintNumberType extends GraphQLScalarType {
-  constructor (fieldName, type, args) {
+  constructor (fieldName, uniqueTypeName, type, args) {
     super({
-      name: `ConstraintNumber`,
+      name: uniqueTypeName,
       serialize (value) {
         value = type.serialize(value)
 
