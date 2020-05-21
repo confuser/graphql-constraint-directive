@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "standard && nyc --reporter=html --reporter=text mocha test/**/*.test.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "author": "James Mortemore (jamesmortemore@gmail.com)",
   "license": "ISC",
@@ -40,7 +42,8 @@
   },
   "dependencies": {
     "graphql-tools": "^6.0.0",
-    "validator": "^10.2.0"
+    "validator": "^10.2.0",
+    "snyk": "^1.323.2"
   },
   "peerDependencies": {
     "graphql": "^0.14.0 || ^15.0.0"
@@ -51,5 +54,6 @@
       "it",
       "before"
     ]
-  }
+  },
+  "snyk": true
 }
