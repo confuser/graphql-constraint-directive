@@ -39,11 +39,11 @@
     "supertest": "^3.1.0"
   },
   "dependencies": {
-    "graphql-tools": "^5.0.0",
+    "graphql-tools": "^6.0.0",
     "validator": "^10.2.0"
   },
   "peerDependencies": {
-    "graphql": "^0.13.0 || ^15.0.0"
+    "graphql": "^0.14.0 || ^15.0.0"
   },
   "standard": {
     "globals": [
