@@ -13,33 +13,12 @@ npm install graphql-constraint-directive
 
 ## Usage
 ```js
-const ConstraintDirective = require('graphql-constraint-directive')
+const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
 const bodyParser = require('body-parser')
 const { graphqlExpress } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools')
 const typeDefs = `
-  scalar ConstraintString
-  scalar ConstraintNumber
-  
-  directive @constraint(
-    # String constraints
-    minLength: Int
-    maxLength: Int
-    startsWith: String
-    endsWith: String
-    notContains: String
-    pattern: String
-    format: String
-
-    # Number constraints
-    min: Int
-    max: Int
-    exclusiveMin: Int
-    exclusiveMax: Int
-    multipleOf: Int
-  ) on INPUT_FIELD_DEFINITION
-  
   type Query {
     books: [Book]
   }
@@ -53,7 +32,8 @@ const typeDefs = `
     title: String! @constraint(minLength: 5, format: "email")
   }`
 const schema = makeExecutableSchema({
-  typeDefs, schemaDirectives: { constraint: ConstraintDirective }
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+  schemaTransforms: [constraintDirective()]
 })
 const app = express()
 
