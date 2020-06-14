@@ -39,7 +39,8 @@
     "supertest": "^3.1.0"
   },
   "dependencies": {
-    "graphql-tools": "^6.0.0",
+    "@graphql-tools/schema": "^6.0.9",
+    "@graphql-tools/utils": "^6.0.9",
     "validator": "^10.2.0"
   },
   "peerDependencies": {

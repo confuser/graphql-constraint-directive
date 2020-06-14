@@ -1,5 +1,5 @@
 const { GraphQLFloat, GraphQLInt, GraphQLString, GraphQLNonNull, isNonNullType, isScalarType } = require('graphql')
-const { getDirectives, mapSchema, MapperKind } = require('graphql-tools')
+const { getDirectives, mapSchema, MapperKind } = require('@graphql-tools/utils')
 const ConstraintStringType = require('./scalars/string')
 const ConstraintNumberType = require('./scalars/number')
 

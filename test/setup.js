@@ -1,7 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const { graphqlExpress } = require('apollo-server-express')
-const { makeExecutableSchema } = require('graphql-tools')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
 const request = require('supertest')
 const { constraintDirective, constraintDirectiveTypeDefs } = require('../')
 
