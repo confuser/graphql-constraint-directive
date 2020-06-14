@@ -15,8 +15,7 @@ npm install graphql-constraint-directive
 ```js
 const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
-const bodyParser = require('body-parser')
-const { graphqlExpress } = require('apollo-server-express')
+const { ApolloServer } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools')
 const typeDefs = `
   type Query {
@@ -36,8 +35,9 @@ const schema = makeExecutableSchema({
   schemaTransforms: [constraintDirective()]
 })
 const app = express()
+const server = new ApolloServer({ schema })
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }))
+server.applyMiddleware({ app })
 
 ```
 
