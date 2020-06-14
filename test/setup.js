@@ -1,6 +1,5 @@
 const express = require('express')
-const bodyParser = require('body-parser')
-const { graphqlExpress } = require('apollo-server-express')
+const { ApolloServer } = require('apollo-server-express')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
 const request = require('supertest')
 const { constraintDirective, constraintDirectiveTypeDefs } = require('../')
@@ -12,8 +11,9 @@ module.exports = function (typeDefs, formatError, resolvers) {
     resolvers
   })
   const app = express()
+  const server = new ApolloServer({ schema, formatError })
 
-  app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
+  server.applyMiddleware({ app })
 
   return request(app)
 }
