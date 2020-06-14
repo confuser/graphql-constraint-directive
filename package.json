@@ -1,6 +1,6 @@
 {
   "name": "graphql-constraint-directive",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Validate GraphQL fields",
   "main": "index.js",
   "scripts": {
