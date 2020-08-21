@@ -32,6 +32,6 @@ describe('Introspection', function () {
 
     const directive = body.data.__schema.directives.find(v => v.name === 'constraint')
 
-    strictEqual(directive.args.length, 13)
+    strictEqual(directive.args.length, 14)
   })
 })
