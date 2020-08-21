@@ -10,9 +10,9 @@ function constraintDirective () {
     // Names must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ as per graphql-js
     let uniqueTypeName
     if (directiveArgumentMap.uniqueTypeName) {
-        uniqueTypeName = directiveArgumentMap.uniqueTypeName.replace(/\W/g, '')
+      uniqueTypeName = directiveArgumentMap.uniqueTypeName.replace(/\W/g, '')
     } else {
-        uniqueTypeName = `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` + Object.entries(directiveArgumentMap)
+      uniqueTypeName = `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` + Object.entries(directiveArgumentMap)
         .map(([key, value]) => `${key}_${value.toString().replace(/\W/g, '')}`)
         .join('_')
     }
