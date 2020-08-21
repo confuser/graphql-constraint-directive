@@ -129,3 +129,6 @@ const formatError = function (error) {
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
 
 ```
+### uniqueTypeName
+```@constraint(uniqueTypeName: "Unique_Type_Name")```
+Override the unique type name generate by the library to the one passed as an argument
