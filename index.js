@@ -8,9 +8,15 @@ function constraintDirective () {
 
   function getConstraintType (fieldName, type, notNull, directiveArgumentMap) {
     // Names must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ as per graphql-js
-    const uniqueTypeName = `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` + Object.entries(directiveArgumentMap)
+    let uniqueTypeName
+    if (directiveArgumentMap.uniqueTypeName) {
+      uniqueTypeName = directiveArgumentMap.uniqueTypeName.replace(/\W/g, '');
+    }
+    else {
+      uniqueTypeName = `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` + Object.entries(directiveArgumentMap)
       .map(([key, value]) => `${key}_${value.toString().replace(/\W/g, '')}`)
       .join('_')
+    }
     const key = Symbol.for(uniqueTypeName)
     let constraintType = constraintTypes[key]
 
@@ -86,6 +92,7 @@ const constraintDirectiveTypeDefs = `
     exclusiveMin: Int
     exclusiveMax: Int
     multipleOf: Int
+    uniqueTypeName: String
   ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION`
 
 module.exports = { constraintDirective, constraintDirectiveTypeDefs }
