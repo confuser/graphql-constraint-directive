@@ -1007,6 +1007,65 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         'Variable "$input" got invalid value {}; Field "title" of required type "title_String_NotNull_minLength_3!" was not provided.')
     })
   })
+
+  describe('#uniqueTypeName', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String
+      }
+      type Mutation {
+        createBook(input: BookInput): Book
+      }
+      input BookInput {
+        title: String! @constraint(minLength: 3, uniqueTypeName: "BookInput_Title")
+      }`
+
+      this.request = setup(this.typeDefs)
+    })
+
+    it('should pass', async function () {
+      const { body, statusCode } = await this.request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 'he💩' } }
+        })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { createBook: null } })
+    })
+
+    it('should fail', async function () {
+      const { body, statusCode } = await this.request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 'a💩' } }
+        })
+
+      strictEqual(statusCode, 400)
+      strictEqual(body.errors[0].message,
+        'Variable "$input" got invalid value "a💩" at "input.title"; Expected type "BookInput_Title". Must be at least 3 characters in length')
+    })
+
+    it('should throw custom error', async function () {
+      const request = setup(this.typeDefs, formatError)
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: 'a💩' } } })
+
+      strictEqual(statusCode, 400)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be at least 3 characters in length',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'minLength', value: 3 }]
+      })
+    })
+  })
 })
 
 describe('@constraint String in FIELD_DEFINITION', function () {
@@ -1859,6 +1918,59 @@ describe('@constraint String in FIELD_DEFINITION', function () {
           fieldName: 'title',
           context: [{ arg: 'format', value: 'test' }]
         })
+      })
+    })
+  })
+
+  describe('#uniqueTypeName', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(minLength: 3, uniqueTypeName: "Book_Title")
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be at least 3 characters in length')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be at least 3 characters in length',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'minLength', value: 3 }]
       })
     })
   })
