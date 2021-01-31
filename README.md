@@ -1,22 +1,18 @@
-# graphql-constraint-directive
+# @iksena/graphql-constraint-directive
 
-[![Build Status](https://api.travis-ci.org/confuser/graphql-constraint-directive.svg?branch=master)](https://travis-ci.org/confuser/graphql-constraint-directive)
-[![Coverage Status](https://coveralls.io/repos/github/confuser/graphql-constraint-directive/badge.svg?branch=master)](https://coveralls.io/github/confuser/graphql-constraint-directive?branch=master)
-[![Known Vulnerabilities](https://snyk.io/test/github/confuser/graphql-constraint-directive/badge.svg?targetFile=package.json)](https://snyk.io/test/github/confuser/graphql-constraint-directive?targetFile=package.json)
-
-Allows using @constraint as a directive to validate input data. Inspired by [Constraints Directives RFC](https://github.com/APIs-guru/graphql-constraints-spec) and OpenAPI
+Allows using @constraint as a directive to validate input data. Inspired by [Constraints Directives RFC](https://github.com/APIs-guru/graphql-constraints-spec) and OpenAPI  
+Forked from [graphql-constraint-directive](https://github.com/confuser/graphql-constraint-directive) to use [SchemaDirectiveVisitor](https://www.apollographql.com/docs/apollo-server/schema/creating-directives/) and make it compatible with [Apollo Federation](https://www.apollographql.com/docs/federation/implementing-services/#defining-custom-directives)
 
 ## Install
 ```
-npm install graphql-constraint-directive
+npm install @iksena/graphql-constraint-directive
 ```
 
 ## Usage
 ```js
-const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
-const express = require('express')
-const { ApolloServer } = require('apollo-server-express')
-const { makeExecutableSchema } = require('graphql-tools')
+const { ConstraintDirective, constraintDirectiveTypeDefs } = require('@iksena/graphql-constraint-directive');
+const express = require('express');
+const { ApolloServer, SchemaDirectiveVisitor, makeExecutableSchema } = require('apollo-server-express');
 const typeDefs = `
   type Query {
     books: [Book]
@@ -29,15 +25,18 @@ const typeDefs = `
   }
   input BookInput {
     title: String! @constraint(minLength: 5, format: "email")
-  }`
+  }
+`;
 const schema = makeExecutableSchema({
-  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
-  schemaTransforms: [constraintDirective()]
-})
-const app = express()
-const server = new ApolloServer({ schema })
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs]
+});
+SchemaDirectiveVisitor.visitSchemaDirectives(schema, {
+  constraint: ConstraintDirective
+});
+const app = express();
+const server = new ApolloServer({ schema });
 
-server.applyMiddleware({ app })
+server.applyMiddleware({ app });
 
 ```
 

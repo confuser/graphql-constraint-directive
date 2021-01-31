@@ -1,6 +1,9 @@
 const express = require('express')
-const { ApolloServer, SchemaDirectiveVisitor, makeExecutableSchema } = require(
-  'apollo-server-express')
+const {
+  ApolloServer,
+  SchemaDirectiveVisitor,
+  makeExecutableSchema
+} = require('apollo-server-express')
 const request = require('supertest')
 const { ConstraintDirective, constraintDirectiveTypeDefs } = require('../')
 
