@@ -4,8 +4,7 @@
   "description": "Validate GraphQL fields",
   "main": "index.js",
   "scripts": {
-    "test": "standard && nyc --reporter=html --reporter=text mocha test/**/*.test.js",
-    "coverage": "nyc report --reporter=text-lcov"
+    "test": "standard && nyc --reporter=html --reporter=text mocha test/**/*.test.js"
   },
   "author": "James Mortemore (jamesmortemore@gmail.com), I Komang Sena Aji Buwana (iksena@aol.com)",
   "license": "ISC",

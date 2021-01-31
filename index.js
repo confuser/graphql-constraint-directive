@@ -42,6 +42,10 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
   visitInputFieldDefinition (field) {
     field.type = this._wrapType(field)
   }
+
+  visitFieldDefinition (field) {
+    field.type = this._wrapType(field)
+  }
 }
 
 const constraintDirectiveTypeDefs = `
@@ -63,7 +67,7 @@ const constraintDirectiveTypeDefs = `
     exclusiveMax: Int
     multipleOf: Int
     uniqueTypeName: String
-  ) on INPUT_FIELD_DEFINITION
+  ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 `
 
 module.exports = { ConstraintDirective, constraintDirectiveTypeDefs }

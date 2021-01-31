@@ -1067,3 +1067,911 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
   })
 })
+
+describe('@constraint String in FIELD_DEFINITION', function () {
+  const query = `query {
+    books {
+      title
+    }
+  }`
+  const resolvers = function (data) {
+    return {
+      Query: {
+        books () {
+          return data
+        }
+      }
+    }
+  }
+
+  describe('#minLength', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(minLength: 3)
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be at least 3 characters in length')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be at least 3 characters in length',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'minLength', value: 3 }]
+      })
+    })
+  })
+
+  describe('#maxLength', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(maxLength: 3)
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 'fo'}, {title: 'foo'}, {title: 'bar'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be no more than 3 characters in length')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be no more than 3 characters in length',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'maxLength', value: 3 }]
+      })
+    })
+  })
+
+  describe('#startsWith', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(startsWith: "💩")
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: '💩baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must start with 💩')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must start with 💩',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'startsWith', value: '💩' }]
+      })
+    })
+  })
+
+  describe('#endsWith', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(endsWith: "💩")
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz💩'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must end with 💩')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must end with 💩',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'endsWith', value: '💩' }]
+      })
+    })
+  })
+
+  describe('#contains', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(contains: "💩")
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'baz💩baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'bazbaz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must contain 💩')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'bazbaz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must contain 💩',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'contains', value: '💩' }]
+      })
+    })
+  })
+
+  describe('#notContains', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(notContains: "💩")
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 'foo'}, {title: 'bar'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 'foo💩foo'}, {title: 'barr'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must not contain 💩')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 'foo💩foo'}, {title: 'barr'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must not contain 💩',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'notContains', value: '💩' }]
+      })
+    })
+  })
+
+  describe('#pattern', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(pattern: "^[0-9a-zA-Z]*$")
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 'foo'}, {title: 'bar'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: '💩'}, {title: '£££'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must match ^[0-9a-zA-Z]*$')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: '💩'}, {title: '£££'}, {title: 'baz'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must match ^[0-9a-zA-Z]*$',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'pattern', value: '^[0-9a-zA-Z]*$' }]
+      })
+    })
+  })
+
+  describe('#format', function () {
+    describe('#byte', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "byte")
+        }`
+      })
+
+      it('should pass', async function () {
+        const mockData = [{ title: 'afoo' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { books: mockData } })
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: '£££' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Must be in byte format')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: '£££' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in byte format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'byte' }]
+        })
+      })
+    })
+
+    describe('#date-time', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "date-time")
+        }`
+      })
+
+      it('should pass', async function () {
+        const mockData = [{ title: '2018-05-16T12:57:00Z' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { books: mockData } })
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: '2018-05-1612:57:00Z' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Must be a date-time in RFC 3339 format')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: '2018-05-1612:57:00Z' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be a date-time in RFC 3339 format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'date-time' }]
+        })
+      })
+    })
+
+    describe('#date', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "date")
+        }`
+      })
+
+      it('should pass', async function () {
+        const mockData = [{ title: '2018-05-16' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { books: mockData } })
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Must be a date in ISO 8601 format')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be a date in ISO 8601 format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'date' }]
+        })
+      })
+    })
+
+    describe('#email', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "email")
+        }`
+      })
+
+      it('should pass', async function () {
+        const mockData = [{ title: 'test@test.com' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { books: mockData } })
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: 'testtest.com' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Must be in email format')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: 'testtest.com' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in email format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'email' }]
+        })
+      })
+    })
+
+    describe('#ipv4', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "ipv4")
+        }`
+      })
+
+      it('should pass', async function () {
+        const mockData = [{ title: '127.0.0.1' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { books: mockData } })
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: '256.256.256.256' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Must be in IP v4 format')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: '256.256.256.256' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in IP v4 format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'ipv4' }]
+        })
+      })
+    })
+
+    describe('#ipv6', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "ipv6")
+        }`
+      })
+
+      it('should pass', async function () {
+        const mockData = [{ title: '2001:db8:0000:1:1:1:1:1' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { books: mockData } })
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Must be in IP v6 format')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in IP v6 format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'ipv6' }]
+        })
+      })
+    })
+
+    describe('#uri', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "uri")
+        }`
+      })
+
+      it('should pass', async function () {
+        const mockData = [{ title: 'foobar.com' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { books: mockData } })
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Must be in URI format')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in URI format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'uri' }]
+        })
+      })
+    })
+
+    describe('#uuid', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "uuid")
+        }`
+      })
+
+      it('should pass', async function () {
+        const mockData = [{ title: 'A987FBC9-4BED-3078-CF07-9141BA07C9F3' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { books: mockData } })
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Must be in UUID format')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Must be in UUID format',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'uuid' }]
+        })
+      })
+    })
+
+    describe('#unknown', function () {
+      before(function () {
+        this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "test")
+        }`
+      })
+
+      it('should fail', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        strictEqual(body.errors[0].message, 'Invalid format type test')
+      })
+
+      it('should throw custom error', async function () {
+        const mockData = [{ title: 'a' }]
+        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const { body, statusCode } = await request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body.errors[0], {
+          message: 'Invalid format type test',
+          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+          fieldName: 'title',
+          context: [{ arg: 'format', value: 'test' }]
+        })
+      })
+    })
+  })
+
+  describe('#uniqueTypeName', function () {
+    before(function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String @constraint(minLength: 3, uniqueTypeName: "Book_Title")
+      }`
+    })
+
+    it('should pass', async function () {
+      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { books: mockData } })
+    })
+
+    it('should fail', async function () {
+      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      strictEqual(body.errors[0].message, 'Must be at least 3 characters in length')
+    })
+
+    it('should throw custom error', async function () {
+      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const { body, statusCode } = await request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body.errors[0], {
+        message: 'Must be at least 3 characters in length',
+        code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+        fieldName: 'title',
+        context: [{ arg: 'minLength', value: 3 }]
+      })
+    })
+  })
+})
