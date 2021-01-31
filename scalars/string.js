@@ -1,12 +1,13 @@
 const { GraphQLScalarType } = require('graphql')
 const { contains, isLength } = require('validator')
+
 const formats = require('./formats')
 const ValidationError = require('../lib/error')
 
 module.exports = class ConstraintStringType extends GraphQLScalarType {
-  constructor (fieldName, uniqueTypeName, type, args) {
+  constructor (fieldName, type, args) {
     super({
-      name: uniqueTypeName,
+      name: 'ConstraintString',
       serialize (value) {
         value = type.serialize(value)
 
@@ -27,7 +28,7 @@ module.exports = class ConstraintStringType extends GraphQLScalarType {
         validate(fieldName, args, value)
 
         return value
-      }
+      },
     })
   }
 }
@@ -84,7 +85,7 @@ function validate (fieldName, args, value) {
     }
 
     try {
-      formatter(value) // Will throw if invalid
+      formatter(value)
     } catch (e) {
       throw new ValidationError(fieldName,
         e.message,

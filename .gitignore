@@ -6,3 +6,4 @@ npm-debug.log
 typings*
 .sync
 .vscode
+.idea

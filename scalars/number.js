@@ -1,10 +1,11 @@
 const { GraphQLScalarType } = require('graphql')
+
 const ValidationError = require('../lib/error')
 
 module.exports = class ConstraintNumberType extends GraphQLScalarType {
-  constructor (fieldName, uniqueTypeName, type, args) {
+  constructor (fieldName, type, args) {
     super({
-      name: uniqueTypeName,
+      name: 'ConstraintNumber',
       serialize (value) {
         value = type.serialize(value)
 
@@ -41,7 +42,6 @@ function validate (fieldName, args, value) {
       `Must be no greater than ${args.max}`,
       [{ arg: 'max', value: args.max }])
   }
-
   if (args.exclusiveMin !== undefined && value <= args.exclusiveMin) {
     throw new ValidationError(fieldName,
       `Must be greater than ${args.exclusiveMin}`,
@@ -52,7 +52,6 @@ function validate (fieldName, args, value) {
       `Must be less than ${args.exclusiveMax}`,
       [{ arg: 'exclusiveMax', value: args.exclusiveMax }])
   }
-
   if (args.multipleOf !== undefined && value % args.multipleOf !== 0) {
     throw new ValidationError(fieldName,
       `Must be a multiple of ${args.multipleOf}`,
