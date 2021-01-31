@@ -6,14 +6,14 @@
   "scripts": {
     "test": "standard --fix && nyc --reporter=html --reporter=text mocha test/**/*.test.js"
   },
-  "author": "James Mortemore (jamesmortemore@gmail.com), I Komang Sena Aji Buwana (iksena@aol.com)",
+  "author": "I Komang Sena Aji Buwana (iksena@aol.com)",
   "license": "ISC",
   "engines": {
     "node": ">=8.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:iksena/graphql-constraint-directive.git"
+    "url": "git+ssh://git@github.com/iksena/graphql-constraint-directive.git"
   },
   "bugs": {
     "url": "https://github.com/iksena/graphql-constraint-directive/issues"
@@ -44,5 +44,10 @@
       "it",
       "before"
     ]
+  },
+  "homepage": "https://github.com/iksena/graphql-constraint-directive#readme",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
   }
 }
