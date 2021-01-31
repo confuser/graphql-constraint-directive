@@ -1,37 +1,6 @@
-const { GraphQLScalarType } = require('graphql')
-
 const ValidationError = require('../lib/error')
 
-module.exports = class ConstraintNumberType extends GraphQLScalarType {
-  constructor (fieldName, type, args, name) {
-    super({
-      name,
-      serialize (value) {
-        value = type.serialize(value)
-
-        validate(fieldName, args, value)
-
-        return value
-      },
-      parseValue (value) {
-        value = type.serialize(value)
-
-        validate(fieldName, args, value)
-
-        return type.parseValue(value)
-      },
-      parseLiteral (ast) {
-        const value = type.parseLiteral(ast)
-
-        validate(fieldName, args, value)
-
-        return value
-      }
-    })
-  }
-}
-
-function validate (fieldName, args, value) {
+const validateNumber = (fieldName, args, value) => {
   if (args.min !== undefined && value < args.min) {
     throw new ValidationError(fieldName,
       `Must be at least ${args.min}`,
@@ -58,3 +27,5 @@ function validate (fieldName, args, value) {
       [{ arg: 'multipleOf', value: args.multipleOf }])
   }
 }
+
+module.exports = validateNumber

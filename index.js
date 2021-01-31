@@ -3,13 +3,13 @@ const {
   GraphQLInt,
   GraphQLString,
   GraphQLNonNull,
+  GraphQLScalarType,
   isNonNullType,
   isScalarType
 } = require('graphql')
 const { SchemaDirectiveVisitor } = require('apollo-server-express')
 
-const ConstraintStringType = require('./scalars/string')
-const ConstraintNumberType = require('./scalars/number')
+const { validateString, validateNumber } = require('./validators')
 
 class ConstraintDirective extends SchemaDirectiveVisitor {
   _getTypeName (type, notNull) {
@@ -23,11 +23,36 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
         .join('_')
   }
 
-  _getConstraintType (fieldName, type, notNull) {
-    const typeName = this._getTypeName(type, notNull)
+  _getTypeConfig (fieldName, type, notNull, validate, args) {
+    return new GraphQLScalarType({
+      name: this._getTypeName(type, notNull),
+      serialize (value) {
+        value = type.serialize(value)
 
+        validate(fieldName, args, value)
+
+        return value
+      },
+      parseValue (value) {
+        value = type.serialize(value)
+
+        validate(fieldName, args, value)
+
+        return type.parseValue(value)
+      },
+      parseLiteral (ast) {
+        const value = type.parseLiteral(ast)
+
+        validate(fieldName, args, value)
+
+        return value
+      }
+    })
+  }
+
+  _getConstraintType (fieldName, type, notNull) {
     if (type === GraphQLString) {
-      const stringType = new ConstraintStringType(fieldName, type, this.args, typeName)
+      const stringType = this._getTypeConfig(fieldName, type, notNull, validateString, this.args)
       if (notNull) {
         return new GraphQLNonNull(stringType)
       }
@@ -36,7 +61,7 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
     }
 
     if (type === GraphQLFloat || type === GraphQLInt) {
-      const numberType = new ConstraintNumberType(fieldName, type, this.args, typeName)
+      const numberType = this._getTypeConfig(fieldName, type, notNull, validateNumber, this.args)
       if (notNull) {
         return new GraphQLNonNull(numberType)
       }
@@ -44,7 +69,7 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
       return numberType
     }
 
-    throw new Error(`Not a valid scalar type: ${type.toString()}`)
+    throw new Error(`Not a supported scalar type: ${type.toString()}`)
   }
 
   _wrapType (field) {

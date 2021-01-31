@@ -1,39 +1,9 @@
-const { GraphQLScalarType } = require('graphql')
 const { contains, isLength } = require('validator')
 
 const formats = require('./formats')
 const ValidationError = require('../lib/error')
 
-module.exports = class ConstraintStringType extends GraphQLScalarType {
-  constructor (fieldName, type, args, name) {
-    super({
-      name,
-      serialize (value) {
-        value = type.serialize(value)
-
-        validate(fieldName, args, value)
-
-        return value
-      },
-      parseValue (value) {
-        value = type.serialize(value)
-
-        validate(fieldName, args, value)
-
-        return type.parseValue(value)
-      },
-      parseLiteral (ast) {
-        const value = type.parseLiteral(ast)
-
-        validate(fieldName, args, value)
-
-        return value
-      }
-    })
-  }
-}
-
-function validate (fieldName, args, value) {
+const validateString = (fieldName, args, value) => {
   if (args.minLength && !isLength(value, { min: args.minLength })) {
     throw new ValidationError(fieldName,
       `Must be at least ${args.minLength} characters in length`,
@@ -93,3 +63,5 @@ function validate (fieldName, args, value) {
     }
   }
 }
+
+module.exports = validateString
