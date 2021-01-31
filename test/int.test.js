@@ -52,7 +52,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value 2 at "input.title"; Expected type "ConstraintNumber". Must be at least 3')
+        'Variable "$input" got invalid value 2 at "input.title"; Expected type "Int!_min_3". Must be at least 3')
     })
 
     it('should throw custom error', async function () {
@@ -111,7 +111,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value 4 at "input.title"; Expected type "ConstraintNumber". Must be no greater than 3')
+        'Variable "$input" got invalid value 4 at "input.title"; Expected type "Int_max_3". Must be no greater than 3')
     })
 
     it('should throw custom error', async function () {
@@ -172,7 +172,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value 3 at "input.title"; Expected type "ConstraintNumber". Must be greater than 3')
+        'Variable "$input" got invalid value 3 at "input.title"; Expected type "Int!_exclusiveMin_3". Must be greater than 3')
     })
 
     it('should throw custom error', async function () {
@@ -233,7 +233,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value 3 at "input.title"; Expected type "ConstraintNumber". Must be less than 3')
+        'Variable "$input" got invalid value 3 at "input.title"; Expected type "Int!_exclusiveMax_3". Must be less than 3')
     })
 
     it('should throw custom error', async function () {
@@ -292,7 +292,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value 7 at "input.title"; Expected type "ConstraintNumber". Must be a multiple of 2')
+        'Variable "$input" got invalid value 7 at "input.title"; Expected type "Int!_multipleOf_2". Must be a multiple of 2')
     })
 
     it('should throw custom error', async function () {
@@ -340,7 +340,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "ConstraintNumber!" not to be null.')
+        'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "Int!_multipleOf_2!" not to be null.')
     })
 
     it('should fail with undefined', async function () {
@@ -352,7 +352,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value {}; Field "title" of required type "ConstraintNumber!" was not provided.')
+        'Variable "$input" got invalid value {}; Field "title" of required type "Int!_multipleOf_2!" was not provided.')
     })
   })
 
@@ -395,7 +395,7 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value 2 at "input.title"; Expected type "ConstraintNumber". Must be at least 3')
+        'Variable "$input" got invalid value 2 at "input.title"; Expected type "BookInput_Title". Must be at least 3')
     })
 
     it('should throw custom error', async function () {

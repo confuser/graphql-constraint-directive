@@ -5,9 +5,9 @@ const formats = require('./formats')
 const ValidationError = require('../lib/error')
 
 module.exports = class ConstraintStringType extends GraphQLScalarType {
-  constructor (fieldName, type, args) {
+  constructor (fieldName, type, args, name) {
     super({
-      name: 'ConstraintString',
+      name,
       serialize (value) {
         value = type.serialize(value)
 
