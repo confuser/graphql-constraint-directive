@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "standard && nyc --reporter=html --reporter=text mocha test/**/*.test.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov"
   },
   "author": "James Mortemore (jamesmortemore@gmail.com), I Komang Sena Aji Buwana (iksena@aol.com)",
   "license": "ISC",
@@ -29,7 +29,6 @@
   ],
   "devDependencies": {
     "apollo-server-express": "^2.19.2",
-    "coveralls": "^3.1.0",
     "express": "^4.17.1",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
@@ -38,12 +37,7 @@
   },
   "dependencies": {
     "graphql": "^15.5.0",
-    "@graphql-tools/schema": "^7.1.2",
-    "@graphql-tools/utils": "^7.1.2",
     "validator": "^10.2.0"
-  },
-  "resolutions": {
-    "graphql": "15.5.0"
   },
   "standard": {
     "globals": [

@@ -28,7 +28,7 @@ module.exports = class ConstraintStringType extends GraphQLScalarType {
         validate(fieldName, args, value)
 
         return value
-      },
+      }
     })
   }
 }

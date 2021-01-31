@@ -1,14 +1,16 @@
 const express = require('express')
-const { ApolloServer } = require('apollo-server-express')
-const { makeExecutableSchema } = require('@graphql-tools/schema')
+const { ApolloServer, SchemaDirectiveVisitor, makeExecutableSchema } = require(
+  'apollo-server-express')
 const request = require('supertest')
-const { constraintDirective, constraintDirectiveTypeDefs } = require('../')
+const { ConstraintDirective, constraintDirectiveTypeDefs } = require('../')
 
 module.exports = function (typeDefs, formatError, resolvers) {
   const schema = makeExecutableSchema({
-    typeDefs: [ constraintDirectiveTypeDefs, typeDefs ],
-    schemaTransforms: [constraintDirective()],
+    typeDefs: [constraintDirectiveTypeDefs, typeDefs],
     resolvers
+  })
+  SchemaDirectiveVisitor.visitSchemaDirectives(schema, {
+    constraint: ConstraintDirective
   })
   const app = express()
   const server = new ApolloServer({ schema, formatError })

@@ -4,7 +4,7 @@ const {
   GraphQLString,
   GraphQLNonNull,
   isNonNullType,
-  isScalarType,
+  isScalarType
 } = require('graphql')
 const { SchemaDirectiveVisitor } = require('apollo-server-express')
 
