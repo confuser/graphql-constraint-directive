@@ -47,12 +47,13 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
+        .send({
+          query, variables: { input: { title: 'a💩' } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value "a💩" at "input.title"; Expected type "String!_minLength_3". Must be at least 3 characters in length')
+        'Variable "$input" got invalid value "a💩" at "input.title"; Expected type "title_String_NotNull_minLength_3". Must be at least 3 characters in length')
     })
 
     it('should throw custom error', async function () {
@@ -95,7 +96,8 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
+        .send({
+          query, variables: { input: { title: 'a💩' } }
         })
 
       strictEqual(statusCode, 200)
@@ -106,12 +108,13 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'fob💩' } }
+        .send({
+          query, variables: { input: { title: 'fob💩' } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value "fob💩" at "input.title"; Expected type "String_maxLength_3". Must be no more than 3 characters in length')
+        'Variable "$input" got invalid value "fob💩" at "input.title"; Expected type "title_String_maxLength_3". Must be no more than 3 characters in length')
     })
 
     it('should throw custom error', async function () {
@@ -154,7 +157,8 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '💩foo' } }
+        .send({
+          query, variables: { input: { title: '💩foo' } }
         })
 
       strictEqual(statusCode, 200)
@@ -169,7 +173,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value "bar💩" at "input.title"; Expected type "String!_startsWith_". Must start with 💩')
+        'Variable "$input" got invalid value "bar💩" at "input.title"; Expected type "title_String_NotNull_startsWith_". Must start with 💩')
     })
 
     it('should throw custom error', async function () {
@@ -212,7 +216,8 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
+        .send({
+          query, variables: { input: { title: 'a💩' } }
         })
 
       strictEqual(statusCode, 200)
@@ -223,12 +228,13 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '💩bar' } }
+        .send({
+          query, variables: { input: { title: '💩bar' } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value "💩bar" at "input.title"; Expected type "String!_endsWith_". Must end with 💩')
+        'Variable "$input" got invalid value "💩bar" at "input.title"; Expected type "title_String_NotNull_endsWith_". Must end with 💩')
     })
 
     it('should throw custom error', async function () {
@@ -271,7 +277,8 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩o' } }
+        .send({
+          query, variables: { input: { title: 'a💩o' } }
         })
 
       strictEqual(statusCode, 200)
@@ -282,12 +289,13 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'fobar' } }
+        .send({
+          query, variables: { input: { title: 'fobar' } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value "fobar" at "input.title"; Expected type "String!_contains_". Must contain 💩')
+        'Variable "$input" got invalid value "fobar" at "input.title"; Expected type "title_String_NotNull_contains_". Must contain 💩')
     })
 
     it('should throw custom error', async function () {
@@ -330,7 +338,8 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '💩' } }
+        .send({
+          query, variables: { input: { title: '💩' } }
         })
 
       strictEqual(statusCode, 200)
@@ -341,12 +350,13 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '💩foobar' } }
+        .send({
+          query, variables: { input: { title: '💩foobar' } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value "💩foobar" at "input.title"; Expected type "String!_notContains_foo". Must not contain foo')
+        'Variable "$input" got invalid value "💩foobar" at "input.title"; Expected type "title_String_NotNull_notContains_foo". Must not contain foo')
     })
 
     it('should throw custom error', async function () {
@@ -389,7 +399,8 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'afoo' } }
+        .send({
+          query, variables: { input: { title: 'afoo' } }
         })
 
       strictEqual(statusCode, 200)
@@ -400,12 +411,13 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '£££' } }
+        .send({
+          query, variables: { input: { title: '£££' } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value "£££" at "input.title"; Expected type "String!_pattern_09azAZ". Must match ^[0-9a-zA-Z]*$')
+        'Variable "$input" got invalid value "£££" at "input.title"; Expected type "title_String_NotNull_pattern_09azAZ". Must match ^[0-9a-zA-Z]*$')
     })
 
     it('should throw custom error', async function () {
@@ -467,7 +479,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "£££" at "input.title"; Expected type "String!_format_byte". Must be in byte format')
+          'Variable "$input" got invalid value "£££" at "input.title"; Expected type "title_String_NotNull_format_byte". Must be in byte format')
       })
 
       it('should throw custom error', async function () {
@@ -528,7 +540,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title"; Expected type "String!_format_datetime". Must be a date-time in RFC 3339 format')
+          'Variable "$input" got invalid value "a" at "input.title"; Expected type "title_String_NotNull_format_datetime". Must be a date-time in RFC 3339 format')
       })
 
       it('should throw custom error', async function () {
@@ -589,7 +601,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title"; Expected type "String!_format_date". Must be a date in ISO 8601 format')
+          'Variable "$input" got invalid value "a" at "input.title"; Expected type "title_String_NotNull_format_date". Must be a date in ISO 8601 format')
       })
 
       it('should throw custom error', async function () {
@@ -650,7 +662,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title"; Expected type "String!_format_email". Must be in email format')
+          'Variable "$input" got invalid value "a" at "input.title"; Expected type "title_String_NotNull_format_email". Must be in email format')
       })
 
       it('should throw custom error', async function () {
@@ -711,7 +723,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title"; Expected type "String!_format_ipv4". Must be in IP v4 format')
+          'Variable "$input" got invalid value "a" at "input.title"; Expected type "title_String_NotNull_format_ipv4". Must be in IP v4 format')
       })
 
       it('should throw custom error', async function () {
@@ -772,7 +784,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title"; Expected type "String!_format_ipv6". Must be in IP v6 format')
+          'Variable "$input" got invalid value "a" at "input.title"; Expected type "title_String_NotNull_format_ipv6". Must be in IP v6 format')
       })
 
       it('should throw custom error', async function () {
@@ -833,7 +845,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title"; Expected type "String!_format_uri". Must be in URI format')
+          'Variable "$input" got invalid value "a" at "input.title"; Expected type "title_String_NotNull_format_uri". Must be in URI format')
       })
 
       it('should throw custom error', async function () {
@@ -894,7 +906,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title"; Expected type "String!_format_uuid". Must be in UUID format')
+          'Variable "$input" got invalid value "a" at "input.title"; Expected type "title_String_NotNull_format_uuid". Must be in UUID format')
       })
 
       it('should throw custom error', async function () {
@@ -943,7 +955,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title"; Expected type "String!_format_test". Invalid format type test')
+          'Variable "$input" got invalid value "a" at "input.title"; Expected type "title_String_NotNull_format_test". Invalid format type test')
       })
 
       it('should throw custom error', async function () {
@@ -987,24 +999,26 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: null } }
+        .send({
+          query, variables: { input: { title: null } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "String!_minLength_3!" not to be null.')
+        'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "title_String_NotNull_minLength_3!" not to be null.')
     })
 
     it('should fail with undefined', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: undefined } }
+        .send({
+          query, variables: { input: { title: undefined } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value {}; Field "title" of required type "String!_minLength_3!" was not provided.')
+        'Variable "$input" got invalid value {}; Field "title" of required type "title_String_NotNull_minLength_3!" was not provided.')
     })
   })
 
@@ -1021,7 +1035,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         createBook(input: BookInput): Book
       }
       input BookInput {
-        title: String! @constraint(minLength: 3)
+        title: String! @constraint(minLength: 3, uniqueTypeName: "BookInput_Title")
       }`
 
       this.request = setup(this.typeDefs)
@@ -1031,7 +1045,8 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'he💩' } }
+        .send({
+          query, variables: { input: { title: 'he💩' } }
         })
 
       strictEqual(statusCode, 200)
@@ -1042,12 +1057,13 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
+        .send({
+          query, variables: { input: { title: 'a💩' } }
         })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
-        'Variable "$input" got invalid value "a💩" at "input.title"; Expected type "String!_minLength_3". Must be at least 3 characters in length')
+        'Variable "$input" got invalid value "a💩" at "input.title"; Expected type "BookInput_Title". Must be at least 3 characters in length')
     })
 
     it('should throw custom error', async function () {
@@ -1096,7 +1112,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const mockData = [{ title: 'foo' }, { title: 'foobar' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1108,7 +1124,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const mockData = [{ title: 'fo' }, { title: 'foo' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1120,7 +1136,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const mockData = [{ title: 'fo' }, { title: 'foo' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1149,7 +1165,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}, {title: 'bar'}]
+      const mockData = [{ title: 'fo' }, { title: 'foo' }, { title: 'bar' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1161,7 +1177,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const mockData = [{ title: 'foo' }, { title: 'foobar' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1173,7 +1189,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const mockData = [{ title: 'foo' }, { title: 'foobar' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1202,7 +1218,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: '💩baz'}]
+      const mockData = [{ title: '💩foo' }, { title: '💩bar' }, { title: '💩baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1214,7 +1230,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: 'baz'}]
+      const mockData = [{ title: '💩foo' }, { title: '💩bar' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1226,7 +1242,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: 'baz'}]
+      const mockData = [{ title: '💩foo' }, { title: '💩bar' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1255,7 +1271,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz💩'}]
+      const mockData = [{ title: 'foo💩' }, { title: 'bar💩' }, { title: 'baz💩' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1267,7 +1283,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz'}]
+      const mockData = [{ title: 'foo💩' }, { title: 'bar💩' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1279,7 +1295,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz'}]
+      const mockData = [{ title: 'foo💩' }, { title: 'bar💩' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1308,7 +1324,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'baz💩baz'}]
+      const mockData = [{ title: 'foo💩foo' }, { title: 'bar💩bar' }, { title: 'baz💩baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1320,7 +1336,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'bazbaz'}]
+      const mockData = [{ title: 'foo💩foo' }, { title: 'bar💩bar' }, { title: 'bazbaz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1332,7 +1348,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'bazbaz'}]
+      const mockData = [{ title: 'foo💩foo' }, { title: 'bar💩bar' }, { title: 'bazbaz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1361,7 +1377,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo'}, {title: 'bar'}, {title: 'baz'}]
+      const mockData = [{ title: 'foo' }, { title: 'bar' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1373,7 +1389,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'barr'}, {title: 'baz'}]
+      const mockData = [{ title: 'foo💩foo' }, { title: 'barr' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1385,7 +1401,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'barr'}, {title: 'baz'}]
+      const mockData = [{ title: 'foo💩foo' }, { title: 'barr' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1414,7 +1430,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo'}, {title: 'bar'}, {title: 'baz'}]
+      const mockData = [{ title: 'foo' }, { title: 'bar' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1426,7 +1442,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: '💩'}, {title: '£££'}, {title: 'baz'}]
+      const mockData = [{ title: '💩' }, { title: '£££' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1438,7 +1454,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: '💩'}, {title: '£££'}, {title: 'baz'}]
+      const mockData = [{ title: '💩' }, { title: '£££' }, { title: 'baz' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1934,7 +1950,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo'}, {title: 'foobar'}]
+      const mockData = [{ title: 'foo' }, { title: 'foobar' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1946,7 +1962,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const mockData = [{ title: 'fo' }, { title: 'foo' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
@@ -1958,7 +1974,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}]
+      const mockData = [{ title: 'fo' }, { title: 'foo' }]
       const request = setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')

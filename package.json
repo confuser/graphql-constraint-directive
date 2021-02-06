@@ -27,7 +27,6 @@
     "constraint"
   ],
   "devDependencies": {
-    "apollo-server-express": "^2.19.2",
     "express": "^4.17.1",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
@@ -35,13 +34,17 @@
     "supertest": "^3.1.0"
   },
   "dependencies": {
-    "graphql": "^15.5.0",
+    "apollo-server-express": "^2.19.2",
     "validator": "^10.2.0"
+  },
+  "peerDependencies": {
+    "graphql": "^14.0.0 || ^15.0.0"
   },
   "standard": {
     "globals": [
       "describe",
       "it",
+      "xit",
       "before"
     ]
   },

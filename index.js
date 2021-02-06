@@ -12,12 +12,12 @@ const { SchemaDirectiveVisitor } = require('apollo-server-express')
 const { validateString, validateNumber } = require('./validators')
 
 class ConstraintDirective extends SchemaDirectiveVisitor {
-  _getTypeName (type, notNull) {
+  _getTypeName (fieldName, type, notNull) {
     if (this.args.uniqueTypeName) {
       return this.args.uniqueTypeName.replace(/\W/g, '')
     }
 
-    return `${type.name}${notNull ? '!_' : '_'}` +
+    return `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` +
       Object.entries(this.args)
         .map(([key, value]) => `${key}_${value.toString().replace(/\W/g, '')}`)
         .join('_')
@@ -25,7 +25,7 @@ class ConstraintDirective extends SchemaDirectiveVisitor {
 
   _getTypeConfig (fieldName, type, notNull, validate, args) {
     return new GraphQLScalarType({
-      name: this._getTypeName(type, notNull),
+      name: this._getTypeName(fieldName, type, notNull),
       serialize (value) {
         value = type.serialize(value)
 
