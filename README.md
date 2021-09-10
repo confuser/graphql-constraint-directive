@@ -30,10 +30,12 @@ const typeDefs = `
   input BookInput {
     title: String! @constraint(minLength: 5, format: "email")
   }`
-const schema = makeExecutableSchema({
+
+let schema = makeExecutableSchema({
   typeDefs: [constraintDirectiveTypeDefs, typeDefs],
-  schemaTransforms: [constraintDirective()]
 })
+schema = constraintDirective()(schema)
+
 const app = express()
 const server = new ApolloServer({ schema })
 

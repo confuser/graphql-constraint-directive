@@ -5,11 +5,12 @@ const request = require('supertest')
 const { constraintDirective, constraintDirectiveTypeDefs } = require('../')
 
 module.exports = function (typeDefs, formatError, resolvers) {
-  const schema = makeExecutableSchema({
+  let schema = makeExecutableSchema({
     typeDefs: [ constraintDirectiveTypeDefs, typeDefs ],
-    schemaTransforms: [constraintDirective()],
     resolvers
   })
+  schema = constraintDirective()(schema)
+
   const app = express()
   const server = new ApolloServer({ schema, formatError })
 
