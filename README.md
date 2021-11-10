@@ -7,11 +7,13 @@
 Allows using @constraint as a directive to validate input data. Inspired by [Constraints Directives RFC](https://github.com/APIs-guru/graphql-constraints-spec) and OpenAPI
 
 ## Install
-```
+
+```bash
 npm install graphql-constraint-directive
 ```
 
 ## Usage
+
 ```js
 const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
@@ -40,44 +42,54 @@ const app = express()
 const server = new ApolloServer({ schema })
 
 server.applyMiddleware({ app })
-
 ```
 
 ## API
+
 ### String
+
 #### minLength
-```@constraint(minLength: 5)```
+
+`@constraint(minLength: 5)`
 Restrict to a minimum length
 
 #### maxLength
-```@constraint(maxLength: 5)```
+
+`@constraint(maxLength: 5)`
 Restrict to a maximum length
 
 #### startsWith
-```@constraint(startsWith: "foo")```
+
+`@constraint(startsWith: "foo")`
 Ensure value starts with foo
 
 #### endsWith
-```@constraint(endsWith: "foo")```
+
+`@constraint(endsWith: "foo")`
 Ensure value ends with foo
 
 #### contains
-```@constraint(contains: "foo")```
+
+`@constraint(contains: "foo")`
 Ensure value contains foo
 
 #### notContains
-```@constraint(notContains: "foo")```
+
+`@constraint(notContains: "foo")`
 Ensure value does not contain foo
 
 #### pattern
-```@constraint(pattern: "^[0-9a-zA-Z]*$")```
+
+`@constraint(pattern: "^[0-9a-zA-Z]*$")`
 Ensure value matches regex, e.g. alphanumeric
 
 #### format
-```@constraint(format: "email")```
+
+`@constraint(format: "email")`
 Ensure value is in a particular format
 
 Supported formats:
+
 - byte: Base64
 - date-time: RFC 3339
 - date: ISO 8601
@@ -88,27 +100,34 @@ Supported formats:
 - uuid
 
 ### Int/Float
+
 #### min
-```@constraint(min: 3)```
+
+`@constraint(min: 3)`
 Ensure value is greater than or equal to
 
 #### max
-```@constraint(max: 3)```
+
+`@constraint(max: 3)`
 Ensure value is less than or equal to
 
 #### exclusiveMin
-```@constraint(exclusiveMin: 3)```
+
+`@constraint(exclusiveMin: 3)`
 Ensure value is greater than
 
 #### exclusiveMax
-```@constraint(exclusiveMax: 3)```
+
+`@constraint(exclusiveMax: 3)`
 Ensure value is less than
 
 #### multipleOf
-```@constraint(multipleOf: 10)```
+
+`@constraint(multipleOf: 10)`
 Ensure value is a multiple
 
 ### ConstraintDirectiveError
+
 Each validation error throws a `ConstraintDirectiveError`. Combined with a formatError function, this can be used to customise error messages.
 
 ```js
@@ -129,8 +148,9 @@ const formatError = function (error) {
 }
 
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
-
 ```
+
 ### uniqueTypeName
-```@constraint(uniqueTypeName: "Unique_Type_Name")```
+
+`@constraint(uniqueTypeName: "Unique_Type_Name")`
 Override the unique type name generate by the library to the one passed as an argument
