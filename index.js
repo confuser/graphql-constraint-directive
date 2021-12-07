@@ -92,6 +92,6 @@ const constraintDirectiveTypeDefs = `
     exclusiveMax: Int
     multipleOf: Int
     uniqueTypeName: String
-  ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION`
+  ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION | ARGUMENT_DEFINITION`
 
 module.exports = { constraintDirective, constraintDirectiveTypeDefs }
