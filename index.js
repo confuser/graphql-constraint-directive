@@ -13,7 +13,12 @@ function constraintDirective () {
       uniqueTypeName = directiveArgumentMap.uniqueTypeName.replace(/\W/g, '')
     } else {
       uniqueTypeName = `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` + Object.entries(directiveArgumentMap)
-        .map(([key, value]) => `${key}_${value.toString().replace(/\W/g, '')}`)
+        .map(([key, value]) => {
+          if (key === 'min' || key === 'max' || key === 'exclusiveMin' || key === 'exclusiveMax' || key === 'multipleOf') {
+            return `${key}_${value.toString().replace(/\W/g, 'dot')}`
+          }
+          return `${key}_${value.toString().replace(/\W/g, '')}`
+        })
         .join('_')
     }
     const key = Symbol.for(uniqueTypeName)
@@ -86,11 +91,11 @@ const constraintDirectiveTypeDefs = `
     format: String
 
     # Number constraints
-    min: Int
-    max: Int
-    exclusiveMin: Int
-    exclusiveMax: Int
-    multipleOf: Int
+    min: Float
+    max: Float
+    exclusiveMin: Float
+    exclusiveMax: Float
+    multipleOf: Float
     uniqueTypeName: String
   ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION`
 

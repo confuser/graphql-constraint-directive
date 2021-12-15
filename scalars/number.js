@@ -30,6 +30,11 @@ module.exports = class ConstraintNumberType extends GraphQLScalarType {
   }
 }
 
+function divisible (a, b) {
+  const eps = Number.EPSILON * 3
+  return a % b < eps || a % b > b - eps
+}
+
 function validate (fieldName, args, value) {
   if (args.min !== undefined && value < args.min) {
     throw new ValidationError(fieldName,
@@ -53,7 +58,7 @@ function validate (fieldName, args, value) {
       [{ arg: 'exclusiveMax', value: args.exclusiveMax }])
   }
 
-  if (args.multipleOf !== undefined && value % args.multipleOf !== 0) {
+  if (args.multipleOf !== undefined && divisible(value, args.multipleOf) === false) {
     throw new ValidationError(fieldName,
       `Must be a multiple of ${args.multipleOf}`,
       [{ arg: 'multipleOf', value: args.multipleOf }])
