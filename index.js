@@ -86,11 +86,11 @@ const constraintDirectiveTypeDefs = `
     format: String
 
     # Number constraints
-    min: Int
-    max: Int
-    exclusiveMin: Int
-    exclusiveMax: Int
-    multipleOf: Int
+    min: Float
+    max: Float
+    exclusiveMin: Float
+    exclusiveMax: Float
+    multipleOf: Float
     uniqueTypeName: String
   ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION`
 

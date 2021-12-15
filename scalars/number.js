@@ -30,6 +30,17 @@ module.exports = class ConstraintNumberType extends GraphQLScalarType {
   }
 }
 
+function modular (a, b) {
+  const [xa, xb] = a.toString().split('.')
+  const [ya, yb] = b.toString().split('.')
+  const za = typeof xb === 'string' ? xb.length : 0
+  const zb = typeof yb === 'string' ? yb.length : 0
+  const zLength = Math.max(za, zb)
+  const x = (xa + (xb || '')).concat('0'.repeat(zLength - za))
+  const y = (ya + (yb || '')).concat('0'.repeat(zLength - zb))
+  return parseInt(x, 10) % parseInt(y, 10)
+}
+
 function validate (fieldName, args, value) {
   if (args.min !== undefined && value < args.min) {
     throw new ValidationError(fieldName,
@@ -53,7 +64,7 @@ function validate (fieldName, args, value) {
       [{ arg: 'exclusiveMax', value: args.exclusiveMax }])
   }
 
-  if (args.multipleOf !== undefined && value % args.multipleOf !== 0) {
+  if (args.multipleOf !== undefined && modular(value, args.multipleOf) !== 0) {
     throw new ValidationError(fieldName,
       `Must be a multiple of ${args.multipleOf}`,
       [{ arg: 'multipleOf', value: args.multipleOf }])
