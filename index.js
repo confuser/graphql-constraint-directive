@@ -13,7 +13,12 @@ function constraintDirective () {
       uniqueTypeName = directiveArgumentMap.uniqueTypeName.replace(/\W/g, '')
     } else {
       uniqueTypeName = `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` + Object.entries(directiveArgumentMap)
-        .map(([key, value]) => `${key}_${value.toString().replace(/\W/g, '')}`)
+        .map(([key, value]) => {
+          if (key === 'min' || key === 'max' || key === 'exclusiveMin' || key === 'exclusiveMax' || key === 'multipleOf') {
+            return `${key}_${value.toString().replace(/\W/g, 'dot')}`
+          }
+          return `${key}_${value.toString().replace(/\W/g, '')}`
+        })
         .join('_')
     }
     const key = Symbol.for(uniqueTypeName)
