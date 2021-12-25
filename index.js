@@ -83,21 +83,13 @@ function constraintDirective () {
 
   function getScalarType (fieldConfig) {
     if (isScalarType(fieldConfig)) {
-      return { scalarType: fieldConfig }
-    } else if (isNonNullType(fieldConfig)) {
-      if (isScalarType(fieldConfig.ofType)) {
-        return { scalarType: fieldConfig.ofType, scalarNotNull: true }
-      }
-      if (isListType(fieldConfig.ofType)) {
-        return {
-          ...getScalarType(fieldConfig.ofType.ofType),
-          list: true,
-          listNotNull: true
-        }
-      }
-      return getScalarType(fieldConfig.ofType)
+      return {scalarType: fieldConfig}
     } else if (isListType(fieldConfig)) {
-      return { ...getScalarType(fieldConfig.ofType), list: true }
+      return {...getScalarType(fieldConfig.ofType), list: true}
+    } else if (isNonNullType(fieldConfig) && isScalarType(fieldConfig.ofType)) {
+      return {scalarType: fieldConfig.ofType, scalarNotNull: true}
+    } else if (isNonNullType(fieldConfig)) {
+      return {...getScalarType(fieldConfig.ofType.ofType), list: true, listNotNull: true}
     } else {
       throw new Error(`Not a valid scalar type: ${fieldConfig.toString()}`)
     }
