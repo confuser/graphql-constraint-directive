@@ -31,8 +31,7 @@ describe('Array', function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: [3, 4] } }
-          })
+          .send({ query, variables: { input: { title: [3, 4] } } })
 
         strictEqual(statusCode, 200)
         deepStrictEqual(body, { data: { createBook: null } })
@@ -42,12 +41,13 @@ describe('Array', function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: [2, 5] } }
-          })
+          .send({ query, variables: { input: { title: [2, 5] } } })
 
         strictEqual(statusCode, 400)
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value 2 at "input.title[0]"; Expected type "title_Int_NotNull_min_3". Must be at least 3')
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value 2 at "input.title[0]"; Expected type "title_List_ListNotNull_Int_NotNull_min_3". Must be at least 3'
+        )
       })
     })
     describe('#max', function () {
@@ -73,8 +73,7 @@ describe('Array', function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: [1, 2] } }
-          })
+          .send({ query, variables: { input: { title: [1, 2] } } })
 
         strictEqual(statusCode, 200)
         deepStrictEqual(body, { data: { createBook: null } })
@@ -84,12 +83,13 @@ describe('Array', function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: [1, 4] } }
-          })
+          .send({ query, variables: { input: { title: [1, 4] } } })
 
         strictEqual(statusCode, 400)
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value 4 at "input.title[1]"; Expected type "title_Int_NotNull_max_3". Must be no greater than 3')
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value 4 at "input.title[1]"; Expected type "title_List_Int_NotNull_max_3". Must be no greater than 3'
+        )
       })
     })
 
@@ -116,24 +116,26 @@ describe('Array', function () {
         let { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: [2, null] } }
-          })
+          .send({ query, variables: { input: { title: [2, null] } } })
 
         strictEqual(statusCode, 400)
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value null at "input.title[1]"; Expected non-nullable type "title_Int_NotNull_multipleOf_2!" not to be null.')
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value null at "input.title[1]"; Expected non-nullable type "title_List_Int_NotNull_multipleOf_2!" not to be null.'
+        )
       })
 
       it('should fail with undefined', async function () {
         let { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: [undefined] } }
-          })
+          .send({ query, variables: { input: { title: [undefined] } } })
 
         strictEqual(statusCode, 400)
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value null at "input.title[0]"; Expected non-nullable type "title_Int_NotNull_multipleOf_2!" not to be null.')
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value null at "input.title[0]"; Expected non-nullable type "title_List_Int_NotNull_multipleOf_2!" not to be null.'
+        )
       })
     })
   })
@@ -167,8 +169,7 @@ describe('Array', function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: ['he💩', 'test'] } }
-          })
+          .send({ query, variables: { input: { title: ['he💩', 'test'] } } })
 
         strictEqual(statusCode, 200)
         deepStrictEqual(body, { data: { createBook: null } })
@@ -178,12 +179,13 @@ describe('Array', function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: ['asdfa', 'a💩'] } }
-          })
+          .send({ query, variables: { input: { title: ['asdfa', 'a💩'] } } })
 
         strictEqual(statusCode, 400)
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a💩" at "input.title[1]"; Expected type "title_String_NotNull_minLength_3". Must be at least 3 characters in length')
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value "a💩" at "input.title[1]"; Expected type "title_List_String_NotNull_minLength_3". Must be at least 3 characters in length'
+        )
       })
     })
 
@@ -210,8 +212,7 @@ describe('Array', function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: ['a💩', '1'] } }
-          })
+          .send({ query, variables: { input: { title: ['a💩', '1'] } } })
 
         strictEqual(statusCode, 200)
         deepStrictEqual(body, { data: { createBook: null } })
@@ -221,12 +222,13 @@ describe('Array', function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: ['pu', 'fob💩'] } }
-          })
+          .send({ query, variables: { input: { title: ['pu', 'fob💩'] } } })
 
         strictEqual(statusCode, 400)
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "fob💩" at "input.title[1]"; Expected type "title_String_maxLength_3". Must be no more than 3 characters in length')
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value "fob💩" at "input.title[1]"; Expected type "title_List_String_maxLength_3". Must be no more than 3 characters in length'
+        )
       })
     })
 
@@ -254,7 +256,10 @@ describe('Array', function () {
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
-            query, variables: { input: { title: ['foobar.com', 'foobar.xyz', 'https://foobar.com'] } }
+            query,
+            variables: {
+              input: { title: ['foobar.com', 'foobar.xyz', 'https://foobar.com'] }
+            }
           })
 
         strictEqual(statusCode, 200)
@@ -266,12 +271,15 @@ describe('Array', function () {
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({
-            query, variables: { input: { title: ['foobar.com', 'a'] } }
+            query,
+            variables: { input: { title: ['foobar.com', 'a'] } }
           })
 
         strictEqual(statusCode, 400)
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value "a" at "input.title[1]"; Expected type "title_String_NotNull_format_uri". Must be in URI format')
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value "a" at "input.title[1]"; Expected type "title_List_ListNotNull_String_NotNull_format_uri". Must be in URI format'
+        )
       })
     })
   })

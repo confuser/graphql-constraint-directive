@@ -22,7 +22,9 @@ function constraintDirective () {
       uniqueTypeName = directiveArgumentMap.uniqueTypeName.replace(/\W/g, '')
     } else {
       uniqueTypeName =
-                `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` +
+                `${fieldName}_${list ? 'List_' : ''}${listNotNull ? 'ListNotNull_' : ''}${
+                  type.name
+                }_${notNull ? 'NotNull_' : ''}` +
                 Object.entries(directiveArgumentMap)
                   .map(([key, value]) => {
                     if (
@@ -83,13 +85,13 @@ function constraintDirective () {
 
   function getScalarType (fieldConfig) {
     if (isScalarType(fieldConfig)) {
-      return {scalarType: fieldConfig}
+      return { scalarType: fieldConfig }
     } else if (isListType(fieldConfig)) {
-      return {...getScalarType(fieldConfig.ofType), list: true}
+      return { ...getScalarType(fieldConfig.ofType), list: true }
     } else if (isNonNullType(fieldConfig) && isScalarType(fieldConfig.ofType)) {
-      return {scalarType: fieldConfig.ofType, scalarNotNull: true}
+      return { scalarType: fieldConfig.ofType, scalarNotNull: true }
     } else if (isNonNullType(fieldConfig)) {
-      return {...getScalarType(fieldConfig.ofType.ofType), list: true, listNotNull: true}
+      return { ...getScalarType(fieldConfig.ofType.ofType), list: true, listNotNull: true }
     } else {
       throw new Error(`Not a valid scalar type: ${fieldConfig.toString()}`)
     }
