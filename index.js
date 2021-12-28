@@ -1,4 +1,13 @@
-const { GraphQLFloat, GraphQLInt, GraphQLString, GraphQLNonNull, isNonNullType, isScalarType } = require('graphql')
+const {
+  GraphQLFloat,
+  GraphQLInt,
+  GraphQLString,
+  GraphQLNonNull,
+  isNonNullType,
+  isScalarType,
+  GraphQLList,
+  isListType
+} = require('graphql')
 const { getDirectives, mapSchema, MapperKind } = require('@graphql-tools/utils')
 const ConstraintStringType = require('./scalars/string')
 const ConstraintNumberType = require('./scalars/number')
@@ -6,76 +15,114 @@ const ConstraintNumberType = require('./scalars/number')
 function constraintDirective () {
   const constraintTypes = {}
 
-  function getConstraintType (fieldName, type, notNull, directiveArgumentMap) {
+  function getConstraintType (fieldName, type, notNull, directiveArgumentMap, list, listNotNull) {
     // Names must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ as per graphql-js
     let uniqueTypeName
     if (directiveArgumentMap.uniqueTypeName) {
       uniqueTypeName = directiveArgumentMap.uniqueTypeName.replace(/\W/g, '')
     } else {
-      uniqueTypeName = `${fieldName}_${type.name}_${notNull ? 'NotNull_' : ''}` + Object.entries(directiveArgumentMap)
-        .map(([key, value]) => {
-          if (key === 'min' || key === 'max' || key === 'exclusiveMin' || key === 'exclusiveMax' || key === 'multipleOf') {
-            return `${key}_${value.toString().replace(/\W/g, 'dot')}`
-          }
-          return `${key}_${value.toString().replace(/\W/g, '')}`
-        })
-        .join('_')
+      uniqueTypeName =
+                `${fieldName}_${list ? 'List_' : ''}${listNotNull ? 'ListNotNull_' : ''}${
+                  type.name
+                }_${notNull ? 'NotNull_' : ''}` +
+                Object.entries(directiveArgumentMap)
+                  .map(([key, value]) => {
+                    if (
+                      key === 'min' ||
+                            key === 'max' ||
+                            key === 'exclusiveMin' ||
+                            key === 'exclusiveMax' ||
+                            key === 'multipleOf'
+                    ) {
+                      return `${key}_${value.toString().replace(/\W/g, 'dot')}`
+                    }
+                    return `${key}_${value.toString().replace(/\W/g, '')}`
+                  })
+                  .join('_')
     }
     const key = Symbol.for(uniqueTypeName)
     let constraintType = constraintTypes[key]
-
     if (constraintType) return constraintType
-
     if (type === GraphQLString) {
       if (notNull) {
-        constraintType = new GraphQLNonNull(new ConstraintStringType(fieldName, uniqueTypeName, type, directiveArgumentMap))
+        constraintType = new GraphQLNonNull(
+          new ConstraintStringType(fieldName, uniqueTypeName, type, directiveArgumentMap)
+        )
       } else {
-        constraintType = new ConstraintStringType(fieldName, uniqueTypeName, type, directiveArgumentMap)
+        constraintType = new ConstraintStringType(
+          fieldName,
+          uniqueTypeName,
+          type,
+          directiveArgumentMap
+        )
       }
     } else if (type === GraphQLFloat || type === GraphQLInt) {
       if (notNull) {
-        constraintType = new GraphQLNonNull(new ConstraintNumberType(fieldName, uniqueTypeName, type, directiveArgumentMap))
+        constraintType = new GraphQLNonNull(
+          new ConstraintNumberType(fieldName, uniqueTypeName, type, directiveArgumentMap)
+        )
       } else {
-        constraintType = new ConstraintNumberType(fieldName, uniqueTypeName, type, directiveArgumentMap)
+        constraintType = new ConstraintNumberType(
+          fieldName,
+          uniqueTypeName,
+          type,
+          directiveArgumentMap
+        )
       }
     } else {
       throw new Error(`Not a valid scalar type: ${type.toString()}`)
     }
-
+    if (list) {
+      constraintType = new GraphQLList(constraintType)
+      if (listNotNull) {
+        constraintType = new GraphQLNonNull(constraintType)
+      }
+    }
     constraintTypes[key] = constraintType
 
     return constraintType
   }
 
-  function wrapType (fieldConfig, directiveArgumentMap) {
-    let originalType, notNull
-
-    if (isNonNullType(fieldConfig.type)) {
-      originalType = fieldConfig.type.ofType
-      notNull = true
-    } else if (isScalarType(fieldConfig.type)) {
-      originalType = fieldConfig.type
+  function getScalarType (fieldConfig) {
+    if (isScalarType(fieldConfig)) {
+      return { scalarType: fieldConfig }
+    } else if (isListType(fieldConfig)) {
+      return { ...getScalarType(fieldConfig.ofType), list: true }
+    } else if (isNonNullType(fieldConfig) && isScalarType(fieldConfig.ofType)) {
+      return { scalarType: fieldConfig.ofType, scalarNotNull: true }
+    } else if (isNonNullType(fieldConfig)) {
+      return { ...getScalarType(fieldConfig.ofType.ofType), list: true, listNotNull: true }
     } else {
-      throw new Error(`Not a scalar type: ${fieldConfig.type.toString()}`)
+      throw new Error(`Not a valid scalar type: ${fieldConfig.toString()}`)
     }
-
-    const fieldName = fieldConfig.astNode.name.value
-
-    fieldConfig.type = getConstraintType(fieldName, originalType, notNull, directiveArgumentMap)
   }
 
-  return schema => mapSchema(schema, {
-    [MapperKind.FIELD]: (fieldConfig) => {
-      const directives = getDirectives(schema, fieldConfig)
-      const directiveArgumentMap = directives.constraint
+  function wrapType (fieldConfig, directiveArgumentMap) {
+    const result = getScalarType(fieldConfig.type)
+    const fieldName = fieldConfig.astNode.name.value
+    fieldConfig.type = getConstraintType(
+      fieldName,
+      result.scalarType,
+      result.scalarNotNull,
+      directiveArgumentMap,
+      result.list,
+      result.listNotNull
+    )
+  }
 
-      if (directiveArgumentMap) {
-        wrapType(fieldConfig, directiveArgumentMap)
+  return (schema) =>
+    mapSchema(schema, {
+      [MapperKind.FIELD]: (fieldConfig) => {
+        const directives = getDirectives(schema, fieldConfig)
+        const directiveArgumentMap = directives.constraint
 
-        return fieldConfig
+        if (directiveArgumentMap) {
+          wrapType(fieldConfig, directiveArgumentMap)
+
+          return fieldConfig
+        }
       }
-    }
-  })
+    })
 }
 
 const constraintDirectiveTypeDefs = `
