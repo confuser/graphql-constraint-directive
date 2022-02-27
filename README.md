@@ -1,6 +1,6 @@
 # graphql-constraint-directive
 
-[![Build Status](https://api.travis-ci.org/confuser/graphql-constraint-directive.svg?branch=master)](https://travis-ci.org/confuser/graphql-constraint-directive)
+[![Build Status](https://github.com/confuser/graphql-constraint-directive/actions/workflows/build.yaml/badge.svg)](https://github.com/confuser/graphql-constraint-directive/actions/workflows/build.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/confuser/graphql-constraint-directive/badge.svg?branch=master)](https://coveralls.io/github/confuser/graphql-constraint-directive?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/confuser/graphql-constraint-directive/badge.svg?targetFile=package.json)](https://snyk.io/test/github/confuser/graphql-constraint-directive?targetFile=package.json)
 
@@ -16,7 +16,7 @@ npm install graphql-constraint-directive
 const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
 const { ApolloServer } = require('apollo-server-express')
-const { makeExecutableSchema } = require('graphql-tools')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
 const typeDefs = `
   type Query {
     books: [Book]
@@ -38,6 +38,8 @@ schema = constraintDirective()(schema)
 
 const app = express()
 const server = new ApolloServer({ schema })
+
+await server.start()
 
 server.applyMiddleware({ app })
 
@@ -121,7 +123,8 @@ Each validation error throws a `ConstraintDirectiveError`. Combined with a forma
 
 ```js
 const formatError = function (error) {
-  if (error.originalError && error.originalError.code === 'ERR_GRAPHQL_CONSTRAINT_VALIDATION') {
+  const code = error?.originalError?.originalError?.code || error?.originalError?.code || error?.code
+  if (code === 'ERR_GRAPHQL_CONSTRAINT_VALIDATION') {
     // return a custom object
   }
 
