@@ -1,7 +1,7 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const setup = require('./setup')
 const formatError = (error) => {
-  const { message, code, fieldName, context } = error.originalError
+  const { message, code, fieldName, context } = error?.originalError?.originalError || error?.originalError || error
 
   return { message, code, fieldName, context }
 }
@@ -14,7 +14,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
   }`
 
   describe('#min', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -29,15 +29,14 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
         title: Float! @constraint(min: 2.99)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 3 } }
-        })
+        .send({ query, variables: { input: { title: 3 } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -47,8 +46,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 2 } }
-        })
+        .send({ query, variables: { input: { title: 2 } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -56,7 +54,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -73,7 +71,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#max', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -88,15 +86,14 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
         title: Float @constraint(max: 3.1)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 2 } }
-        })
+        .send({ query, variables: { input: { title: 2 } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -106,8 +103,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 4 } }
-        })
+        .send({ query, variables: { input: { title: 4 } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -115,7 +111,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -132,7 +128,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#exclusiveMin', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -147,7 +143,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
         title: Float! @constraint(exclusiveMin: 3)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
@@ -176,7 +172,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -193,7 +189,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#exclusiveMax', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -208,7 +204,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
         title: Float! @constraint(exclusiveMax: 3)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
@@ -237,7 +233,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -254,7 +250,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#multipleOf', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -269,15 +265,14 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
         title: Float! @constraint(multipleOf: 2.5)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 12.5 } }
-        })
+        .send({ query, variables: { input: { title: 12.5 } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -287,8 +282,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 7 } }
-        })
+        .send({ query, variables: { input: { title: 7 } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -296,7 +290,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -313,7 +307,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#notNull', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -328,15 +322,14 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
         title: Float! @constraint(multipleOf: 2)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should fail with null', async function () {
-      let { body, statusCode } = await this.request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: null } }
-        })
+        .send({ query, variables: { input: { title: null } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -344,11 +337,10 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should fail with undefined', async function () {
-      let { body, statusCode } = await this.request
+      const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: undefined } }
-        })
+        .send({ query, variables: { input: { title: undefined } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -357,7 +349,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#uniqueTypeName', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -372,15 +364,14 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
         title: Float! @constraint(min: 3, uniqueTypeName: "BookInput_Title")
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 3 } }
-        })
+        .send({ query, variables: { input: { title: 3 } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -390,8 +381,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 2 } }
-        })
+        .send({ query, variables: { input: { title: 2 } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -399,7 +389,7 @@ describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -433,7 +423,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   }
 
   describe('#min', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -445,8 +435,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -457,8 +447,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 1}, {title: 2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -469,8 +459,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 1}, {title: 2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -487,7 +477,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#min0', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -499,8 +489,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 1}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -511,8 +501,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: -1}, {title: 2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: -1 }, { title: 2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -524,7 +514,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#max', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -536,8 +526,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 1}, {title: 2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -548,8 +538,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -560,8 +550,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -578,7 +568,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#max0', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -590,8 +580,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 0}, {title: -2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 0 }, { title: -2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -602,8 +592,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: -2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: -2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -615,7 +605,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#exclusiveMin', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -627,8 +617,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 3}, {title: 4}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 3 }, { title: 4 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -639,8 +629,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -651,8 +641,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -669,7 +659,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#exclusiveMin0', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -681,8 +671,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 1}, {title: 4}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 4 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -693,8 +683,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 0}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 0 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -706,7 +696,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#exclusiveMax', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -718,8 +708,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 0}, {title: 1}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 0 }, { title: 1 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -730,8 +720,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 1}, {title: 2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -742,8 +732,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 1}, {title: 2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -760,7 +750,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#exclusiveMax0', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -772,8 +762,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: -1}, {title: -2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: -1 }, { title: -2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -784,8 +774,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 0}, {title: -2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 0 }, { title: -2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -797,7 +787,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#multipleOf', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -809,8 +799,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 2}, {title: 4}, {title: 6}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 2 }, { title: 4 }, { title: 6 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -821,8 +811,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 1}, {title: 2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -833,8 +823,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 1}, {title: 2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -851,7 +841,7 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
   })
 
   describe('#uniqueTypeName', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -863,8 +853,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 2}, {title: 3}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 2 }, { title: 3 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -875,8 +865,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 1}, {title: 2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -887,8 +877,8 @@ describe('@constraint Float in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 1}, {title: 2}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 1 }, { title: 2 }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')

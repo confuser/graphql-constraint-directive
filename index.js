@@ -8,7 +8,7 @@ const {
   GraphQLList,
   isListType
 } = require('graphql')
-const { getDirectives, mapSchema, MapperKind } = require('@graphql-tools/utils')
+const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
 const ConstraintStringType = require('./scalars/string')
 const ConstraintNumberType = require('./scalars/number')
 
@@ -113,8 +113,7 @@ function constraintDirective () {
   return (schema) =>
     mapSchema(schema, {
       [MapperKind.FIELD]: (fieldConfig) => {
-        const directives = getDirectives(schema, fieldConfig)
-        const directiveArgumentMap = directives.constraint
+        const directiveArgumentMap = getDirective(schema, fieldConfig, 'constraint')?.[0]
 
         if (directiveArgumentMap) {
           wrapType(fieldConfig, directiveArgumentMap)

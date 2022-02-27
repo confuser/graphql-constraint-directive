@@ -10,7 +10,7 @@
   "author": "James Mortemore (jamesmortemore@gmail.com)",
   "license": "ISC",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=14.0.0"
   },
   "repository": {
     "type": "git",
@@ -28,22 +28,22 @@
     "constraint"
   ],
   "devDependencies": {
-    "apollo-server-express": "^2.14.2",
+    "apollo-server-express": "^3.6.3",
     "coveralls": "^3.1.0",
-    "express": "^4.16.3",
-    "graphql": "^15.0.0",
-    "mocha": "^7.1.2",
+    "express": "^4.17.3",
+    "graphql": "^16.0.0",
+    "mocha": "^9.2.1",
     "nyc": "^15.0.1",
-    "standard": "^11.0.1",
-    "supertest": "^3.1.0"
+    "standard": "^16.0.4",
+    "supertest": "^6.2.2"
   },
   "dependencies": {
-    "@graphql-tools/schema": "^6.0.9",
-    "@graphql-tools/utils": "^6.0.9",
+    "@graphql-tools/schema": "^8.3.2",
+    "@graphql-tools/utils": "^8.6.2",
     "validator": "^13.6.0"
   },
   "peerDependencies": {
-    "graphql": "^14.0.0 || ^15.0.0"
+    "graphql": ">=14.0.0"
   },
   "standard": {
     "globals": [

@@ -1,5 +1,6 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const setup = require('./setup')
+
 describe('Array', function () {
   describe('Int', function () {
     const query = `mutation createBook($input: BookInput) {
@@ -9,7 +10,7 @@ describe('Array', function () {
       }`
 
     describe('#min', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
           type Query {
             books: [Book]
@@ -24,7 +25,7 @@ describe('Array', function () {
             title: [Int!]! @constraint(min: 3)
           }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -51,7 +52,7 @@ describe('Array', function () {
       })
     })
     describe('#max', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
           type Query {
             books: [Book]
@@ -66,7 +67,7 @@ describe('Array', function () {
             title: [Int!] @constraint(max: 3)
           }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -94,7 +95,7 @@ describe('Array', function () {
     })
 
     describe('#notNull', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
           type Query {
             books: [Book]
@@ -109,11 +110,11 @@ describe('Array', function () {
             title: [Int!] @constraint(multipleOf: 2)
           }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should fail with null', async function () {
-        let { body, statusCode } = await this.request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: [2, null] } } })
@@ -126,7 +127,7 @@ describe('Array', function () {
       })
 
       it('should fail with undefined', async function () {
-        let { body, statusCode } = await this.request
+        const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: [undefined] } } })
@@ -147,7 +148,7 @@ describe('Array', function () {
         }
       }`
     describe('#minLength', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
           type Query {
             books: [Book]
@@ -162,7 +163,7 @@ describe('Array', function () {
             title: [String!] @constraint(minLength: 3)
           }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -190,7 +191,7 @@ describe('Array', function () {
     })
 
     describe('#maxLength', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
           type Query {
             books: [Book]
@@ -205,7 +206,7 @@ describe('Array', function () {
             title: [String] @constraint(maxLength: 3)
           }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -233,7 +234,7 @@ describe('Array', function () {
     })
 
     describe('#uri', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
           type Query {
             books: [Book]
@@ -248,7 +249,7 @@ describe('Array', function () {
             title: [String!]! @constraint(format: "uri")
           }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
