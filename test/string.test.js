@@ -1,7 +1,7 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const setup = require('./setup')
 const formatError = (error) => {
-  const { message, code, fieldName, context } = error.originalError
+  const { message, code, fieldName, context } = error?.originalError?.originalError || error?.originalError || error
 
   return { message, code, fieldName, context }
 }
@@ -14,7 +14,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   }`
 
   describe('#minLength', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -29,15 +29,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String! @constraint(minLength: 3)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'he💩' } }
-        })
+        .send({ query, variables: { input: { title: 'he💩' } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -47,8 +46,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
-        })
+        .send({ query, variables: { input: { title: 'a💩' } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -56,7 +54,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -73,7 +71,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#maxLength', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -88,15 +86,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String @constraint(maxLength: 3)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
-        })
+        .send({ query, variables: { input: { title: 'a💩' } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -106,8 +103,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'fob💩' } }
-        })
+        .send({ query, variables: { input: { title: 'fob💩' } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -115,7 +111,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -132,7 +128,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#startsWith', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -147,15 +143,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String! @constraint(startsWith: "💩")
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '💩foo' } }
-        })
+        .send({ query, variables: { input: { title: '💩foo' } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -173,7 +168,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -190,7 +185,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#endsWith', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -205,15 +200,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String! @constraint(endsWith: "💩")
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
-        })
+        .send({ query, variables: { input: { title: 'a💩' } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -223,8 +217,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '💩bar' } }
-        })
+        .send({ query, variables: { input: { title: '💩bar' } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -232,7 +225,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -249,7 +242,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#contains', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -264,15 +257,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String! @constraint(contains: "💩")
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩o' } }
-        })
+        .send({ query, variables: { input: { title: 'a💩o' } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -282,8 +274,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'fobar' } }
-        })
+        .send({ query, variables: { input: { title: 'fobar' } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -291,7 +282,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -308,7 +299,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#notContains', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -323,15 +314,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String! @constraint(notContains: "foo")
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '💩' } }
-        })
+        .send({ query, variables: { input: { title: '💩' } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -341,8 +331,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '💩foobar' } }
-        })
+        .send({ query, variables: { input: { title: '💩foobar' } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -350,7 +339,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -367,7 +356,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#pattern', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -382,15 +371,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String! @constraint(pattern: "^[0-9a-zA-Z]*$")
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'afoo' } }
-        })
+        .send({ query, variables: { input: { title: 'afoo' } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -400,8 +388,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: '£££' } }
-        })
+        .send({ query, variables: { input: { title: '£££' } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -409,7 +396,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -427,7 +414,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
 
   describe('#format', function () {
     describe('#byte', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -442,7 +429,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "byte")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -471,7 +458,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -488,7 +475,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     describe('#date-time', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -503,7 +490,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "date-time")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -532,7 +519,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -549,7 +536,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     describe('#date', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -564,7 +551,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "date")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -593,7 +580,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -610,7 +597,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     describe('#email', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -625,7 +612,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "email")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -654,7 +641,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -671,7 +658,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     describe('#ipv4', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -686,7 +673,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "ipv4")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -715,7 +702,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -732,7 +719,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     describe('#ipv6', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -747,7 +734,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "ipv6")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -776,7 +763,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -793,7 +780,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     describe('#uri', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -808,7 +795,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "uri")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -837,7 +824,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -854,7 +841,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     describe('#uuid', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -869,7 +856,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "uuid")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should pass', async function () {
@@ -898,7 +885,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -915,7 +902,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     describe('#unknown', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -930,7 +917,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
           title: String! @constraint(format: "test")
         }`
 
-        this.request = setup(this.typeDefs)
+        this.request = await setup(this.typeDefs)
       })
 
       it('should fail', async function () {
@@ -947,7 +934,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       })
 
       it('should throw custom error', async function () {
-        const request = setup(this.typeDefs, formatError)
+        const request = await setup(this.typeDefs, formatError)
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -965,7 +952,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#notNull', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -980,15 +967,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String! @constraint(minLength: 3)
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should fail with null', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: null } }
-        })
+        .send({ query, variables: { input: { title: null } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -999,8 +985,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: undefined } }
-        })
+        .send({ query, variables: { input: { title: undefined } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -1009,7 +994,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
   })
 
   describe('#uniqueTypeName', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1024,15 +1009,14 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
         title: String! @constraint(minLength: 3, uniqueTypeName: "BookInput_Title")
       }`
 
-      this.request = setup(this.typeDefs)
+      this.request = await setup(this.typeDefs)
     })
 
     it('should pass', async function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'he💩' } }
-        })
+        .send({ query, variables: { input: { title: 'he💩' } } })
 
       strictEqual(statusCode, 200)
       deepStrictEqual(body, { data: { createBook: null } })
@@ -1042,8 +1026,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
-        .send({ query, variables: { input: { title: 'a💩' } }
-        })
+        .send({ query, variables: { input: { title: 'a💩' } } })
 
       strictEqual(statusCode, 400)
       strictEqual(body.errors[0].message,
@@ -1051,7 +1034,7 @@ describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const request = setup(this.typeDefs, formatError)
+      const request = await setup(this.typeDefs, formatError)
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1085,7 +1068,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
   }
 
   describe('#minLength', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1096,8 +1079,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo'}, {title: 'foobar'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo' }, { title: 'foobar' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1108,8 +1091,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'fo' }, { title: 'foo' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1120,8 +1103,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'fo' }, { title: 'foo' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1138,7 +1121,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
   })
 
   describe('#maxLength', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1149,8 +1132,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}, {title: 'bar'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'fo' }, { title: 'foo' }, { title: 'bar' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1161,8 +1144,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'foo'}, {title: 'foobar'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo' }, { title: 'foobar' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1173,8 +1156,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'foo'}, {title: 'foobar'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo' }, { title: 'foobar' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1191,7 +1174,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
   })
 
   describe('#startsWith', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1202,8 +1185,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: '💩baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: '💩foo' }, { title: '💩bar' }, { title: '💩baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1214,8 +1197,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: '💩foo' }, { title: '💩bar' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1226,8 +1209,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: '💩foo'}, {title: '💩bar'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: '💩foo' }, { title: '💩bar' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1244,7 +1227,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
   })
 
   describe('#endsWith', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1255,8 +1238,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz💩'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo💩' }, { title: 'bar💩' }, { title: 'baz💩' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1267,8 +1250,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo💩' }, { title: 'bar💩' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1279,8 +1262,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'foo💩'}, {title: 'bar💩'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo💩' }, { title: 'bar💩' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1297,7 +1280,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
   })
 
   describe('#contains', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1308,8 +1291,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'baz💩baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo💩foo' }, { title: 'bar💩bar' }, { title: 'baz💩baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1320,8 +1303,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'bazbaz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo💩foo' }, { title: 'bar💩bar' }, { title: 'bazbaz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1332,8 +1315,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'bar💩bar'}, {title: 'bazbaz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo💩foo' }, { title: 'bar💩bar' }, { title: 'bazbaz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1350,7 +1333,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
   })
 
   describe('#notContains', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1361,8 +1344,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo'}, {title: 'bar'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo' }, { title: 'bar' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1373,8 +1356,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'barr'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo💩foo' }, { title: 'barr' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1385,8 +1368,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'foo💩foo'}, {title: 'barr'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo💩foo' }, { title: 'barr' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1403,7 +1386,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
   })
 
   describe('#pattern', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1414,8 +1397,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo'}, {title: 'bar'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo' }, { title: 'bar' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1426,8 +1409,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: '💩'}, {title: '£££'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: '💩' }, { title: '£££' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1438,8 +1421,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: '💩'}, {title: '£££'}, {title: 'baz'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: '💩' }, { title: '£££' }, { title: 'baz' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1457,7 +1440,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
   describe('#format', function () {
     describe('#byte', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1469,7 +1452,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should pass', async function () {
         const mockData = [{ title: 'afoo' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1481,7 +1464,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: '£££' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1493,7 +1476,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: '£££' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1510,7 +1493,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     describe('#date-time', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1522,7 +1505,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should pass', async function () {
         const mockData = [{ title: '2018-05-16T12:57:00Z' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1534,7 +1517,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: '2018-05-1612:57:00Z' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1546,7 +1529,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: '2018-05-1612:57:00Z' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1563,7 +1546,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     describe('#date', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1575,7 +1558,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should pass', async function () {
         const mockData = [{ title: '2018-05-16' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1587,7 +1570,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1599,7 +1582,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1616,7 +1599,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     describe('#email', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1628,7 +1611,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should pass', async function () {
         const mockData = [{ title: 'test@test.com' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1640,7 +1623,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: 'testtest.com' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1652,7 +1635,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: 'testtest.com' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1669,7 +1652,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     describe('#ipv4', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1681,7 +1664,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should pass', async function () {
         const mockData = [{ title: '127.0.0.1' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1693,7 +1676,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: '256.256.256.256' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1705,7 +1688,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: '256.256.256.256' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1722,7 +1705,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     describe('#ipv6', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1734,7 +1717,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should pass', async function () {
         const mockData = [{ title: '2001:db8:0000:1:1:1:1:1' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1746,7 +1729,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1758,7 +1741,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1775,7 +1758,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     describe('#uri', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1787,7 +1770,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should pass', async function () {
         const mockData = [{ title: 'foobar.com' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1799,7 +1782,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1811,7 +1794,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1828,7 +1811,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     describe('#uuid', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1840,7 +1823,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should pass', async function () {
         const mockData = [{ title: 'A987FBC9-4BED-3078-CF07-9141BA07C9F3' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1852,7 +1835,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1864,7 +1847,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1881,7 +1864,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     describe('#unknown', function () {
-      before(function () {
+      before(async function () {
         this.typeDefs = `
         type Query {
           books: [Book]
@@ -1893,7 +1876,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should fail', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1905,7 +1888,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
 
       it('should throw custom error', async function () {
         const mockData = [{ title: 'a' }]
-        const request = setup(this.typeDefs, formatError, resolvers(mockData))
+        const request = await setup(this.typeDefs, formatError, resolvers(mockData))
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
@@ -1923,7 +1906,7 @@ describe('@constraint String in FIELD_DEFINITION', function () {
   })
 
   describe('#uniqueTypeName', function () {
-    before(function () {
+    before(async function () {
       this.typeDefs = `
       type Query {
         books: [Book]
@@ -1934,8 +1917,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should pass', async function () {
-      const mockData = [{title: 'foo'}, {title: 'foobar'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'foo' }, { title: 'foobar' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1946,8 +1929,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should fail', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'fo' }, { title: 'foo' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')
@@ -1958,8 +1941,8 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
 
     it('should throw custom error', async function () {
-      const mockData = [{title: 'fo'}, {title: 'foo'}]
-      const request = setup(this.typeDefs, formatError, resolvers(mockData))
+      const mockData = [{ title: 'fo' }, { title: 'foo' }]
+      const request = await setup(this.typeDefs, formatError, resolvers(mockData))
       const { body, statusCode } = await request
         .post('/graphql')
         .set('Accept', 'application/json')

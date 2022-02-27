@@ -3,7 +3,7 @@ const { getIntrospectionQuery } = require('graphql')
 const setup = require('./setup')
 
 describe('Introspection', function () {
-  before(function () {
+  before(async function () {
     this.typeDefs = `
     type Query {
       books: [Book]
@@ -19,7 +19,7 @@ describe('Introspection', function () {
       subTitle: Int! @constraint(max: 3, uniqueTypeName: "BookInput_subTitle")
     }`
 
-    this.request = setup(this.typeDefs)
+    this.request = await setup(this.typeDefs)
   })
 
   it('should allow introspection', async function () {
