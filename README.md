@@ -11,6 +11,12 @@ Allows using @constraint as a directive to validate input data. Inspired by [Con
 npm install graphql-constraint-directive
 ```
 
+For GraphQL v15 and below, use v2 of this package
+
+```
+npm install graphql-constraint-directive@v2
+```
+
 ## Usage
 ```js
 const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
