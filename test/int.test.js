@@ -348,6 +348,46 @@ describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
     })
   })
 
+  describe('#null', function () {
+    before(async function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String
+      }
+      type Mutation {
+        createBook(input: BookInput): Book
+      }
+      input BookInput {
+        title: Int @constraint(multipleOf: 2)
+      }`
+
+      this.request = await setup(this.typeDefs)
+    })
+
+    it('should pass with null', async function () {
+      const { body, statusCode } = await this.request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: null } } })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { createBook: null } })
+    })
+
+    it('should pass with undefined', async function () {
+      const { body, statusCode } = await this.request
+        .post('/graphql')
+        .set('Accept', 'application/json')
+        .send({ query, variables: { input: { title: undefined } } })
+
+      strictEqual(statusCode, 200)
+      deepStrictEqual(body, { data: { createBook: null } })
+    })
+  })
+
   describe('#uniqueTypeName', function () {
     before(async function () {
       this.typeDefs = `
