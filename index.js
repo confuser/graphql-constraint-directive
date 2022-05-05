@@ -120,11 +120,20 @@ function constraintDirective () {
 
           return fieldConfig
         }
+      },
+      [MapperKind.ARGUMENT]: (fieldConfig) => {
+        const directiveArgumentMap = getDirective(schema, fieldConfig, 'constraint')?.[0]
+
+        if (directiveArgumentMap) {
+          wrapType(fieldConfig, directiveArgumentMap)
+
+          return fieldConfig
+        }
       }
     })
 }
 
-const constraintDirectiveTypeDefs = `
+const constraintDirectiveTypeDefs = /* GraphQL */`
   directive @constraint(
     # String constraints
     minLength: Int
@@ -143,6 +152,6 @@ const constraintDirectiveTypeDefs = `
     exclusiveMax: Float
     multipleOf: Float
     uniqueTypeName: String
-  ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION`
+  ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION | ARGUMENT_DEFINITION`
 
 module.exports = { constraintDirective, constraintDirectiveTypeDefs }
