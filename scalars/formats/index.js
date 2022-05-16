@@ -1,17 +1,10 @@
-const formats = [
-  'byte',
-  'date-time',
-  'date',
-  'email',
-  'ipv4',
-  'ipv6',
-  'uri',
-  'uuid'
-]
-const fns = {}
-
-formats.forEach(function (format) {
-  fns[format] = require('./' + format)
-})
-
-module.exports = fns
+module.exports = {
+  byte: require('./byte'),
+  'date-time': require('./date-time'),
+  date: require('./date'),
+  email: require('./email'),
+  ipv4: require('./ipv4'),
+  ipv6: require('./ipv6'),
+  uri: require('./uri'),
+  uuid: require('./uuid')
+}
