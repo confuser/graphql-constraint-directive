@@ -1,21 +1,12 @@
-const byte = require('./byte')
-const time = require('./date-time')
-const date = require('./date')
-const email = require('./email')
-const ipv4 = require('./ipv4')
-const ipv6 = require('./ipv6')
-const uri = require('./uri')
-const uuid = require('./uuid')
-
 const fns = {
-  byte,
-  'date-time': time,
-  date,
-  email,
-  ipv4,
-  ipv6,
-  uri,
-  uuid
+  byte: require('./byte'),
+  'date-time': require('./date-time'),
+  date: require('./date'),
+  email: require('./email'),
+  ipv4: require('./ipv4'),
+  ipv6: require('./ipv6'),
+  uri: require('./uri'),
+  uuid: require('./uuid')
 }
 
 module.exports = fns
