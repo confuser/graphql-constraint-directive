@@ -1,4 +1,4 @@
-const fns = {
+module.exports = {
   byte: require('./byte'),
   'date-time': require('./date-time'),
   date: require('./date'),
@@ -8,5 +8,3 @@ const fns = {
   uri: require('./uri'),
   uuid: require('./uuid')
 }
-
-module.exports = fns
