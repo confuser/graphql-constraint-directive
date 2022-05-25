@@ -1,7 +1,7 @@
 const { GraphQLScalarType } = require('graphql')
 const ValidationError = require('../lib/error')
 
-module.exports = class ConstraintNumberType extends GraphQLScalarType {
+class ConstraintNumberType extends GraphQLScalarType {
   constructor (fieldName, uniqueTypeName, type, args) {
     super({
       name: uniqueTypeName,
@@ -64,3 +64,5 @@ function validate (fieldName, args, value) {
       [{ arg: 'multipleOf', value: args.multipleOf }])
   }
 }
+
+module.exports = { ConstraintNumberType, validate }

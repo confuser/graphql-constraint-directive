@@ -1,22 +1,21 @@
 const {
-  GraphQLFloat,
-  GraphQLInt,
-  GraphQLString,
   GraphQLNonNull,
-  isNonNullType,
-  isScalarType,
   GraphQLList,
-  isListType
+  TypeInfo,
+  ValidationContext,
+  visit,
+  visitWithTypeInfo,
+  separateOperations
 } = require('graphql')
+const QueryValidationVisitor = require('./lib/QueryValidationVisitor.js')
 const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
-const ConstraintStringType = require('./scalars/string')
-const ConstraintNumberType = require('./scalars/number')
+const { getConstraintTypeObject, getScalarType } = require('./lib/typeutils')
 
 function constraintDirective () {
   const constraintTypes = {}
 
   function getConstraintType (fieldName, type, notNull, directiveArgumentMap, list, listNotNull) {
-    // Names must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ as per graphql-js
+  // Names must match /^[_a-zA-Z][_a-zA-Z0-9]*$/ as per graphql-js
     let uniqueTypeName
     if (directiveArgumentMap.uniqueTypeName) {
       uniqueTypeName = directiveArgumentMap.uniqueTypeName.replace(/\W/g, '')
@@ -43,34 +42,9 @@ function constraintDirective () {
     const key = Symbol.for(uniqueTypeName)
     let constraintType = constraintTypes[key]
     if (constraintType) return constraintType
-    if (type === GraphQLString) {
-      if (notNull) {
-        constraintType = new GraphQLNonNull(
-          new ConstraintStringType(fieldName, uniqueTypeName, type, directiveArgumentMap)
-        )
-      } else {
-        constraintType = new ConstraintStringType(
-          fieldName,
-          uniqueTypeName,
-          type,
-          directiveArgumentMap
-        )
-      }
-    } else if (type === GraphQLFloat || type === GraphQLInt) {
-      if (notNull) {
-        constraintType = new GraphQLNonNull(
-          new ConstraintNumberType(fieldName, uniqueTypeName, type, directiveArgumentMap)
-        )
-      } else {
-        constraintType = new ConstraintNumberType(
-          fieldName,
-          uniqueTypeName,
-          type,
-          directiveArgumentMap
-        )
-      }
-    } else {
-      throw new Error(`Not a valid scalar type: ${type.toString()}`)
+    constraintType = getConstraintTypeObject(fieldName, type, uniqueTypeName, directiveArgumentMap)
+    if (notNull) {
+      constraintType = new GraphQLNonNull(constraintType)
     }
     if (list) {
       constraintType = new GraphQLList(constraintType)
@@ -81,20 +55,6 @@ function constraintDirective () {
     constraintTypes[key] = constraintType
 
     return constraintType
-  }
-
-  function getScalarType (fieldConfig) {
-    if (isScalarType(fieldConfig)) {
-      return { scalarType: fieldConfig }
-    } else if (isListType(fieldConfig)) {
-      return { ...getScalarType(fieldConfig.ofType), list: true }
-    } else if (isNonNullType(fieldConfig) && isScalarType(fieldConfig.ofType)) {
-      return { scalarType: fieldConfig.ofType, scalarNotNull: true }
-    } else if (isNonNullType(fieldConfig)) {
-      return { ...getScalarType(fieldConfig.ofType.ofType), list: true, listNotNull: true }
-    } else {
-      throw new Error(`Not a valid scalar type: ${fieldConfig.toString()}`)
-    }
   }
 
   function wrapType (fieldConfig, directiveArgumentMap) {
@@ -133,6 +93,53 @@ function constraintDirective () {
     })
 }
 
+function validateQuery (schema, query, variables, operationName) {
+  console.log('validateQuery')
+  const typeInfo = new TypeInfo(schema)
+
+  const errors = []
+  const context = new ValidationContext(
+    schema,
+    query,
+    typeInfo,
+    (error) => errors.push(error)
+  )
+  const visitor = new QueryValidationVisitor(context, {
+    variables,
+    operationName
+  })
+
+  visit(query, visitWithTypeInfo(typeInfo, visitor))
+
+  return errors
+}
+
+function createApolloQueryValidationPlugin ({ schema }) {
+  return {
+    async requestDidStart () {
+      return ({
+        async didResolveOperation ({ request, document }) {
+          console.log('Apollo didResolveOperation starts')
+          const query = request.operationName
+            ? separateOperations(document)[request.operationName]
+            : document
+
+          const errors = validateQuery(
+            schema,
+            query,
+            request.variables,
+            request.operationName
+          )
+          console.log('Apollo didResolveOperation finishes with errors: ' + errors)
+          if (errors.length > 0) {
+            throw errors
+          }
+        }
+      })
+    }
+  }
+}
+
 const constraintDirectiveTypeDefs = /* GraphQL */`
   directive @constraint(
     # String constraints
@@ -154,4 +161,4 @@ const constraintDirectiveTypeDefs = /* GraphQL */`
     uniqueTypeName: String
   ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION | ARGUMENT_DEFINITION`
 
-module.exports = { constraintDirective, constraintDirectiveTypeDefs }
+module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin }
