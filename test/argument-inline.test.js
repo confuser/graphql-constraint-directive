@@ -1,18 +1,23 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { formatError, valueByImplType } = require('./testutils')
+const { formatError } = require('./testutils')
 
 exports.test = function (setup, implType) {
-  const queryIntType = valueByImplType(implType, 'size_Int_max_3', 'Int')
-
-  describe('@constraint Int in ARGUMENT_DEFINITION with value provided over Query variable', function () {
+  describe('@constraint Int in ARGUMENT_DEFINITION with value inline in the Query', function () {
     describe('#max', function () {
-      const query = /* GraphQL */`
-        query ($size: ${queryIntType}) {
-            books(size: $size) {
+      const queryOk = /* GraphQL */`
+        query {
+            books(size: 3) {
                 title
             }
         }
-    `
+      `
+      const queryFailing = /* GraphQL */`
+        query {
+            books(size: 100) {
+              title
+            }
+        }
+      `
 
       before(async function () {
         this.typeDefs = /* GraphQL */`
@@ -31,7 +36,7 @@ exports.test = function (setup, implType) {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { size: 2 } })
+          .send({ query: queryOk })
 
         strictEqual(statusCode, 200)
         deepStrictEqual(body, { data: { books: null } })
@@ -41,11 +46,12 @@ exports.test = function (setup, implType) {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { size: 100 } })
+          .send({ query: queryFailing })
 
         strictEqual(statusCode, 400)
+        // console.log(body.errors)
         strictEqual(body.errors[0].message,
-          'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_3"', '') + '. Must be no greater than 3')
+          'Argument "size" of "books" got invalid value 100. Must be no greater than 3')
       })
 
       it('should throw custom error', async function () {
@@ -53,7 +59,7 @@ exports.test = function (setup, implType) {
         const { body, statusCode } = await request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query, variables: { size: 100 } })
+          .send({ query: queryFailing })
 
         strictEqual(statusCode, 400)
         deepStrictEqual(body.errors[0], {

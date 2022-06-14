@@ -2,24 +2,19 @@ const express = require('express')
 const { ApolloServer } = require('apollo-server-express')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
 const request = require('supertest')
-const { constraintDirectiveTypeDefs, constraintDirective, createApolloQueryValidationPlugin } = require('../')
+const { createApolloQueryValidationPlugin, constraintDirectiveTypeDefs } = require('..')
 
 module.exports = async function (typeDefs, formatError, resolvers) {
-  let schema = makeExecutableSchema({
+  const schema = makeExecutableSchema({
     typeDefs: [constraintDirectiveTypeDefs, typeDefs],
     resolvers
   })
 
-  const plugins = []
-  if (process.env.VALIDATOR_TYPE === 'apollo') {
-    plugins.push(
-      createApolloQueryValidationPlugin({
-        schema
-      })
-    )
-  } else {
-    schema = constraintDirective()(schema)
-  }
+  const plugins = [
+    createApolloQueryValidationPlugin({
+      schema
+    })
+  ]
 
   const app = express()
   const server = new ApolloServer({

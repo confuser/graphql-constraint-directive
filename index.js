@@ -94,7 +94,7 @@ function constraintDirective () {
 }
 
 function validateQuery (schema, query, variables, operationName) {
-  console.log('validateQuery')
+  // console.log('validateQuery')
   const typeInfo = new TypeInfo(schema)
 
   const errors = []
@@ -119,7 +119,7 @@ function createApolloQueryValidationPlugin ({ schema }) {
     async requestDidStart () {
       return ({
         async didResolveOperation ({ request, document }) {
-          console.log('Apollo didResolveOperation starts')
+          // console.log('Apollo didResolveOperation starts')
           const query = request.operationName
             ? separateOperations(document)[request.operationName]
             : document
@@ -130,7 +130,7 @@ function createApolloQueryValidationPlugin ({ schema }) {
             request.variables,
             request.operationName
           )
-          console.log('Apollo didResolveOperation finishes with errors: ' + errors)
+          // console.log('Apollo didResolveOperation finishes with errors: ' + errors)
           if (errors.length > 0) {
             throw errors
           }
