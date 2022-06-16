@@ -4,7 +4,7 @@ const { IMPL_TYPE_SERVER_VALIDATOR } = require('./testutils')
 const IMPL_TYPE = IMPL_TYPE_SERVER_VALIDATOR
 
 describe('Server validator based implementation - Apollo plugin', function () {
-  // require('./introspection.test').test(setup, IMPL_TYPE)
+  require('./introspection.test').test(setup, IMPL_TYPE)
   require('./argument.test').test(setup, IMPL_TYPE)
   require('./argument-inline.test').test(setup, IMPL_TYPE)
 
