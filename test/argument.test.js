@@ -3,6 +3,7 @@ const { formatError, valueByImplType } = require('./testutils')
 
 exports.test = function (setup, implType) {
   const queryIntType = valueByImplType(implType, 'size_Int_max_3', 'Int')
+  const query2IntType = valueByImplType(implType, 'size_Int_max_4', 'Int')
 
   describe('@constraint Int in ARGUMENT_DEFINITION with value provided over Query variable', function () {
     describe('#max', function () {
@@ -14,13 +15,24 @@ exports.test = function (setup, implType) {
         }
     `
 
+      const query2 = /* GraphQL */`
+        query ($size: ${query2IntType}) {
+            book {
+                title
+                authors(size: $size)
+            }
+        }
+        `
+
       before(async function () {
         this.typeDefs = /* GraphQL */`
           type Query {
               books (size: Int @constraint(max: 3)): [Book]
+              book: Book
           }
           type Book {
               title: String
+              authors (size: Int @constraint(max: 4)): [String]
           }
       `
 
@@ -37,6 +49,16 @@ exports.test = function (setup, implType) {
         deepStrictEqual(body, { data: { books: null } })
       })
 
+      it('should pass - deeper nesting', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query: query2, variables: { size: 2 } })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { book: null } })
+      })
+
       it('should fail', async function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
@@ -46,6 +68,17 @@ exports.test = function (setup, implType) {
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
           'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_3"', '') + '. Must be no greater than 3')
+      })
+
+      it('should fail - deeper nesting', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query: query2, variables: { size: 100 } })
+
+        strictEqual(statusCode, 400)
+        strictEqual(body.errors[0].message,
+          'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_4"', '') + '. Must be no greater than 4')
       })
 
       it('should throw custom error', async function () {
