@@ -13,16 +13,25 @@ exports.test = function (setup, implType) {
                 title
             }
         }
-    `
+      `
 
-      const query2 = /* GraphQL */`
+      const queryDeeper = /* GraphQL */`
         query ($size: ${query2IntType}) {
             book {
                 title
                 authors(size: $size)
             }
         }
-        `
+      `
+
+      const queryTwoVariables = /* GraphQL */`
+        query ($size: ${queryIntType}, $sizeAuthors: ${query2IntType}) {
+          books(size: $size) {
+                title
+                authors(size: $sizeAuthors)
+            }
+        }
+      `
 
       before(async function () {
         this.typeDefs = /* GraphQL */`
@@ -53,7 +62,7 @@ exports.test = function (setup, implType) {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query: query2, variables: { size: 2 } })
+          .send({ query: queryDeeper, variables: { size: 4 } })
 
         strictEqual(statusCode, 200)
         deepStrictEqual(body, { data: { book: null } })
@@ -74,11 +83,25 @@ exports.test = function (setup, implType) {
         const { body, statusCode } = await this.request
           .post('/graphql')
           .set('Accept', 'application/json')
-          .send({ query: query2, variables: { size: 100 } })
+          .send({ query: queryDeeper, variables: { size: 5 } })
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_4"', '') + '. Must be no greater than 4')
+          'Variable "$size" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"', '') + '. Must be no greater than 4')
+      })
+
+      it('should fail - more errors', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query: queryTwoVariables, variables: { size: 4, sizeAuthors: 5 } })
+
+        // console.log(body)
+        strictEqual(statusCode, 400)
+        strictEqual(body.errors[0].message,
+          'Variable "$size" got invalid value 4' + valueByImplType(implType, '; Expected type "size_Int_max_3"', '') + '. Must be no greater than 3')
+        strictEqual(body.errors[1].message,
+          'Variable "$sizeAuthors" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"', '') + '. Must be no greater than 4')
       })
 
       it('should throw custom error', async function () {
