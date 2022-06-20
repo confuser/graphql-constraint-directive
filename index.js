@@ -132,6 +132,7 @@ function createApolloQueryValidationPlugin ({ schema }) {
           )
           // console.log('Apollo didResolveOperation finishes with errors: ' + errors)
           if (errors.length > 0) {
+            // TODO translate errors for Apollo (to UserInputError) not to be reported as extension.code.INTERNAL_SERVER_ERROR
             throw errors
           }
         }

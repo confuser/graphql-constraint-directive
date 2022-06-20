@@ -924,6 +924,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query })
 
+        console.log(JSON.stringify(body))
         strictEqual(statusCode, 200)
         deepStrictEqual(body.errors[0], {
           message: 'Must be at least 2',
