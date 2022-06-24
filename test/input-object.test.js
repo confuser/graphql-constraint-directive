@@ -79,7 +79,7 @@ exports.test = function (setup, implType) {
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"', '') + '. Must be at least 3')
         strictEqual(body.errors[1].message,
-          'Variable "$input" got invalid value a at "input.author.name"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"', '') + '. Must be at least 2 characters in length')
+          'Variable "$input" got invalid value "a" at "input.author.name"' + valueByImplType(implType, '; Expected type "name_String_NotNull_minLength_2"', '') + '. Must be at least 2 characters in length')
       })
 
       it('should throw custom error', async function () {
@@ -93,7 +93,7 @@ exports.test = function (setup, implType) {
         deepStrictEqual(body.errors[0], {
           message: 'Must be at least 3',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: 'input.title',
+          fieldName: valueByImplType(implType, 'title', 'input.title'),
           context: [{ arg: 'min', value: 3 }]
         })
       })
@@ -142,7 +142,9 @@ exports.test = function (setup, implType) {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Argument "input" of "createBook" got invalid value 2 at "title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"', '') + '. Must be at least 3')
+          valueByImplType(implType,
+            'Expected value of type "title_Int_NotNull_min_3!", found 2; Must be at least 3',
+            'Argument "input" of "createBook" got invalid value 2 at "title". Must be at least 3'))
       })
 
       it('should fail - nested object', async function () {
@@ -155,9 +157,15 @@ exports.test = function (setup, implType) {
         strictEqual(statusCode, 400)
         strictEqual(body.errors.length, 2)
         strictEqual(body.errors[0].message,
-          'Argument "input" of "createBook" got invalid value 2 at "title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"', '') + '. Must be at least 3')
+          valueByImplType(implType,
+            'Expected value of type "title_Int_NotNull_min_3!", found 2; Must be at least 3',
+            'Argument "input" of "createBook" got invalid value 2 at "title". Must be at least 3')
+        )
         strictEqual(body.errors[1].message,
-          'Argument "input" of "createBook" got invalid value a at "author.name"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"', '') + '. Must be at least 2 characters in length')
+          valueByImplType(implType,
+            'Expected value of type "name_String_NotNull_minLength_2!", found "a"; Must be at least 2 characters in length',
+            'Argument "input" of "createBook" got invalid value "a" at "author.name". Must be at least 2 characters in length')
+        )
       })
 
       it('should throw custom error', async function () {
@@ -172,13 +180,13 @@ exports.test = function (setup, implType) {
         deepStrictEqual(body.errors[0], {
           message: 'Must be at least 3',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: 'input.title',
+          fieldName: valueByImplType(implType, 'title', 'input.title'),
           context: [{ arg: 'min', value: 3 }]
         })
         deepStrictEqual(body.errors[1], {
           message: 'Must be at least 2 characters in length',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: 'input.author.name',
+          fieldName: valueByImplType(implType, 'name', 'input.author.name'),
           context: [{ arg: 'minLength', value: 2 }]
         })
       })

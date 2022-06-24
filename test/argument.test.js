@@ -120,7 +120,7 @@ exports.test = function (setup, implType) {
         deepStrictEqual(body.errors[1], {
           message: 'Must be no greater than 4',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: 'sizeAuthors',
+          fieldName: valueByImplType(implType, 'size', 'sizeAuthors'),
           context: [{ arg: 'max', value: 4 }]
         })
       })
@@ -213,7 +213,10 @@ exports.test = function (setup, implType) {
         strictEqual(statusCode, 400)
         // console.log(body.errors)
         strictEqual(body.errors[0].message,
-          'Argument "size" of "books" got invalid value 100. Must be no greater than 3')
+          valueByImplType(implType,
+            'Expected value of type "size_Int_NotNull_max_3!", found 100; Must be no greater than 3',
+            'Argument "size" of "books" got invalid value 100. Must be no greater than 3')
+        )
       })
 
       it('should fail - deeper nesting', async function () {
@@ -225,7 +228,9 @@ exports.test = function (setup, implType) {
         strictEqual(statusCode, 400)
         // console.log(body.errors)
         strictEqual(body.errors[0].message,
-          'Argument "size" of "authors" got invalid value 5. Must be no greater than 4')
+          valueByImplType(implType,
+            'Expected value of type "size_Int_max_4", found 5; Must be no greater than 4',
+            'Argument "size" of "authors" got invalid value 5. Must be no greater than 4'))
       })
 
       it('should fail - more errors', async function () {
@@ -237,9 +242,15 @@ exports.test = function (setup, implType) {
         strictEqual(statusCode, 400)
         // console.log(body.errors)
         strictEqual(body.errors[0].message,
-          'Argument "size" of "books" got invalid value 100. Must be no greater than 3')
+          valueByImplType(implType,
+            'Expected value of type "size_Int_NotNull_max_3!", found 100; Must be no greater than 3',
+            'Argument "size" of "books" got invalid value 100. Must be no greater than 3')
+        )
         strictEqual(body.errors[1].message,
-          'Argument "size" of "authors" got invalid value 5. Must be no greater than 4')
+          valueByImplType(implType,
+            'Expected value of type "size_Int_max_4", found 5; Must be no greater than 4',
+            'Argument "size" of "authors" got invalid value 5. Must be no greater than 4')
+        )
       })
 
       it('should throw custom error', async function () {
@@ -253,13 +264,13 @@ exports.test = function (setup, implType) {
         deepStrictEqual(body.errors[0], {
           message: 'Must be no greater than 3',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: 'books.size',
+          fieldName: valueByImplType(implType, 'size', 'books.size'),
           context: [{ arg: 'max', value: 3 }]
         })
         deepStrictEqual(body.errors[1], {
           message: 'Must be no greater than 4',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: 'authors.size',
+          fieldName: valueByImplType(implType, 'size', 'authors.size'),
           context: [{ arg: 'max', value: 4 }]
         })
       })
