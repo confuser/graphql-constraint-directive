@@ -1,4 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
+const { valueByImplType } = require('./testutils')
 
 exports.test = function (setup, implType) {
   describe('Array', function () {
@@ -47,7 +48,9 @@ exports.test = function (setup, implType) {
           strictEqual(statusCode, 400)
           strictEqual(
             body.errors[0].message,
-            'Variable "$input" got invalid value 2 at "input.title[0]"; Expected type "title_List_ListNotNull_Int_NotNull_min_3". Must be at least 3'
+            'Variable "$input" got invalid value 2 at "input.title[0]"' +
+            valueByImplType(implType, '; Expected type "title_List_ListNotNull_Int_NotNull_min_3"', '') +
+            '. Must be at least 3'
           )
         })
       })
@@ -89,7 +92,9 @@ exports.test = function (setup, implType) {
           strictEqual(statusCode, 400)
           strictEqual(
             body.errors[0].message,
-            'Variable "$input" got invalid value 4 at "input.title[1]"; Expected type "title_List_Int_NotNull_max_3". Must be no greater than 3'
+            'Variable "$input" got invalid value 4 at "input.title[1]"' +
+            valueByImplType(implType, '; Expected type "title_List_Int_NotNull_max_3"', '') +
+            '. Must be no greater than 3'
           )
         })
       })
@@ -122,7 +127,9 @@ exports.test = function (setup, implType) {
           strictEqual(statusCode, 400)
           strictEqual(
             body.errors[0].message,
-            'Variable "$input" got invalid value null at "input.title[1]"; Expected non-nullable type "title_List_Int_NotNull_multipleOf_2!" not to be null.'
+            'Variable "$input" got invalid value null at "input.title[1]"; Expected non-nullable type "' +
+            valueByImplType(implType, 'title_List_Int_NotNull_multipleOf_2', 'Int') +
+            '!" not to be null.'
           )
         })
 
@@ -135,7 +142,9 @@ exports.test = function (setup, implType) {
           strictEqual(statusCode, 400)
           strictEqual(
             body.errors[0].message,
-            'Variable "$input" got invalid value null at "input.title[0]"; Expected non-nullable type "title_List_Int_NotNull_multipleOf_2!" not to be null.'
+            'Variable "$input" got invalid value null at "input.title[0]"; Expected non-nullable type "' +
+            valueByImplType(implType, 'title_List_Int_NotNull_multipleOf_2', 'Int') +
+            '!" not to be null.'
           )
         })
       })
@@ -185,7 +194,9 @@ exports.test = function (setup, implType) {
           strictEqual(statusCode, 400)
           strictEqual(
             body.errors[0].message,
-            'Variable "$input" got invalid value "a💩" at "input.title[1]"; Expected type "title_List_String_NotNull_minLength_3". Must be at least 3 characters in length'
+            'Variable "$input" got invalid value "a💩" at "input.title[1]"' +
+            valueByImplType(implType, '; Expected type "title_List_String_NotNull_minLength_3"', '') +
+            '. Must be at least 3 characters in length'
           )
         })
       })
@@ -228,7 +239,9 @@ exports.test = function (setup, implType) {
           strictEqual(statusCode, 400)
           strictEqual(
             body.errors[0].message,
-            'Variable "$input" got invalid value "fob💩" at "input.title[1]"; Expected type "title_List_String_maxLength_3". Must be no more than 3 characters in length'
+            'Variable "$input" got invalid value "fob💩" at "input.title[1]"' +
+            valueByImplType(implType, '; Expected type "title_List_String_maxLength_3"', '') +
+            '. Must be no more than 3 characters in length'
           )
         })
       })
@@ -279,7 +292,9 @@ exports.test = function (setup, implType) {
           strictEqual(statusCode, 400)
           strictEqual(
             body.errors[0].message,
-            'Variable "$input" got invalid value "a" at "input.title[1]"; Expected type "title_List_ListNotNull_String_NotNull_format_uri". Must be in URI format'
+            'Variable "$input" got invalid value "a" at "input.title[1]"' +
+            valueByImplType(implType, '; Expected type "title_List_ListNotNull_String_NotNull_format_uri"', '') +
+            '. Must be in URI format'
           )
         })
       })

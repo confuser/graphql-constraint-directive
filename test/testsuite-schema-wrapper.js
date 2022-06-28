@@ -7,8 +7,8 @@ describe('Schema wrapper based implementation', function () {
   require('./introspection.test').test(setup, IMPL_TYPE)
   require('./argument.test').test(setup, IMPL_TYPE)
   require('./input-object.test').test(setup, IMPL_TYPE)
-
   require('./array.test').test(setup, IMPL_TYPE)
+  require('./array-structures.test').test(setup, IMPL_TYPE)
   require('./float.test').test(setup, IMPL_TYPE)
   require('./int.test').test(setup, IMPL_TYPE)
   require('./string.test').test(setup, IMPL_TYPE)
