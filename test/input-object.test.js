@@ -180,13 +180,13 @@ exports.test = function (setup, implType) {
         deepStrictEqual(body.errors[0], {
           message: 'Must be at least 3',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: valueByImplType(implType, 'title', 'input.title'),
+          fieldName: 'title',
           context: [{ arg: 'min', value: 3 }]
         })
         deepStrictEqual(body.errors[1], {
           message: 'Must be at least 2 characters in length',
           code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: valueByImplType(implType, 'name', 'input.author.name'),
+          fieldName: valueByImplType(implType, 'name', 'author.name'),
           context: [{ arg: 'minLength', value: 2 }]
         })
       })
