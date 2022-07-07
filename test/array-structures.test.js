@@ -4,27 +4,30 @@ const { valueByImplType } = require('./testutils')
 exports.test = function (setup, implType) {
   describe('Array structures', function () {
     describe('INPUT_OBJECT', function () {
-      const query = `mutation createBook($input: BookInput) {
-        createBook(input: $input) {
-          title
+      const query = /* GraphQL */`
+        mutation createBook($input: BookInput) {
+          createBook(input: $input) {
+            title
+          }
         }
-      }`
+      `
 
       describe('simple type', function () {
         before(async function () {
-          this.typeDefs = `
-          type Query {
-            books: [Book]
-          }
-          type Book {
-            title: String
-          }
-          type Mutation {
-            createBook(input: BookInput): Book
-          }
-          input BookInput {
-            title: [Int!]! @constraint(min: 3)
-          }`
+          this.typeDefs = /* GraphQL */`
+            type Query {
+              books: [Book]
+            }
+            type Book {
+              title: String
+            }
+            type Mutation {
+              createBook(input: BookInput): Book
+            }
+            input BookInput {
+              title: [Int!]! @constraint(min: 3)
+            }
+          `
 
           this.request = await setup(this.typeDefs)
         })
@@ -57,7 +60,7 @@ exports.test = function (setup, implType) {
 
       describe('input object', function () {
         before(async function () {
-          this.typeDefs = `
+          this.typeDefs = /* GraphQL */`
           type Query {
             books: [Book]
           }
@@ -120,7 +123,7 @@ exports.test = function (setup, implType) {
 
       describe('input object - inlined', function () {
         before(async function () {
-          this.typeDefs = `
+          this.typeDefs = /* GraphQL */`
           type Query {
             books: [Book]
           }
@@ -143,11 +146,12 @@ exports.test = function (setup, implType) {
         })
 
         it('should pass', async function () {
-          const query = `mutation {
-            createBook(input: {
-              authors: [{ name: "asdsd", age: [5, 7] }, { name: "fdgt", age: [6, 5] }] 
-            }) {
-              title
+          const query = /* GraphQL */`
+            mutation {
+              createBook(input: {
+                authors: [{ name: "asdsd", age: [5, 7] }, { name: "fdgt", age: [6, 5] }] 
+              }) {
+                title
             }
           }`
           const { body, statusCode } = await this.request
