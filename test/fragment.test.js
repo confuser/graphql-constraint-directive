@@ -2,7 +2,7 @@ const { deepStrictEqual, strictEqual } = require('assert')
 const { valueByImplType } = require('./testutils')
 
 exports.test = function (setup, implType) {
-  describe('Inline Fragment', function () {
+  describe('Fragment', function () {
     before(async function () {
       this.typeDefs = /* GraphQL */`
         type Query {
@@ -20,7 +20,7 @@ exports.test = function (setup, implType) {
     describe('Inlined value', function () {
       it('should pass', async function () {
         const query = /* GraphQL */`
-          query comparison {
+          query Comparison {
             leftComparison: getBook {
               ...comparisonFileds
             }
@@ -28,6 +28,7 @@ exports.test = function (setup, implType) {
               ...comparisonFileds
             }
           }
+
           fragment comparisonFileds on Book {
             title
             authors(max: 5)
@@ -109,7 +110,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { arg: 4 } })
 
-        // console.log(body)
+        // console.log(JSON.stringify(body))
         strictEqual(statusCode, 400)
         strictEqual(
           body.errors[0].message,

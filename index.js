@@ -119,7 +119,6 @@ function createApolloQueryValidationPlugin ({ schema }) {
     async requestDidStart () {
       return ({
         async didResolveOperation ({ request, document }) {
-          // console.log('Apollo didResolveOperation starts')
           const query = request.operationName
             ? separateOperations(document)[request.operationName]
             : document
@@ -130,10 +129,11 @@ function createApolloQueryValidationPlugin ({ schema }) {
             request.variables,
             request.operationName
           )
-          // console.log('Apollo didResolveOperation finishes with errors: ' + errors)
           if (errors.length > 0) {
-            // TODO translate errors for Apollo (to UserInputError) not to be reported as extension.code.INTERNAL_SERVER_ERROR
-            throw errors
+            throw errors.map(err => {
+              const { UserInputError } = require('apollo-server-errors')
+              return new UserInputError(err.message, { field: err.fieldName, context: err.context })
+            })
           }
         }
       })

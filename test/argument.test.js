@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { formatError, valueByImplType } = require('./testutils')
+const { formatError, valueByImplType, isSchemaWrapperImplType } = require('./testutils')
 
 exports.test = function (setup, implType) {
   const queryIntType = valueByImplType(implType, 'size_Int_max_3', 'Int')
@@ -103,27 +103,29 @@ exports.test = function (setup, implType) {
           'Variable "$sizeAuthors" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"', '') + '. Must be no greater than 4')
       })
 
-      it('should throw custom error', async function () {
-        const request = await setup(this.typeDefs, formatError)
-        const { body, statusCode } = await request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query: queryTwoVariables, variables: { size: 100, sizeAuthors: 5 } })
+      if (isSchemaWrapperImplType(implType)) {
+        it('should throw custom error', async function () {
+          const request = await setup(this.typeDefs, formatError)
+          const { body, statusCode } = await request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query: queryTwoVariables, variables: { size: 100, sizeAuthors: 5 } })
 
-        strictEqual(statusCode, 400)
-        deepStrictEqual(body.errors[0], {
-          message: 'Must be no greater than 3',
-          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: 'size',
-          context: [{ arg: 'max', value: 3 }]
+          strictEqual(statusCode, 400)
+          deepStrictEqual(body.errors[0], {
+            message: 'Must be no greater than 3',
+            code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+            fieldName: 'size',
+            context: [{ arg: 'max', value: 3 }]
+          })
+          deepStrictEqual(body.errors[1], {
+            message: 'Must be no greater than 4',
+            code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+            fieldName: valueByImplType(implType, 'size', 'sizeAuthors'),
+            context: [{ arg: 'max', value: 4 }]
+          })
         })
-        deepStrictEqual(body.errors[1], {
-          message: 'Must be no greater than 4',
-          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: valueByImplType(implType, 'size', 'sizeAuthors'),
-          context: [{ arg: 'max', value: 4 }]
-        })
-      })
+      }
     })
 
     describe('Values inlined in the query', function () {
@@ -253,27 +255,29 @@ exports.test = function (setup, implType) {
         )
       })
 
-      it('should throw custom error', async function () {
-        const request = await setup(this.typeDefs, formatError)
-        const { body, statusCode } = await request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query: queryFailingTwoTimes })
+      if (isSchemaWrapperImplType(implType)) {
+        it('should throw custom error', async function () {
+          const request = await setup(this.typeDefs, formatError)
+          const { body, statusCode } = await request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query: queryFailingTwoTimes })
 
-        strictEqual(statusCode, 400)
-        deepStrictEqual(body.errors[0], {
-          message: 'Must be no greater than 3',
-          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: valueByImplType(implType, 'size', 'books.size'),
-          context: [{ arg: 'max', value: 3 }]
+          strictEqual(statusCode, 400)
+          deepStrictEqual(body.errors[0], {
+            message: 'Must be no greater than 3',
+            code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+            fieldName: valueByImplType(implType, 'size', 'books.size'),
+            context: [{ arg: 'max', value: 3 }]
+          })
+          deepStrictEqual(body.errors[1], {
+            message: 'Must be no greater than 4',
+            code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+            fieldName: valueByImplType(implType, 'size', 'authors.size'),
+            context: [{ arg: 'max', value: 4 }]
+          })
         })
-        deepStrictEqual(body.errors[1], {
-          message: 'Must be no greater than 4',
-          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: valueByImplType(implType, 'size', 'authors.size'),
-          context: [{ arg: 'max', value: 4 }]
-        })
-      })
+      }
     })
   })
 }

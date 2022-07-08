@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType } = require('./testutils')
 
 exports.test = function (setup, implType) {
   // const queryIntType = valueByImplType(implType, 'title_Int_NotNull_min_3', 'Int')
@@ -82,21 +82,23 @@ exports.test = function (setup, implType) {
           'Variable "$input" got invalid value "a" at "input.author.name"' + valueByImplType(implType, '; Expected type "name_String_NotNull_minLength_2"', '') + '. Must be at least 2 characters in length')
       })
 
-      it('should throw custom error', async function () {
-        const request = await setup(this.typeDefs, formatError)
-        const { body, statusCode } = await request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query: queryVariables, variables: { input: { title: 2 } } })
+      if (isSchemaWrapperImplType(implType)) {
+        it('should throw custom error', async function () {
+          const request = await setup(this.typeDefs, formatError)
+          const { body, statusCode } = await request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query: queryVariables, variables: { input: { title: 2 } } })
 
-        strictEqual(statusCode, 400)
-        deepStrictEqual(body.errors[0], {
-          message: 'Must be at least 3',
-          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: valueByImplType(implType, 'title', 'input.title'),
-          context: [{ arg: 'min', value: 3 }]
+          strictEqual(statusCode, 400)
+          deepStrictEqual(body.errors[0], {
+            message: 'Must be at least 3',
+            code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+            fieldName: valueByImplType(implType, 'title', 'input.title'),
+            context: [{ arg: 'min', value: 3 }]
+          })
         })
-      })
+      }
     })
 
     describe('Values inlined in the query', function () {
@@ -168,28 +170,30 @@ exports.test = function (setup, implType) {
         )
       })
 
-      it('should throw custom error', async function () {
-        const request = await setup(this.typeDefs, formatError)
-        const { body, statusCode } = await request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query: queryInlineFailNested })
+      if (isSchemaWrapperImplType(implType)) {
+        it('should throw custom error', async function () {
+          const request = await setup(this.typeDefs, formatError)
+          const { body, statusCode } = await request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query: queryInlineFailNested })
 
-        strictEqual(statusCode, 400)
-        strictEqual(body.errors.length, 2)
-        deepStrictEqual(body.errors[0], {
-          message: 'Must be at least 3',
-          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: 'title',
-          context: [{ arg: 'min', value: 3 }]
+          strictEqual(statusCode, 400)
+          strictEqual(body.errors.length, 2)
+          deepStrictEqual(body.errors[0], {
+            message: 'Must be at least 3',
+            code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+            fieldName: 'title',
+            context: [{ arg: 'min', value: 3 }]
+          })
+          deepStrictEqual(body.errors[1], {
+            message: 'Must be at least 2 characters in length',
+            code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+            fieldName: valueByImplType(implType, 'name', 'author.name'),
+            context: [{ arg: 'minLength', value: 2 }]
+          })
         })
-        deepStrictEqual(body.errors[1], {
-          message: 'Must be at least 2 characters in length',
-          code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
-          fieldName: valueByImplType(implType, 'name', 'author.name'),
-          context: [{ arg: 'minLength', value: 2 }]
-        })
-      })
+      }
     })
   })
 }
