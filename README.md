@@ -18,6 +18,17 @@ npm install graphql-constraint-directive@v2
 ```
 
 ## Usage
+
+### Schema wrapper
+
+Implementation based on schema wrappers - basic scalars are wrapped as custom scalars with validations. 
+
+Pros:
+* posibility to validate output
+
+Cons:
+* modifies GraphQL schema, basic scalars (Int, Float, String) are replaced by custom scalars
+
 ```js
 const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
@@ -49,6 +60,58 @@ await server.start()
 
 server.applyMiddleware({ app })
 
+```
+
+### Server plugin
+
+Implementation based on server plugin. Implementation entry point is function `validateQuery(schema, query, variables, operationName)`.
+
+Pros:
+* schema stays unmodified
+
+Cons:
+* validates only inputs
+
+#### Apollo server plugin
+
+```js
+const { createApolloQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
+const express = require('express')
+const { ApolloServer } = require('apollo-server-express')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+const typeDefs = `
+  type Query {
+    books: [Book]
+  }
+  type Book {
+    title: String
+  }
+  type Mutation {
+    createBook(input: BookInput): Book
+  }
+  input BookInput {
+    title: String! @constraint(minLength: 5, format: "email")
+  }`
+
+let schema = makeExecutableSchema({
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+})
+
+const plugins = [
+  createApolloQueryValidationPlugin({
+    schema
+  })
+]
+
+const app = express()
+const server = new ApolloServer({ 
+  schema,
+  plugins
+})
+
+await server.start()
+
+server.applyMiddleware({ app })
 ```
 
 ## API
@@ -140,6 +203,10 @@ const formatError = function (error) {
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
 
 ```
+
+Apollo server plugin throws [`UserInputError`](https://www.apollographql.com/docs/apollo-server/data/errors/#bad_user_input) for each validatin error.
+
 ### uniqueTypeName
 ```@constraint(uniqueTypeName: "Unique_Type_Name")```
-Override the unique type name generate by the library to the one passed as an argument
+Override the unique type name generate by the library to the one passed as an argument. 
+Has meaning only for `Schema wrapper` implementation.
