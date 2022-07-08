@@ -11,9 +11,8 @@ describe('Server validator based implementation - Apollo plugin', function () {
   require('./array-structures.test').test(setup, IMPL_TYPE)
   require('./fragment-inline.test').test(setup, IMPL_TYPE)
   require('./fragment.test').test(setup, IMPL_TYPE)
-  // TODO uncomment and update tests once feature implemented
-
-  // require('./float.test').test(setup, IMPL_TYPE)
-  // require('./int.test').test(setup, IMPL_TYPE)
-  // require('./string.test').test(setup, IMPL_TYPE)
+  require('./variable.test').test(setup, IMPL_TYPE)
+  require('./float.test').test(setup, IMPL_TYPE)
+  require('./int.test').test(setup, IMPL_TYPE)
+  require('./string.test').test(setup, IMPL_TYPE)
 })

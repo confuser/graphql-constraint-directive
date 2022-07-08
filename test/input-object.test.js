@@ -65,7 +65,7 @@ exports.test = function (setup, implType) {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"', '') + '. Must be at least 3')
+          'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"') + '. Must be at least 3')
       })
 
       it('should fail - nested objects', async function () {
@@ -77,9 +77,9 @@ exports.test = function (setup, implType) {
         strictEqual(statusCode, 400)
         strictEqual(body.errors.length, 2)
         strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"', '') + '. Must be at least 3')
+          'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"') + '. Must be at least 3')
         strictEqual(body.errors[1].message,
-          'Variable "$input" got invalid value "a" at "input.author.name"' + valueByImplType(implType, '; Expected type "name_String_NotNull_minLength_2"', '') + '. Must be at least 2 characters in length')
+          'Variable "$input" got invalid value "a" at "input.author.name"' + valueByImplType(implType, '; Expected type "name_String_NotNull_minLength_2"') + '. Must be at least 2 characters in length')
       })
 
       if (isSchemaWrapperImplType(implType)) {

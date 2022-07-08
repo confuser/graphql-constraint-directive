@@ -123,13 +123,13 @@ exports.test = function (setup, implType) {
         strictEqual(
           body.errors[0].message,
           'Variable "$arg1" got invalid value 4' +
-          valueByImplType(implType, '; Expected type "max_Int_min_5"', '') +
+          valueByImplType(implType, '; Expected type "max_Int_min_5"') +
           '. Must be at least 5'
         )
         strictEqual(
           body.errors[1].message,
           'Variable "$arg2" got invalid value 3' +
-          valueByImplType(implType, '; Expected type "min_Int_min_4"', '') +
+          valueByImplType(implType, '; Expected type "min_Int_min_4"') +
           '. Must be at least 4'
         )
       })

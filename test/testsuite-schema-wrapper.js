@@ -11,6 +11,7 @@ describe('Schema wrapper based implementation', function () {
   require('./array-structures.test').test(setup, IMPL_TYPE)
   require('./fragment-inline.test').test(setup, IMPL_TYPE)
   require('./fragment.test').test(setup, IMPL_TYPE)
+  require('./variable.test').test(setup, IMPL_TYPE)
   require('./float.test').test(setup, IMPL_TYPE)
   require('./int.test').test(setup, IMPL_TYPE)
   require('./string.test').test(setup, IMPL_TYPE)

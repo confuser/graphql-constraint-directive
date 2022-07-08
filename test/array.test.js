@@ -49,7 +49,7 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value 2 at "input.title[0]"' +
-            valueByImplType(implType, '; Expected type "title_List_ListNotNull_Int_NotNull_min_3"', '') +
+            valueByImplType(implType, '; Expected type "title_List_ListNotNull_Int_NotNull_min_3"') +
             '. Must be at least 3'
           )
         })
@@ -93,7 +93,7 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value 4 at "input.title[1]"' +
-            valueByImplType(implType, '; Expected type "title_List_Int_NotNull_max_3"', '') +
+            valueByImplType(implType, '; Expected type "title_List_Int_NotNull_max_3"') +
             '. Must be no greater than 3'
           )
         })
@@ -195,7 +195,7 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "a💩" at "input.title[1]"' +
-            valueByImplType(implType, '; Expected type "title_List_String_NotNull_minLength_3"', '') +
+            valueByImplType(implType, '; Expected type "title_List_String_NotNull_minLength_3"') +
             '. Must be at least 3 characters in length'
           )
         })
@@ -240,7 +240,7 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "fob💩" at "input.title[1]"' +
-            valueByImplType(implType, '; Expected type "title_List_String_maxLength_3"', '') +
+            valueByImplType(implType, '; Expected type "title_List_String_maxLength_3"') +
             '. Must be no more than 3 characters in length'
           )
         })
@@ -293,7 +293,7 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title[1]"' +
-            valueByImplType(implType, '; Expected type "title_List_ListNotNull_String_NotNull_format_uri"', '') +
+            valueByImplType(implType, '; Expected type "title_List_ListNotNull_String_NotNull_format_uri"') +
             '. Must be in URI format'
           )
         })

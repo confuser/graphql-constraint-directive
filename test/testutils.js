@@ -12,7 +12,7 @@ const formatError = (error) => {
  * @returns selected value
  */
 function valueByImplType (implType, valueSchemaWrapper, valueServerValidator) {
-  if (implType === IMPL_TYPE_SCHEMA_WRAPPER) { return valueSchemaWrapper } else { return valueServerValidator }
+  if (implType === IMPL_TYPE_SCHEMA_WRAPPER) { return valueSchemaWrapper } else { return valueServerValidator || '' }
 }
 
 /**

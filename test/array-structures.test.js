@@ -52,7 +52,7 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value 2 at "input.title[0]"' +
-            valueByImplType(implType, '; Expected type "title_List_ListNotNull_Int_NotNull_min_3"', '') +
+            valueByImplType(implType, '; Expected type "title_List_ListNotNull_Int_NotNull_min_3"') +
             '. Must be at least 3'
           )
         })
@@ -103,19 +103,19 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "asdsdd" at "input.authors[0].name"' +
-            valueByImplType(implType, '; Expected type "name_String_NotNull_maxLength_5"', '') +
+            valueByImplType(implType, '; Expected type "name_String_NotNull_maxLength_5"') +
             '. Must be no more than 5 characters in length'
           )
           strictEqual(
             body.errors[1].message,
             'Variable "$input" got invalid value 2 at "input.authors[0].age[1]"' +
-            valueByImplType(implType, '; Expected type "age_List_ListNotNull_Int_NotNull_min_3"', '') +
+            valueByImplType(implType, '; Expected type "age_List_ListNotNull_Int_NotNull_min_3"') +
             '. Must be at least 3'
           )
           strictEqual(
             body.errors[2].message,
             'Variable "$input" got invalid value 1 at "input.authors[1].age[0]"' +
-            valueByImplType(implType, '; Expected type "age_List_ListNotNull_Int_NotNull_min_3"', '') +
+            valueByImplType(implType, '; Expected type "age_List_ListNotNull_Int_NotNull_min_3"') +
             '. Must be at least 3'
           )
         })
@@ -244,7 +244,7 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value 2 at "input[0]"' +
-            valueByImplType(implType, '; Expected type "input_List_ListNotNull_Int_NotNull_min_3"', '') +
+            valueByImplType(implType, '; Expected type "input_List_ListNotNull_Int_NotNull_min_3"') +
             '. Must be at least 3'
           )
         })
@@ -354,7 +354,7 @@ exports.test = function (setup, implType) {
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "asdfrs" at "input[0].title"' +
-            valueByImplType(implType, '; Expected type "title_String_NotNull_maxLength_5"', '') +
+            valueByImplType(implType, '; Expected type "title_String_NotNull_maxLength_5"') +
             '. Must be no more than 5 characters in length'
           )
         })

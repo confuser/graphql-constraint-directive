@@ -75,7 +75,7 @@ exports.test = function (setup, implType) {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_3"', '') + '. Must be no greater than 3')
+          'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_3"') + '. Must be no greater than 3')
       })
 
       it('should fail - deeper nesting', async function () {
@@ -86,7 +86,7 @@ exports.test = function (setup, implType) {
 
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$size" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"', '') + '. Must be no greater than 4')
+          'Variable "$size" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"') + '. Must be no greater than 4')
       })
 
       it('should fail - more errors', async function () {
@@ -98,9 +98,9 @@ exports.test = function (setup, implType) {
         // console.log(body)
         strictEqual(statusCode, 400)
         strictEqual(body.errors[0].message,
-          'Variable "$size" got invalid value 4' + valueByImplType(implType, '; Expected type "size_Int_max_3"', '') + '. Must be no greater than 3')
+          'Variable "$size" got invalid value 4' + valueByImplType(implType, '; Expected type "size_Int_max_3"') + '. Must be no greater than 3')
         strictEqual(body.errors[1].message,
-          'Variable "$sizeAuthors" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"', '') + '. Must be no greater than 4')
+          'Variable "$sizeAuthors" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"') + '. Must be no greater than 4')
       })
 
       if (isSchemaWrapperImplType(implType)) {

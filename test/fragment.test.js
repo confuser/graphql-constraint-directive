@@ -115,7 +115,7 @@ exports.test = function (setup, implType) {
         strictEqual(
           body.errors[0].message,
           'Variable "$arg" got invalid value 4' +
-          valueByImplType(implType, '; Expected type "max_Int_min_5"', '') +
+          valueByImplType(implType, '; Expected type "max_Int_min_5"') +
           '. Must be at least 5'
         )
       })
