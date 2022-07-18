@@ -10,6 +10,7 @@ const {
 const QueryValidationVisitor = require('./lib/QueryValidationVisitor.js')
 const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
 const { getConstraintTypeObject, getScalarType } = require('./lib/typeutils')
+const { constraintDirectiveTypeDefs } = require('./lib/typeDefs')
 
 function constraintDirective () {
   const constraintTypes = {}
@@ -140,26 +141,5 @@ function createApolloQueryValidationPlugin ({ schema }) {
     }
   }
 }
-
-const constraintDirectiveTypeDefs = /* GraphQL */`
-  directive @constraint(
-    # String constraints
-    minLength: Int
-    maxLength: Int
-    startsWith: String
-    endsWith: String
-    contains: String
-    notContains: String
-    pattern: String
-    format: String
-
-    # Number constraints
-    min: Float
-    max: Float
-    exclusiveMin: Float
-    exclusiveMax: Float
-    multipleOf: Float
-    uniqueTypeName: String
-  ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION | ARGUMENT_DEFINITION`
 
 module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin }
