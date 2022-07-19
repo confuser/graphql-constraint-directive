@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule } = require('./testutils')
 exports.test = function (setup, implType) {
   describe('@constraint Int in INPUT_FIELD_DEFINITION', function () {
     const query = `mutation createBook($input: BookInput) {
@@ -336,7 +336,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: null } } })
 
-        strictEqual(statusCode, 400)
+        if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "' + valueByImplType(implType, 'title_Int_NotNull_multipleOf_2', 'Int') + '!" not to be null.')
       })
@@ -347,7 +347,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: undefined } } })
 
-        strictEqual(statusCode, 400)
+        if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_Int_NotNull_multipleOf_2', 'Int') + '!" was not provided.')
       })

@@ -25,13 +25,25 @@ function isSchemaWrapperImplType (implType) {
   return implType === IMPL_TYPE_SCHEMA_WRAPPER
 }
 
+function isServerValidator (implType) {
+  return implType === IMPL_TYPE_SERVER_VALIDATOR
+}
+
+function isServerValidatorRule (implType) {
+  return implType === IMPL_TYPE_SERVER_VALIDATOR_RULE
+}
+
 const IMPL_TYPE_SERVER_VALIDATOR = 'serverValidator'
+const IMPL_TYPE_SERVER_VALIDATOR_RULE = 'serverValidatorRule'
 const IMPL_TYPE_SCHEMA_WRAPPER = 'schemaWrapper'
 
 module.exports = {
   IMPL_TYPE_SCHEMA_WRAPPER,
   IMPL_TYPE_SERVER_VALIDATOR,
+  IMPL_TYPE_SERVER_VALIDATOR_RULE,
   valueByImplType,
   isSchemaWrapperImplType,
+  isServerValidator,
+  isServerValidatorRule,
   formatError
 }

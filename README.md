@@ -79,6 +79,7 @@ const { createApolloQueryValidationPlugin, constraintDirectiveTypeDefs } = requi
 const express = require('express')
 const { ApolloServer } = require('apollo-server-express')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
+
 const typeDefs = `
   type Query {
     books: [Book]
@@ -112,6 +113,49 @@ const server = new ApolloServer({
 await server.start()
 
 server.applyMiddleware({ app })
+```
+
+#### Validation Rule in Express
+
+```js
+const { createQueryValidationRule, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
+const express = require('express')
+const { graphqlHTTP } = require('express-graphql')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+
+const typeDefs = `
+  type Query {
+    books: [Book]
+  }
+  type Book {
+    title: String
+  }
+  type Mutation {
+    createBook(input: BookInput): Book
+  }
+  input BookInput {
+    title: String! @constraint(minLength: 5, format: "email")
+  }`
+
+let schema = makeExecutableSchema({
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+})
+
+const app = express()
+
+app.use(
+  '/api',
+  graphqlHTTP(async (request, response, { variables }) => ({
+    schema,
+    validationRules: [
+      createQueryValidationRule({
+        variables
+      })
+    ]
+  }))
+)
+app.listen(4000);
+
 ```
 
 ## API

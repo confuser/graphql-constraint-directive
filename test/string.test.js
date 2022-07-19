@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule } = require('./testutils')
 
 exports.test = function (setup, implType) {
   describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
@@ -1004,7 +1004,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: null } } })
 
-        strictEqual(statusCode, 400)
+        if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" not to be null.')
       })
@@ -1015,7 +1015,8 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: undefined } } })
 
-        strictEqual(statusCode, 400)
+        // console.log(body)
+        if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" was not provided.')
       })

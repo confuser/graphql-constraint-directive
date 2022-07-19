@@ -142,4 +142,10 @@ function createApolloQueryValidationPlugin ({ schema }) {
   }
 }
 
-module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin }
+function createQueryValidationRule (options) {
+  return (context) => {
+    return new QueryValidationVisitor(context, options)
+  }
+}
+
+module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin, createQueryValidationRule }

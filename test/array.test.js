@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType } = require('./testutils')
+const { valueByImplType, isServerValidatorRule } = require('./testutils')
 
 exports.test = function (setup, implType) {
   describe('Array', function () {
@@ -124,7 +124,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: [2, null] } } })
 
-          strictEqual(statusCode, 400)
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value null at "input.title[1]"; Expected non-nullable type "' +
@@ -139,7 +139,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: [undefined] } } })
 
-          strictEqual(statusCode, 400)
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value null at "input.title[0]"; Expected non-nullable type "' +
