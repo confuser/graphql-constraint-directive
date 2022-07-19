@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError } = require('./testutils')
 
 exports.test = function (setup, implType) {
   describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
@@ -45,7 +45,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: 2 } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Float_NotNull_min_2dot99"') + '. Must be at least 2.99')
       })
@@ -104,7 +104,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: 4 } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value 4 at "input.title"' + valueByImplType(implType, '; Expected type "title_Float_max_3dot1"') + '. Must be no greater than 3.1')
       })
@@ -167,7 +167,7 @@ exports.test = function (setup, implType) {
             query, variables: { input: { title: 3 } }
           })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value 3 at "input.title"' + valueByImplType(implType, '; Expected type "title_Float_NotNull_exclusiveMin_3"') + '. Must be greater than 3')
       })
@@ -230,7 +230,7 @@ exports.test = function (setup, implType) {
             query, variables: { input: { title: 3 } }
           })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value 3 at "input.title"' + valueByImplType(implType, '; Expected type "title_Float_NotNull_exclusiveMax_3"') + '. Must be less than 3')
       })
@@ -289,7 +289,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: 7 } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value 7 at "input.title"' + valueByImplType(implType, '; Expected type "title_Float_NotNull_multipleOf_2dot5"') + '. Must be a multiple of 2.5')
       })
@@ -332,27 +332,29 @@ exports.test = function (setup, implType) {
         this.request = await setup(this.typeDefs)
       })
 
-      it('should fail with null', async function () {
-        const { body, statusCode } = await this.request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: null } } })
+      if (!isServerValidatorEnvelop(implType)) {
+        it('should fail with null', async function () {
+          const { body, statusCode } = await this.request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: null } } })
 
-        if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "' + valueByImplType(implType, 'title_Float_NotNull_multipleOf_2', 'Float') + '!" not to be null.')
-      })
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
+          strictEqual(body.errors[0].message,
+            'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "' + valueByImplType(implType, 'title_Float_NotNull_multipleOf_2', 'Float') + '!" not to be null.')
+        })
 
-      it('should fail with undefined', async function () {
-        const { body, statusCode } = await this.request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: undefined } } })
+        it('should fail with undefined', async function () {
+          const { body, statusCode } = await this.request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: undefined } } })
 
-        if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_Float_NotNull_multipleOf_2', 'Float') + '!" was not provided.')
-      })
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
+          strictEqual(body.errors[0].message,
+            'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_Float_NotNull_multipleOf_2', 'Float') + '!" was not provided.')
+        })
+      }
     })
 
     describe('#null', function () {
@@ -413,29 +415,28 @@ exports.test = function (setup, implType) {
 
         this.request = await setup(this.typeDefs)
       })
-
-      it('should pass', async function () {
-        const { body, statusCode } = await this.request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: 3 } } })
-
-        strictEqual(statusCode, 200)
-        deepStrictEqual(body, { data: { createBook: null } })
-      })
-
-      it('should fail', async function () {
-        const { body, statusCode } = await this.request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: 2 } } })
-
-        strictEqual(statusCode, 400)
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "BookInput_Title"') + '. Must be at least 3')
-      })
-
       if (isSchemaWrapperImplType(implType)) {
+        it('should pass', async function () {
+          const { body, statusCode } = await this.request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: 3 } } })
+
+          strictEqual(statusCode, 200)
+          deepStrictEqual(body, { data: { createBook: null } })
+        })
+
+        it('should fail', async function () {
+          const { body, statusCode } = await this.request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: 2 } } })
+
+          strictEqual(statusCode, 400)
+          strictEqual(body.errors[0].message,
+            'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "BookInput_Title"') + '. Must be at least 3')
+        })
+
         it('should throw custom error', async function () {
           const request = await setup(this.typeDefs, formatError)
           const { body, statusCode } = await request

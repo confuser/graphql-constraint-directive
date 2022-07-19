@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isStatusCodeError } = require('./testutils')
 
 exports.test = function (setup, implType) {
   // const queryIntType = valueByImplType(implType, 'title_Int_NotNull_min_3', 'Int')
@@ -63,7 +63,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryVariables, variables: { input: { title: 2 } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"') + '. Must be at least 3')
       })
@@ -74,7 +74,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryVariables, variables: { input: { title: 2, author: { name: 'a' } } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors.length, 2)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"') + '. Must be at least 3')
@@ -142,7 +142,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryInlineFail })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           valueByImplType(implType,
             'Expected value of type "title_Int_NotNull_min_3!", found 2; Must be at least 3',
@@ -156,7 +156,7 @@ exports.test = function (setup, implType) {
           .send({ query: queryInlineFailNested })
 
         // console.log(body)
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors.length, 2)
         strictEqual(body.errors[0].message,
           valueByImplType(implType,

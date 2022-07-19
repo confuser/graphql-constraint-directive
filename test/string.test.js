@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError } = require('./testutils')
 
 exports.test = function (setup, implType) {
   describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
@@ -44,7 +44,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: 'a💩' } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value "a💩" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_minLength_3"') + '. Must be at least 3 characters in length')
       })
@@ -103,7 +103,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: 'fob💩' } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value "fob💩" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_maxLength_3"') + '. Must be no more than 3 characters in length')
       })
@@ -162,7 +162,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: 'bar💩' } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value "bar💩" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_startsWith_"') + '. Must start with 💩')
       })
@@ -221,7 +221,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: '💩bar' } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value "💩bar" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_endsWith_"') + '. Must end with 💩')
       })
@@ -280,7 +280,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: 'fobar' } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value "fobar" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_contains_"') + '. Must contain 💩')
       })
@@ -339,7 +339,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: '💩foobar' } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value "💩foobar" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_notContains_foo"') + '. Must not contain foo')
       })
@@ -398,7 +398,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: '£££' } } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$input" got invalid value "£££" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_pattern_09azAZ"') + '. Must match ^[0-9a-zA-Z]*$')
       })
@@ -462,7 +462,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: '£££' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "£££" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_byte"') + '. Must be in byte format')
         })
@@ -525,7 +525,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: 'a' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_datetime"') + '. Must be a date-time in RFC 3339 format')
         })
@@ -588,7 +588,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: 'a' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_date"') + '. Must be a date in ISO 8601 format')
         })
@@ -651,7 +651,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: 'a' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_email"') + '. Must be in email format')
         })
@@ -714,7 +714,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: 'a' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_ipv4"') + '. Must be in IP v4 format')
         })
@@ -777,7 +777,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: 'a' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_ipv6"') + '. Must be in IP v6 format')
         })
@@ -840,7 +840,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: 'a' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_uri"') + '. Must be in URI format')
         })
@@ -903,7 +903,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: 'a' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_uuid"') + '. Must be in UUID format')
         })
@@ -954,7 +954,7 @@ exports.test = function (setup, implType) {
               query, variables: { input: { title: 'a' } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_test"') + '. Invalid format type test')
         })
@@ -998,28 +998,30 @@ exports.test = function (setup, implType) {
         this.request = await setup(this.typeDefs)
       })
 
-      it('should fail with null', async function () {
-        const { body, statusCode } = await this.request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: null } } })
+      if (!isServerValidatorEnvelop(implType)) {
+        it('should fail with null', async function () {
+          const { body, statusCode } = await this.request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: null } } })
 
-        if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" not to be null.')
-      })
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isStatusCodeError(statusCode, implType) }
+          strictEqual(body.errors[0].message,
+            'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" not to be null.')
+        })
 
-      it('should fail with undefined', async function () {
-        const { body, statusCode } = await this.request
-          .post('/graphql')
-          .set('Accept', 'application/json')
-          .send({ query, variables: { input: { title: undefined } } })
+        it('should fail with undefined', async function () {
+          const { body, statusCode } = await this.request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: undefined } } })
 
-        // console.log(body)
-        if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
-        strictEqual(body.errors[0].message,
-          'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" was not provided.')
-      })
+          console.log(JSON.stringify(body))
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isStatusCodeError(statusCode, implType) }
+          strictEqual(body.errors[0].message,
+            'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" was not provided.')
+        })
+      }
     })
 
     describe('#null', function () {

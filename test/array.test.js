@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, isServerValidatorRule } = require('./testutils')
+const { valueByImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError } = require('./testutils')
 
 exports.test = function (setup, implType) {
   describe('Array', function () {
@@ -45,7 +45,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: [2, 5] } } })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value 2 at "input.title[0]"' +
@@ -89,7 +89,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: [1, 4] } } })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value 4 at "input.title[1]"' +
@@ -118,35 +118,37 @@ exports.test = function (setup, implType) {
           this.request = await setup(this.typeDefs)
         })
 
-        it('should fail with null', async function () {
-          const { body, statusCode } = await this.request
-            .post('/graphql')
-            .set('Accept', 'application/json')
-            .send({ query, variables: { input: { title: [2, null] } } })
+        if (!isServerValidatorEnvelop(implType)) {
+          it('should fail with null', async function () {
+            const { body, statusCode } = await this.request
+              .post('/graphql')
+              .set('Accept', 'application/json')
+              .send({ query, variables: { input: { title: [2, null] } } })
 
-          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
-          strictEqual(
-            body.errors[0].message,
-            'Variable "$input" got invalid value null at "input.title[1]"; Expected non-nullable type "' +
+            if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
+            strictEqual(
+              body.errors[0].message,
+              'Variable "$input" got invalid value null at "input.title[1]"; Expected non-nullable type "' +
             valueByImplType(implType, 'title_List_Int_NotNull_multipleOf_2', 'Int') +
             '!" not to be null.'
-          )
-        })
+            )
+          })
 
-        it('should fail with undefined', async function () {
-          const { body, statusCode } = await this.request
-            .post('/graphql')
-            .set('Accept', 'application/json')
-            .send({ query, variables: { input: { title: [undefined] } } })
+          it('should fail with undefined', async function () {
+            const { body, statusCode } = await this.request
+              .post('/graphql')
+              .set('Accept', 'application/json')
+              .send({ query, variables: { input: { title: [undefined] } } })
 
-          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
-          strictEqual(
-            body.errors[0].message,
-            'Variable "$input" got invalid value null at "input.title[0]"; Expected non-nullable type "' +
+            if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
+            strictEqual(
+              body.errors[0].message,
+              'Variable "$input" got invalid value null at "input.title[0]"; Expected non-nullable type "' +
             valueByImplType(implType, 'title_List_Int_NotNull_multipleOf_2', 'Int') +
             '!" not to be null.'
-          )
-        })
+            )
+          })
+        }
       })
     })
 
@@ -191,7 +193,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: ['asdfa', 'a💩'] } } })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "a💩" at "input.title[1]"' +
@@ -236,7 +238,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: ['pu', 'fob💩'] } } })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "fob💩" at "input.title[1]"' +
@@ -289,7 +291,7 @@ exports.test = function (setup, implType) {
               variables: { input: { title: ['foobar.com', 'a'] } }
             })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "a" at "input.title[1]"' +

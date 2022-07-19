@@ -1,3 +1,5 @@
+const { strictEqual } = require('assert')
+
 const formatError = (error) => {
   const { message, code, fieldName, context } = error?.originalError?.originalError || error?.originalError || error
   return { message, code, fieldName, context }
@@ -15,6 +17,10 @@ function valueByImplType (implType, valueSchemaWrapper, valueServerValidator) {
   if (implType === IMPL_TYPE_SCHEMA_WRAPPER) { return valueSchemaWrapper } else { return valueServerValidator || '' }
 }
 
+function isStatusCodeError (statusCode, implType) {
+  if (implType === IMPL_TYPE_SERVER_VALIDATOR_ENVELOP) { strictEqual(statusCode, 200) } else { strictEqual(statusCode, 400) }
+}
+
 /**
  * Return true if implementation type is `IMPL_TYPE_SCHEMA_WRAPPER` - usefull for tests which need to vary based on implementation type.
  *
@@ -25,25 +31,33 @@ function isSchemaWrapperImplType (implType) {
   return implType === IMPL_TYPE_SCHEMA_WRAPPER
 }
 
-function isServerValidator (implType) {
-  return implType === IMPL_TYPE_SERVER_VALIDATOR
+function isServerValidatorApollo (implType) {
+  return implType === IMPL_TYPE_SERVER_VALIDATOR_APOLLO
+}
+
+function isServerValidatorEnvelop (implType) {
+  return implType === IMPL_TYPE_SERVER_VALIDATOR_ENVELOP
 }
 
 function isServerValidatorRule (implType) {
   return implType === IMPL_TYPE_SERVER_VALIDATOR_RULE
 }
 
-const IMPL_TYPE_SERVER_VALIDATOR = 'serverValidator'
+const IMPL_TYPE_SERVER_VALIDATOR_APOLLO = 'serverValidatorApollo'
+const IMPL_TYPE_SERVER_VALIDATOR_ENVELOP = 'serverValidatorEnvelop'
 const IMPL_TYPE_SERVER_VALIDATOR_RULE = 'serverValidatorRule'
 const IMPL_TYPE_SCHEMA_WRAPPER = 'schemaWrapper'
 
 module.exports = {
   IMPL_TYPE_SCHEMA_WRAPPER,
-  IMPL_TYPE_SERVER_VALIDATOR,
+  IMPL_TYPE_SERVER_VALIDATOR_APOLLO,
+  IMPL_TYPE_SERVER_VALIDATOR_ENVELOP,
   IMPL_TYPE_SERVER_VALIDATOR_RULE,
+  isStatusCodeError,
   valueByImplType,
   isSchemaWrapperImplType,
-  isServerValidator,
+  isServerValidatorApollo,
+  isServerValidatorEnvelop,
   isServerValidatorRule,
   formatError
 }

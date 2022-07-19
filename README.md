@@ -72,6 +72,48 @@ Pros:
 Cons:
 * validates only inputs
 
+#### Envelop plugin plugin
+
+You can use [Envelop plugin](https://www.envelop.dev), for example in Yoga server, but also anywhere in Envelop.
+Functionality is plugged in `execute` phase.
+
+```js
+const { createEnvelopQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
+const express = require('express')
+const { createServer } = require('@graphql-yoga/node')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+
+const typeDefs = `
+  type Query {
+    books: [Book]
+  }
+  type Book {
+    title: String
+  }
+  type Mutation {
+    createBook(input: BookInput): Book
+  }
+  input BookInput {
+    title: String! @constraint(minLength: 5, format: "email")
+  }`
+
+let schema = makeExecutableSchema({
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+})
+
+const app = express()
+
+const yoga = createServer({
+    schema,
+    plugins: [createEnvelopQueryValidationPlugin()],
+    graphiql: false
+})
+
+app.use('/', yoga)
+
+app.listen(4000);
+```
+
 #### Apollo server plugin
 
 ```js

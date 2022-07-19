@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType } = require('./testutils')
+const { valueByImplType, isStatusCodeError } = require('./testutils')
 
 exports.test = function (setup, implType) {
   describe('Array structures', function () {
@@ -48,7 +48,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: [2, 5] } } })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value 2 at "input.title[0]"' +
@@ -99,7 +99,7 @@ exports.test = function (setup, implType) {
             .send({ query, variables: { input: { authors: [{ name: 'asdsdd', age: [5, 2] }, { name: 'fdgt', age: [1, 5] }] } } })
 
           // console.log(body)
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "asdsdd" at "input.authors[0].name"' +
@@ -176,7 +176,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             valueByImplType(implType, 'Expected value of type "name_String_NotNull_maxLength_5!", found "asdsdd";',
@@ -240,7 +240,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: [2, 5] } })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value 2 at "input[0]"' +
@@ -293,7 +293,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query })
 
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             valueByImplType(implType, 'Expected value of type "input_List_ListNotNull_Int_NotNull_min_3!", found 2;',
@@ -350,7 +350,7 @@ exports.test = function (setup, implType) {
             .send({ query, variables: { input: [{ title: 'asdfrs', authors: [{ name: 'dfgds' }, { name: 'ytyuyd' }] }, { title: 'hgfgh', authors: [{ name: 'rertfs' }] }] } })
 
           // console.log(body)
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             'Variable "$input" got invalid value "asdfrs" at "input[0].title"' +
@@ -411,7 +411,7 @@ exports.test = function (setup, implType) {
             .send({ query })
 
           // console.log(body)
-          strictEqual(statusCode, 400)
+          isStatusCodeError(statusCode, implType)
           strictEqual(
             body.errors[0].message,
             valueByImplType(implType, 'Expected value of type "title_String_NotNull_maxLength_5!", found "asdfrs";',

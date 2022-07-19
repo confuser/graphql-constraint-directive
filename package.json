@@ -8,6 +8,7 @@
     "test": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-full.js",
     "test-schema-wrapper": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-schema-wrapper.js",
     "test-apollo-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-apollo-plugin.js",
+    "test-envelop-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-envelop-plugin.js",
     "test-validation-rule-express-graphql": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-validation-rule-express-graphql.js"
   },
   "author": "James Mortemore (jamesmortemore@gmail.com)",
@@ -39,7 +40,8 @@
     "mocha": "^9.2.1",
     "nyc": "^15.0.1",
     "standard": "^16.0.4",
-    "supertest": "^6.2.2"
+    "supertest": "^6.2.2",
+    "@graphql-yoga/node" : "^2.13.3"
   },
   "dependencies": {
     "@graphql-tools/schema": "^8.3.2",

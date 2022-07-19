@@ -1,9 +1,9 @@
-const setup = require('./setup-apollo-plugin')
-const { IMPL_TYPE_SERVER_VALIDATOR_APOLLO } = require('./testutils')
+const setup = require('./setup-envelop-plugin')
+const { IMPL_TYPE_SERVER_VALIDATOR_ENVELOP } = require('./testutils')
 
-const IMPL_TYPE = IMPL_TYPE_SERVER_VALIDATOR_APOLLO
+const IMPL_TYPE = IMPL_TYPE_SERVER_VALIDATOR_ENVELOP
 
-describe('Server validator based implementation - Apollo plugin', function () {
+describe('Server validator based implementation - Envelop plugin', function () {
   require('./introspection.test').test(setup, IMPL_TYPE)
   require('./argument.test').test(setup, IMPL_TYPE)
   require('./input-object.test').test(setup, IMPL_TYPE)

@@ -5,7 +5,8 @@ const {
   ValidationContext,
   visit,
   visitWithTypeInfo,
-  separateOperations
+  separateOperations,
+  GraphQLError
 } = require('graphql')
 const QueryValidationVisitor = require('./lib/QueryValidationVisitor.js')
 const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
@@ -142,10 +143,21 @@ function createApolloQueryValidationPlugin ({ schema }) {
   }
 }
 
+function createEnvelopQueryValidationPlugin () {
+  return {
+    onExecute ({ args, setResultAndStopExecution }) {
+      const errors = validateQuery(args.schema, args.document, args.variableValues, args.operationName)
+      if (errors.length > 0) {
+        setResultAndStopExecution({ errors: errors.map(err => { return new GraphQLError(err.message, null, null, null, null, err, { exception: err }) }) })
+      }
+    }
+  }
+}
+
 function createQueryValidationRule (options) {
   return (context) => {
     return new QueryValidationVisitor(context, options)
   }
 }
 
-module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin, createQueryValidationRule }
+module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin, createEnvelopQueryValidationPlugin, createQueryValidationRule }

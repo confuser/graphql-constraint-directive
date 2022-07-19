@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType } = require('./testutils')
+const { valueByImplType, isStatusCodeError } = require('./testutils')
 
 exports.test = function (setup, implType) {
   describe('Fragment', function () {
@@ -66,7 +66,7 @@ exports.test = function (setup, implType) {
           .send({ query })
 
         // console.log(body)
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(
           body.errors[0].message,
           valueByImplType(implType, 'Expected value of type "max_Int_min_5", found 4;', 'Argument "max" of "authors" got invalid value 4.') +
@@ -111,7 +111,7 @@ exports.test = function (setup, implType) {
           .send({ query, variables: { arg: 4 } })
 
         // console.log(JSON.stringify(body))
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(
           body.errors[0].message,
           'Variable "$arg" got invalid value 4' +

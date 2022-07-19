@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType } = require('./testutils')
+const { valueByImplType, isStatusCodeError } = require('./testutils')
 
 exports.test = function (setup, implType) {
   const queryIntType = valueByImplType(implType, 'size_Int_max_3', 'Int')
@@ -48,7 +48,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           valueByImplType(implType, 'Expected value of type "size_Int_max_3", found 4;', 'Variable "$size" got invalid value 4.') + ' Must be no greater than 3')
       })

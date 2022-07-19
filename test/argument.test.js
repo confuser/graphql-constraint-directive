@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { formatError, valueByImplType, isSchemaWrapperImplType } = require('./testutils')
+const { formatError, valueByImplType, isSchemaWrapperImplType, isStatusCodeError } = require('./testutils')
 
 exports.test = function (setup, implType) {
   const queryIntType = valueByImplType(implType, 'size_Int_max_3', 'Int')
@@ -73,7 +73,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { size: 100 } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_3"') + '. Must be no greater than 3')
       })
@@ -84,7 +84,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryDeeper, variables: { size: 5 } })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$size" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"') + '. Must be no greater than 4')
       })
@@ -96,7 +96,7 @@ exports.test = function (setup, implType) {
           .send({ query: queryTwoVariables, variables: { size: 4, sizeAuthors: 5 } })
 
         // console.log(body)
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$size" got invalid value 4' + valueByImplType(implType, '; Expected type "size_Int_max_3"') + '. Must be no greater than 3')
         strictEqual(body.errors[1].message,
@@ -212,7 +212,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryFailing })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         // console.log(body.errors)
         strictEqual(body.errors[0].message,
           valueByImplType(implType,
@@ -227,7 +227,7 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryDeeperFailing })
 
-        strictEqual(statusCode, 400)
+        isStatusCodeError(statusCode, implType)
         // console.log(body.errors)
         strictEqual(body.errors[0].message,
           valueByImplType(implType,
@@ -241,8 +241,8 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryFailingTwoTimes })
 
-        strictEqual(statusCode, 400)
-        // console.log(body.errors)
+        // console.log(body)
+        isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           valueByImplType(implType,
             'Expected value of type "size_Int_NotNull_max_3!", found 100; Must be no greater than 3',

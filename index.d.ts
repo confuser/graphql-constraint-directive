@@ -10,3 +10,5 @@ export function validateQuery () : (schema: GraphQLSchema, query: DocumentNode, 
 export function createApolloQueryValidationPlugin () : (schema: GraphQLSchema) => function;
 
 export function createQueryValidationRule( options: { [key: string]: any }) : (context: ValidationContext) => QueryValidationVisitor;
+
+export function createEnvelopQueryValidationPlugin() : object;
