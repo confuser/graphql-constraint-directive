@@ -1016,7 +1016,7 @@ exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: undefined } } })
 
-          console.log(JSON.stringify(body))
+          // console.log(JSON.stringify(body))
           if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isStatusCodeError(statusCode, implType) }
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" was not provided.')
