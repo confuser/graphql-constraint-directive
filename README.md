@@ -72,7 +72,7 @@ Pros:
 Cons:
 * validates only inputs
 
-#### Envelop plugin plugin
+#### Envelop plugin
 
 You can use [Envelop plugin](https://www.envelop.dev), for example in Yoga server, but also anywhere in Envelop.
 Functionality is plugged in `execute` phase.
@@ -116,6 +116,8 @@ app.listen(4000);
 
 #### Apollo server plugin
 
+In [Apollo server](https://www.apollographql.com/docs/apollo-server/) you can use apollo plugin:
+
 ```js
 const { createApolloQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
@@ -158,6 +160,9 @@ server.applyMiddleware({ app })
 ```
 
 #### Validation Rule in Express
+
+You can also use [Validation rule](https://graphql.org/graphql-js/validation/), but only in 
+server where query `variables` are available.
 
 ```js
 const { createQueryValidationRule, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
@@ -291,6 +296,7 @@ app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
 ```
 
 Apollo server plugin throws [`UserInputError`](https://www.apollographql.com/docs/apollo-server/data/errors/#bad_user_input) for each validatin error.
+Envelop plugin throws prefilled `GraphQLError` for each validation error.
 
 ### uniqueTypeName
 ```@constraint(uniqueTypeName: "Unique_Type_Name")```
