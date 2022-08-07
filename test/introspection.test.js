@@ -30,7 +30,7 @@ describe('Introspection', function () {
 
     strictEqual(statusCode, 200)
     const directive = body.data.__schema.directives.find(v => v.name === 'constraint')
-    strictEqual(directive.args.length, 14)
+    strictEqual(directive.args.length, 16)
 
     const type = body.data.__schema.types.find(t => t.name === 'BookInput_subTitle')
     notEqual(type, null)
