@@ -147,6 +147,91 @@ describe('Array', function () {
           title
         }
       }`
+    describe('#minListLength', function () {
+      before(async function () {
+        this.typeDefs = `
+            type Query {
+              books: [Book]
+            }
+            type Book {
+              title: String
+            }
+            type Mutation {
+              createBook(input: BookInput): Book
+            }
+            input BookInput {
+              title: [String!] @constraint(minListLength: 3)
+            }`
+
+        this.request = await setup(this.typeDefs)
+      })
+
+      it('should pass', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: ['he💩', 'test', '123'] } } })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
+      it('should fail', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: ['asdfa', 'a💩'] } } })
+
+        strictEqual(statusCode, 400)
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value ["asdfa", "a💩"] at "input.title"; Expected type "title_List_String_NotNull_minListLength_3". Must be at least 3 elements in array'
+        )
+      })
+    })
+
+    describe('#maxListLength', function () {
+      before(async function () {
+        this.typeDefs = `
+            type Query {
+              books: [Book]
+            }
+            type Book {
+              title: String
+            }
+            type Mutation {
+              createBook(input: BookInput): Book
+            }
+            input BookInput {
+              title: [String!]! @constraint(maxListLength: 3)
+            }`
+
+        this.request = await setup(this.typeDefs)
+      })
+
+      it('should pass', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: ['a💩', 'null'] } } })
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
+      it('should fail', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: ['pu', 'fob💩', '123', '456'] } } })
+
+        strictEqual(statusCode, 400)
+        strictEqual(
+          body.errors[0].message,
+          'Variable "$input" got invalid value ["pu", "fob💩", "123", "456"] at "input.title"; Expected type "title_List_ListNotNull_String_NotNull_maxListLength_3". Must be no more than 3 elements in array'
+        )
+      })
+    })
+
     describe('#minLength', function () {
       before(async function () {
         this.typeDefs = `

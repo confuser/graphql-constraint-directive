@@ -1945,6 +1945,29 @@ describe('@constraint String in FIELD_DEFINITION', function () {
     })
   })
 
+  describe('#listConstarint', function () {
+    before(async function () {
+      this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: Int @constraint(min: 2, maxListLength: 3)
+      }
+      `
+    })
+
+    it('should fail', async function () {
+      const mockData = [{ title: 2 }, { title: 3 }]
+      try {
+        await setup(this.typeDefs, formatError, resolvers(mockData))
+        throw new Error('should not reach here')
+      } catch (err) {
+        strictEqual(err.message, 'List length constraints are only valid for list types.')
+      }
+    })
+  })
+
   describe('#uniqueTypeName', function () {
     before(async function () {
       this.typeDefs = `
