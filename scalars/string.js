@@ -11,7 +11,7 @@ module.exports = class ConstraintStringType extends GraphQLScalarType {
       serialize (value) {
         if (isNotNull !== undefined) {
           listValidate(fieldName, args, value, isNotNull)
-          value.forEach((item) => validate(fieldName, args, item))
+          value.forEach((item) => item !== undefined && item !== null && validate(fieldName, args, item))
           return value
         }
         value = type.serialize(value)
@@ -21,7 +21,7 @@ module.exports = class ConstraintStringType extends GraphQLScalarType {
       parseValue (value) {
         if (isNotNull !== undefined) {
           listValidate(fieldName, args, value, isNotNull)
-          value.forEach((item) => validate(fieldName, args, item))
+          value.forEach((item) => item !== undefined && item !== null && validate(fieldName, args, item))
           return value
         }
         value = type.serialize(value)
@@ -32,7 +32,7 @@ module.exports = class ConstraintStringType extends GraphQLScalarType {
         if (isNotNull !== undefined) {
           const values = ast.values.map(({ value }) => value)
           listValidate(fieldName, args, values, isNotNull)
-          values.forEach((value) => validate(fieldName, args, value))
+          values.forEach((value) => value !== undefined && value !== null && validate(fieldName, args, value))
           return values
         }
         const value = type.parseLiteral(ast)

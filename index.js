@@ -67,7 +67,7 @@ function constraintDirective () {
             uniqueTypeName,
             type,
             directiveArgumentMap,
-            notNull
+            !!notNull
           )
         )
       } else {
@@ -76,7 +76,7 @@ function constraintDirective () {
           uniqueTypeName,
           type,
           directiveArgumentMap,
-          list ? true : undefined
+          list ? !!notNull : undefined
         )
       }
     } else if (type === GraphQLFloat || type === GraphQLInt) {
@@ -97,7 +97,7 @@ function constraintDirective () {
             uniqueTypeName,
             type,
             directiveArgumentMap,
-            notNull
+            !!notNull
           )
         )
       } else {
@@ -106,7 +106,7 @@ function constraintDirective () {
           uniqueTypeName,
           type,
           directiveArgumentMap,
-          list ? true : undefined
+          list ? !!notNull : undefined
         )
       }
     } else {
