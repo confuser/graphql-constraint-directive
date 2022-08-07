@@ -137,6 +137,9 @@ function constraintDirective () {
 
   function wrapType (fieldConfig, directiveArgumentMap) {
     const result = getScalarType(fieldConfig.type)
+    if (!result.list && ['minListLength', 'maxListLength'].some(key => directiveArgumentMap[key] !== undefined)) {
+      throw new Error('List length constraints are only valid for list types.')
+    }
     const fieldName = fieldConfig.astNode.name.value
     fieldConfig.type = getConstraintType(
       fieldName,
