@@ -116,6 +116,15 @@ Ensure value is less than
 ```@constraint(multipleOf: 10)```
 Ensure value is a multiple
 
+### List
+#### minListLength
+```@constraint(minListLength: 3)```
+Restrict the minimum length of the list
+
+#### maxListLength
+```@constraint(maxListLength: 3)```
+Restrict the maximum length of the list
+
 ### ConstraintDirectiveError
 Each validation error throws a `ConstraintDirectiveError`. Combined with a formatError function, this can be used to customise error messages.
 
