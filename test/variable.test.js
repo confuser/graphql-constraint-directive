@@ -1,7 +1,7 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const { valueByImplType, isStatusCodeError } = require('./testutils')
 
-exports.test = function (setup, implType) {
+module.exports.test = function (setup, implType) {
   const queryIntType = valueByImplType(implType, 'size_Int_max_3', 'Int')
 
   describe('Variables', function () {

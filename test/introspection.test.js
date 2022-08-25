@@ -2,7 +2,7 @@ const { strictEqual, notEqual } = require('assert')
 const { getIntrospectionQuery } = require('graphql')
 const { isSchemaWrapperImplType } = require('./testutils')
 
-exports.test = function (setup, implType) {
+module.exports.test = function (setup, implType) {
   describe('Introspection', function () {
     before(async function () {
       this.typeDefs = `

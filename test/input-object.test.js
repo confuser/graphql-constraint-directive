@@ -1,9 +1,7 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const { valueByImplType, formatError, isSchemaWrapperImplType, isStatusCodeError } = require('./testutils')
 
-exports.test = function (setup, implType) {
-  // const queryIntType = valueByImplType(implType, 'title_Int_NotNull_min_3', 'Int')
-
+module.exports.test = function (setup, implType) {
   describe('@constraint in INPUT_OBJECT', function () {
     before(async function () {
       this.typeDefs = /* GraphQL */`
@@ -155,7 +153,6 @@ exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryInlineFailNested })
 
-        // console.log(body)
         isStatusCodeError(statusCode, implType)
         strictEqual(body.errors.length, 2)
         strictEqual(body.errors[0].message,

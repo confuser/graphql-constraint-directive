@@ -1,5 +1,5 @@
 import {GraphQLSchema, GraphQLError, DocumentNode, ValidationContext} from "graphql";
-import QueryValidationVisitor from "./lib/QueryValidationVisitor";
+import QueryValidationVisitor from "./lib/query-validation-visitor";
 
 export function constraintDirective () : (schema: GraphQLSchema) => GraphQLSchema;
 

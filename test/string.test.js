@@ -1,7 +1,7 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError } = require('./testutils')
 
-exports.test = function (setup, implType) {
+module.exports.test = function (setup, implType) {
   describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
     const query = `mutation createBook($input: BookInput) {
       createBook(input: $input) {

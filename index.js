@@ -8,10 +8,10 @@ const {
   separateOperations,
   GraphQLError
 } = require('graphql')
-const QueryValidationVisitor = require('./lib/QueryValidationVisitor.js')
+const QueryValidationVisitor = require('./lib/query-validation-visitor.js')
 const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
-const { getConstraintTypeObject, getScalarType } = require('./lib/typeutils')
-const { constraintDirectiveTypeDefs } = require('./lib/typeDefs')
+const { getConstraintTypeObject, getScalarType } = require('./lib/type-utils')
+const { constraintDirectiveTypeDefs } = require('./lib/type-defs')
 
 function constraintDirective () {
   const constraintTypes = {}
@@ -96,7 +96,6 @@ function constraintDirective () {
 }
 
 function validateQuery (schema, query, variables, operationName) {
-  // console.log('validateQuery')
   const typeInfo = new TypeInfo(schema)
 
   const errors = []

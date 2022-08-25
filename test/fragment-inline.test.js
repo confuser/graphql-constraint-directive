@@ -1,7 +1,7 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const { valueByImplType, isStatusCodeError } = require('./testutils')
 
-exports.test = function (setup, implType) {
+module.exports.test = function (setup, implType) {
   describe('Inline Fragment', function () {
     before(async function () {
       this.typeDefs = /* GraphQL */`

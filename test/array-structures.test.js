@@ -1,7 +1,7 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const { valueByImplType, isStatusCodeError } = require('./testutils')
 
-exports.test = function (setup, implType) {
+module.exports.test = function (setup, implType) {
   describe('Array structures', function () {
     describe('INPUT_OBJECT', function () {
       const query = /* GraphQL */`

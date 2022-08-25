@@ -17,6 +17,13 @@ function valueByImplType (implType, valueSchemaWrapper, valueServerValidator) {
   if (implType === IMPL_TYPE_SCHEMA_WRAPPER) { return valueSchemaWrapper } else { return valueServerValidator || '' }
 }
 
+/**
+ * Checks if status code means error - depends on implType.
+ *
+ * @parem {*} statusCode to check
+ * @param {*} implType to check status code for. Some of `IMPL_TYPE_xx` constants
+ * @returns true if status code means error
+ */
 function isStatusCodeError (statusCode, implType) {
   if (implType === IMPL_TYPE_SERVER_VALIDATOR_ENVELOP) { strictEqual(statusCode, 200) } else { strictEqual(statusCode, 400) }
 }
@@ -31,14 +38,32 @@ function isSchemaWrapperImplType (implType) {
   return implType === IMPL_TYPE_SCHEMA_WRAPPER
 }
 
+/**
+ * Return true if implementation type is `IMPL_TYPE_SERVER_VALIDATOR_APOLLO` - usefull for tests which need to vary based on implementation type.
+ *
+ * @param {*} implType  to check
+ * @returns true if `implType` is `IMPL_TYPE_SERVER_VALIDATOR_APOLLO`
+ */
 function isServerValidatorApollo (implType) {
   return implType === IMPL_TYPE_SERVER_VALIDATOR_APOLLO
 }
 
+/**
+ * Return true if implementation type is `IMPL_TYPE_SERVER_VALIDATOR_ENVELOP` - usefull for tests which need to vary based on implementation type.
+ *
+ * @param {*} implType  to check
+ * @returns true if `implType` is `IMPL_TYPE_SERVER_VALIDATOR_ENVELOP`
+ */
 function isServerValidatorEnvelop (implType) {
   return implType === IMPL_TYPE_SERVER_VALIDATOR_ENVELOP
 }
 
+/**
+ * Return true if implementation type is `IMPL_TYPE_SERVER_VALIDATOR_RULE` - usefull for tests which need to vary based on implementation type.
+ *
+ * @param {*} implType  to check
+ * @returns true if `implType` is `IMPL_TYPE_SERVER_VALIDATOR_RULE`
+ */
 function isServerValidatorRule (implType) {
   return implType === IMPL_TYPE_SERVER_VALIDATOR_RULE
 }

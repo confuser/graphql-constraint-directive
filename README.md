@@ -18,15 +18,16 @@ npm install graphql-constraint-directive@v2
 ```
 
 ## Usage
+There are multiple ways to make use of the constraint directive in your project. Below outlines the benefits and caveats. Please choose the most appropriate to your use case.
 
 ### Schema wrapper
 
 Implementation based on schema wrappers - basic scalars are wrapped as custom scalars with validations. 
 
-Pros:
+#### Benefits
 * posibility to validate output
 
-Cons:
+#### Caveats
 * modifies GraphQL schema, basic scalars (Int, Float, String) are replaced by custom scalars
 
 ```js
@@ -66,16 +67,16 @@ server.applyMiddleware({ app })
 
 Implementation based on server plugin. Implementation entry point is function `validateQuery(schema, query, variables, operationName)`.
 
-Pros:
+#### Benefits
 * schema stays unmodified
 
-Cons:
+#### Caveats
 * validates only inputs
 
-#### Envelop plugin
+#### Envelop
 
-You can use [Envelop plugin](https://www.envelop.dev), for example in Yoga server, but also anywhere in Envelop.
-Functionality is plugged in `execute` phase.
+Use as an [Envelop plugin](https://www.envelop.dev) in supported frameworks, e.g. [GraphQL Yoga](https://www.graphql-yoga.com/).
+Functionality is plugged in `execute` phase
 
 ```js
 const { createEnvelopQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
@@ -114,9 +115,9 @@ app.use('/', yoga)
 app.listen(4000);
 ```
 
-#### Apollo server plugin
+#### Apollo Server
 
-In [Apollo server](https://www.apollographql.com/docs/apollo-server/) you can use apollo plugin:
+As an [Apollo Server](https://www.apollographql.com/docs/apollo-server/) plugin
 
 ```js
 const { createApolloQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
@@ -159,10 +160,9 @@ await server.start()
 server.applyMiddleware({ app })
 ```
 
-#### Validation Rule in Express
+#### Express
 
-You can also use [Validation rule](https://graphql.org/graphql-js/validation/), but only in 
-server where query `variables` are available.
+As a [Validation rule](https://graphql.org/graphql-js/validation/) where query `variables` are available 
 
 ```js
 const { createQueryValidationRule, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
@@ -295,8 +295,11 @@ app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
 
 ```
 
-Apollo server plugin throws [`UserInputError`](https://www.apollographql.com/docs/apollo-server/data/errors/#bad_user_input) for each validatin error.
-Envelop plugin throws prefilled `GraphQLError` for each validation error.
+#### Apollo Server
+Throws a [`UserInputError`](https://www.apollographql.com/docs/apollo-server/data/errors/#bad_user_input) for each validation error
+
+#### Envelop
+The Envelop plugin throws a prefilled `GraphQLError` for each validation error
 
 ### uniqueTypeName
 ```@constraint(uniqueTypeName: "Unique_Type_Name")```

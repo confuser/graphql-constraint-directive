@@ -1,7 +1,7 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const { valueByImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError } = require('./testutils')
 
-exports.test = function (setup, implType) {
+module.exports.test = function (setup, implType) {
   describe('Array', function () {
     describe('Int', function () {
       const query = `mutation createBook($input: BookInput) {
