@@ -25,7 +25,8 @@ There are multiple ways to make use of the constraint directive in your project.
 Implementation based on schema wrappers - basic scalars are wrapped as custom scalars with validations. 
 
 #### Benefits
-* posibility to validate output
+* based on `graphql` library, works everywhere 
+* posibility to also validate GraphQL response data
 
 #### Caveats
 * modifies GraphQL schema, basic scalars (Int, Float, String) are replaced by custom scalars
@@ -65,13 +66,15 @@ server.applyMiddleware({ app })
 
 ### Server plugin
 
-Implementation based on server plugin. Implementation entry point is function `validateQuery(schema, query, variables, operationName)`.
+Implementation based on server plugin. Common server plugins are implemented,
+function `validateQuery(schema, query, variables, operationName)` can be used to implement additional plugins.
 
 #### Benefits
 * schema stays unmodified
 
 #### Caveats
-* validates only inputs
+* runs only in supported servers
+* validates only GraphQL query, not response data
 
 #### Envelop
 
@@ -162,7 +165,7 @@ server.applyMiddleware({ app })
 
 #### Express
 
-As a [Validation rule](https://graphql.org/graphql-js/validation/) where query `variables` are available 
+As a [Validation rule](https://graphql.org/graphql-js/validation/) when query `variables` are available 
 
 ```js
 const { createQueryValidationRule, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
