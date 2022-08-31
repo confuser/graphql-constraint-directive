@@ -1,22 +1,23 @@
 const express = require('express')
-const { ApolloServer } = require('apollo-server-express')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
+const { createServer } = require('@graphql-yoga/node')
 const request = require('supertest')
-const { constraintDirective, constraintDirectiveTypeDefs } = require('../')
+const { createEnvelopQueryValidationPlugin, constraintDirectiveTypeDefs } = require('..')
 
 module.exports = async function (typeDefs, formatError, resolvers) {
-  let schema = makeExecutableSchema({
+  const schema = makeExecutableSchema({
     typeDefs: [constraintDirectiveTypeDefs, typeDefs],
     resolvers
   })
-  schema = constraintDirective()(schema)
 
   const app = express()
-  const server = new ApolloServer({ schema, formatError })
+  const yoga = createServer({
+    schema,
+    plugins: [createEnvelopQueryValidationPlugin()],
+    graphiql: false
+  })
 
-  await server.start()
-
-  server.applyMiddleware({ app })
+  app.use('/', yoga)
 
   return request(app)
 }

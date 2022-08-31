@@ -18,6 +18,19 @@ npm install graphql-constraint-directive@v2
 ```
 
 ## Usage
+There are multiple ways to make use of the constraint directive in your project. Below outlines the benefits and caveats. Please choose the most appropriate to your use case.
+
+### Schema wrapper
+
+Implementation based on schema wrappers - basic scalars are wrapped as custom scalars with validations. 
+
+#### Benefits
+* based on `graphql` library, works everywhere 
+* posibility to also validate GraphQL response data
+
+#### Caveats
+* modifies GraphQL schema, basic scalars (Int, Float, String) are replaced by custom scalars
+
 ```js
 const { constraintDirective, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
@@ -48,6 +61,150 @@ const server = new ApolloServer({ schema })
 await server.start()
 
 server.applyMiddleware({ app })
+
+```
+
+### Server plugin
+
+Implementation based on server plugin. Common server plugins are implemented,
+function `validateQuery(schema, query, variables, operationName)` can be used to implement additional plugins.
+
+#### Benefits
+* schema stays unmodified
+
+#### Caveats
+* runs only in supported servers
+* validates only GraphQL query, not response data
+
+#### Envelop
+
+Use as an [Envelop plugin](https://www.envelop.dev) in supported frameworks, e.g. [GraphQL Yoga](https://www.graphql-yoga.com/).
+Functionality is plugged in `execute` phase
+
+```js
+const { createEnvelopQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
+const express = require('express')
+const { createServer } = require('@graphql-yoga/node')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+
+const typeDefs = `
+  type Query {
+    books: [Book]
+  }
+  type Book {
+    title: String
+  }
+  type Mutation {
+    createBook(input: BookInput): Book
+  }
+  input BookInput {
+    title: String! @constraint(minLength: 5, format: "email")
+  }`
+
+let schema = makeExecutableSchema({
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+})
+
+const app = express()
+
+const yoga = createServer({
+    schema,
+    plugins: [createEnvelopQueryValidationPlugin()],
+    graphiql: false
+})
+
+app.use('/', yoga)
+
+app.listen(4000);
+```
+
+#### Apollo Server
+
+As an [Apollo Server](https://www.apollographql.com/docs/apollo-server/) plugin
+
+```js
+const { createApolloQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
+const express = require('express')
+const { ApolloServer } = require('apollo-server-express')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+
+const typeDefs = `
+  type Query {
+    books: [Book]
+  }
+  type Book {
+    title: String
+  }
+  type Mutation {
+    createBook(input: BookInput): Book
+  }
+  input BookInput {
+    title: String! @constraint(minLength: 5, format: "email")
+  }`
+
+let schema = makeExecutableSchema({
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+})
+
+const plugins = [
+  createApolloQueryValidationPlugin({
+    schema
+  })
+]
+
+const app = express()
+const server = new ApolloServer({ 
+  schema,
+  plugins
+})
+
+await server.start()
+
+server.applyMiddleware({ app })
+```
+
+#### Express
+
+As a [Validation rule](https://graphql.org/graphql-js/validation/) when query `variables` are available 
+
+```js
+const { createQueryValidationRule, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
+const express = require('express')
+const { graphqlHTTP } = require('express-graphql')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+
+const typeDefs = `
+  type Query {
+    books: [Book]
+  }
+  type Book {
+    title: String
+  }
+  type Mutation {
+    createBook(input: BookInput): Book
+  }
+  input BookInput {
+    title: String! @constraint(minLength: 5, format: "email")
+  }`
+
+let schema = makeExecutableSchema({
+  typeDefs: [constraintDirectiveTypeDefs, typeDefs],
+})
+
+const app = express()
+
+app.use(
+  '/api',
+  graphqlHTTP(async (request, response, { variables }) => ({
+    schema,
+    validationRules: [
+      createQueryValidationRule({
+        variables
+      })
+    ]
+  }))
+)
+app.listen(4000);
 
 ```
 
@@ -140,6 +297,14 @@ const formatError = function (error) {
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
 
 ```
+
+#### Apollo Server
+Throws a [`UserInputError`](https://www.apollographql.com/docs/apollo-server/data/errors/#bad_user_input) for each validation error
+
+#### Envelop
+The Envelop plugin throws a prefilled `GraphQLError` for each validation error
+
 ### uniqueTypeName
 ```@constraint(uniqueTypeName: "Unique_Type_Name")```
-Override the unique type name generate by the library to the one passed as an argument
+Override the unique type name generate by the library to the one passed as an argument. 
+Has meaning only for `Schema wrapper` implementation.
