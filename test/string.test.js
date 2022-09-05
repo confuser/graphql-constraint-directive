@@ -1064,6 +1064,71 @@ module.exports.test = function (setup, implType) {
       })
     })
 
+    describe('other directives', function () {
+      const query = `mutation createBook($input: BookInput, $skipTest: Boolean!) {
+        createBook(input: $input) {
+          title @skip(if: $skipTest)
+        }
+      }`
+
+      before(async function () {
+        this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String
+      }
+      type Mutation {
+        createBook(input: BookInput): Book
+      }
+      input BookInput {
+        title: String! @constraint(minLength: 3)
+      }`
+
+        this.request = await setup(this.typeDefs)
+      })
+
+      it('should pass', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'he💩' }, skipTest: false } })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
+      it('should fail', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'a💩' }, skipTest: false } })
+
+        isStatusCodeError(statusCode, implType)
+        strictEqual(body.errors[0].message,
+          'Variable "$input" got invalid value "a💩" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_minLength_3"') + '. Must be at least 3 characters in length')
+      })
+
+      if (isSchemaWrapperImplType(implType)) {
+        it('should throw custom error', async function () {
+          const request = await setup(this.typeDefs, formatError)
+          const { body, statusCode } = await request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: 'a💩' }, skipTest: false } })
+
+          strictEqual(statusCode, 400)
+          deepStrictEqual(body.errors[0], {
+            message: 'Must be at least 3 characters in length',
+            code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+            fieldName: 'title',
+            context: [{ arg: 'minLength', value: 3 }]
+          })
+        })
+      }
+    })
+
     if (isSchemaWrapperImplType(implType)) {
       describe('#uniqueTypeName', function () {
         before(async function () {
