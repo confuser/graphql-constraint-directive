@@ -9,6 +9,7 @@ describe('Server validator based implementation - validation rule - Server Graph
   require('./input-object.test').test(setup, IMPL_TYPE)
   require('./array.test').test(setup, IMPL_TYPE)
   require('./array-structures.test').test(setup, IMPL_TYPE)
+  require('./array-size.test').test(setup, IMPL_TYPE)
   require('./fragment-inline.test').test(setup, IMPL_TYPE)
   require('./fragment.test').test(setup, IMPL_TYPE)
   require('./variable.test').test(setup, IMPL_TYPE)
