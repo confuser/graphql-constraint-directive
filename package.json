@@ -32,7 +32,7 @@
     "constraint"
   ],
   "devDependencies": {
-    "apollo-server-express": "3.6.3",
+    "apollo-server-express": "3.10.3",
     "coveralls": "3.1.1",
     "express": "4.17.3",
     "express-graphql": "0.12.0",
