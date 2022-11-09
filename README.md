@@ -164,7 +164,7 @@ server.applyMiddleware({ app })
 ```
 #### Apollo subgraph server
 
-Theres small change required to make the Apollo Server quickstart work when trying to build an [Apollo Subgraph Server](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-apollo-server/).
+There is a small change required to make the Apollo Server quickstart work when trying to build an [Apollo Subgraph Server](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-apollo-server/).
 
 Notably, we need to wrap our `typDefs` with the `gql` tag, from either the `graphql-tag` or the `apollo-server-core` packages. This converts the `typeDefs` to an `AST` or `DocumentNode` format and is required by `buildSubgraphSchema`, as mentioned in their [docs](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-apollo-server/):
 >While Apollo Server can accept a string (or `DocumentNode`) for its `typeDefs`, the `buildSubgraphSchema` function below requires the schema we pass in to be a `DocumentNode`.
