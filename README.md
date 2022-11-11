@@ -162,6 +162,56 @@ await server.start()
 
 server.applyMiddleware({ app })
 ```
+#### Apollo subgraph server
+
+There is a small change required to make the Apollo Server quickstart work when trying to build an [Apollo Subgraph Server](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-apollo-server/).
+
+Notably, we need to wrap our `typDefs` with the `gql` tag, from either the `graphql-tag` or the `apollo-server-core` packages. This converts the `typeDefs` to an `AST` or `DocumentNode` format and is required by `buildSubgraphSchema`, as mentioned in their [docs](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-apollo-server/):
+>While Apollo Server can accept a string (or `DocumentNode`) for its `typeDefs`, the `buildSubgraphSchema` function below requires the schema we pass in to be a `DocumentNode`.
+
+Then, we must use the `buildSubgraphSchema` function to build a schema that can be passed to an Apollo Gateway/supergraph, instead of `makeExecuteableSchema`. This uses `makeExecutableSchema` under the hood.
+
+```ts
+import { ApolloServer } from '@apollo/server';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import { gql } from 'graphql-tag'; // Or can be imported from 'apollo-server-core'
+import { buildSubgraphSchema } from '@apollo/subgraph';
+import { createApolloQueryValidationPlugin, constraintDirectiveTypeDefs } from 'graphql-constraint-directive';
+
+const typeDefs = gql`
+  extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable"])
+
+  type Query {
+    books: [Book]
+  }
+  type Book {
+    title: String
+  }
+  type Mutation {
+    createBook(input: BookInput): Book
+  }
+  input BookInput {
+    title: String! @constraint(minLength: 5, format: "email")
+  }
+`;
+
+const schema = buildSubgraphSchema({
+  typeDefs: [gql(constraintDirectiveTypeDefs), typeDefs]
+});
+
+const plugins = [
+  createApolloQueryValidationPlugin({
+    schema
+  })
+]
+
+const server = new ApolloServer({
+  schema,
+  plugins
+});
+
+await startStandaloneServer(server);
+```
 
 #### Express
 
