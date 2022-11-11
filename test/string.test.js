@@ -49,6 +49,17 @@ module.exports.test = function (setup, implType) {
           'Variable "$input" got invalid value "a💩" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_minLength_3"') + '. Must be at least 3 characters in length')
       })
 
+      it('should fail with empty string', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: '' } } })
+
+        isStatusCodeError(statusCode, implType)
+        strictEqual(body.errors[0].message,
+          'Variable "$input" got invalid value "" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_minLength_3"') + '. Must be at least 3 characters in length')
+      })
+
       if (isSchemaWrapperImplType(implType)) {
         it('should throw custom error', async function () {
           const request = await setup(this.typeDefs, formatError)
