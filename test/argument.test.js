@@ -73,6 +73,8 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { size: 100 } })
 
+        console.log('Body: ' + JSON.stringify(body))
+        console.log('SC: ' + statusCode)
         isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_3"') + '. Must be no greater than 3')
