@@ -19,7 +19,7 @@ module.exports.test = function (setup, implType) {
         union Result = Book | Magazine
       `
 
-      this.request = await setup(this.typeDefs)
+      this.request = await setup({ typeDefs: this.typeDefs })
     })
 
     describe('Inlined value', function () {

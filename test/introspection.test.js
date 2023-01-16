@@ -20,7 +20,7 @@ module.exports.test = function (setup, implType) {
       subTitle: Int! @constraint(max: 3, uniqueTypeName: "BookInput_subTitle")
     }`
 
-      this.request = await setup(this.typeDefs)
+      this.request = await setup({ typeDefs: this.typeDefs })
     })
 
     it('should allow introspection', async function () {

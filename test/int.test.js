@@ -25,7 +25,7 @@ module.exports.test = function (setup, implType) {
         title: Int! @constraint(min: 3)
       }`
 
-        this.request = await setup(this.typeDefs)
+        this.request = await setup({ typeDefs: this.typeDefs })
       })
 
       it('should pass', async function () {
@@ -51,7 +51,7 @@ module.exports.test = function (setup, implType) {
 
       if (isSchemaWrapperImplType(implType)) {
         it('should throw custom error', async function () {
-          const request = await setup(this.typeDefs, formatError)
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -84,7 +84,7 @@ module.exports.test = function (setup, implType) {
         title: Int @constraint(max: 3)
       }`
 
-        this.request = await setup(this.typeDefs)
+        this.request = await setup({ typeDefs: this.typeDefs })
       })
 
       it('should pass', async function () {
@@ -110,7 +110,7 @@ module.exports.test = function (setup, implType) {
 
       if (isSchemaWrapperImplType(implType)) {
         it('should throw custom error', async function () {
-          const request = await setup(this.typeDefs, formatError)
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -143,7 +143,7 @@ module.exports.test = function (setup, implType) {
         title: Int! @constraint(exclusiveMin: 3)
       }`
 
-        this.request = await setup(this.typeDefs)
+        this.request = await setup({ typeDefs: this.typeDefs })
       })
 
       it('should pass', async function () {
@@ -173,7 +173,7 @@ module.exports.test = function (setup, implType) {
 
       if (isSchemaWrapperImplType(implType)) {
         it('should throw custom error', async function () {
-          const request = await setup(this.typeDefs, formatError)
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -206,7 +206,7 @@ module.exports.test = function (setup, implType) {
         title: Int! @constraint(exclusiveMax: 3)
       }`
 
-        this.request = await setup(this.typeDefs)
+        this.request = await setup({ typeDefs: this.typeDefs })
       })
 
       it('should pass', async function () {
@@ -236,7 +236,7 @@ module.exports.test = function (setup, implType) {
 
       if (isSchemaWrapperImplType(implType)) {
         it('should throw custom error', async function () {
-          const request = await setup(this.typeDefs, formatError)
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -269,7 +269,7 @@ module.exports.test = function (setup, implType) {
         title: Int! @constraint(multipleOf: 2)
       }`
 
-        this.request = await setup(this.typeDefs)
+        this.request = await setup({ typeDefs: this.typeDefs })
       })
 
       it('should pass', async function () {
@@ -295,7 +295,7 @@ module.exports.test = function (setup, implType) {
 
       if (isSchemaWrapperImplType(implType)) {
         it('should throw custom error', async function () {
-          const request = await setup(this.typeDefs, formatError)
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -328,7 +328,7 @@ module.exports.test = function (setup, implType) {
         title: Int! @constraint(multipleOf: 2)
       }`
 
-        this.request = await setup(this.typeDefs)
+        this.request = await setup({ typeDefs: this.typeDefs })
       })
 
       if (!isServerValidatorEnvelop(implType)) {
@@ -372,7 +372,7 @@ module.exports.test = function (setup, implType) {
         title: Int @constraint(multipleOf: 2)
       }`
 
-        this.request = await setup(this.typeDefs)
+        this.request = await setup({ typeDefs: this.typeDefs })
       })
 
       it('should pass with null', async function () {
@@ -412,7 +412,7 @@ module.exports.test = function (setup, implType) {
         title: Int! @constraint(min: 3, uniqueTypeName: "BookInput_Title")
       }`
 
-        this.request = await setup(this.typeDefs)
+        this.request = await setup({ typeDefs: this.typeDefs })
       })
 
       if (isSchemaWrapperImplType(implType)) {
@@ -438,7 +438,7 @@ module.exports.test = function (setup, implType) {
         })
 
         it('should throw custom error', async function () {
-          const request = await setup(this.typeDefs, formatError)
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -487,7 +487,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -499,7 +499,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: 1 }, { title: 2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -511,7 +511,7 @@ module.exports.test = function (setup, implType) {
 
         it('should throw custom error', async function () {
           const mockData = [{ title: 1 }, { title: 2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -541,7 +541,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 1 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -553,7 +553,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: -1 }, { title: 2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -578,7 +578,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 1 }, { title: 2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -590,7 +590,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: 2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -602,7 +602,7 @@ module.exports.test = function (setup, implType) {
 
         it('should throw custom error', async function () {
           const mockData = [{ title: 2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -632,7 +632,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 0 }, { title: -2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -644,7 +644,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: -2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -669,7 +669,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 3 }, { title: 4 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -681,7 +681,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: 2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -693,7 +693,7 @@ module.exports.test = function (setup, implType) {
 
         it('should throw custom error', async function () {
           const mockData = [{ title: 2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -723,7 +723,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 1 }, { title: 4 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -735,7 +735,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: 0 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -760,7 +760,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 0 }, { title: 1 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -772,7 +772,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: 1 }, { title: 2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -784,7 +784,7 @@ module.exports.test = function (setup, implType) {
 
         it('should throw custom error', async function () {
           const mockData = [{ title: 1 }, { title: 2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -814,7 +814,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: -1 }, { title: -2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -826,7 +826,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: 0 }, { title: -2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -851,7 +851,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 2 }, { title: 4 }, { title: 6 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -863,7 +863,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: 1 }, { title: 2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -875,7 +875,7 @@ module.exports.test = function (setup, implType) {
 
         it('should throw custom error', async function () {
           const mockData = [{ title: 1 }, { title: 2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -905,7 +905,7 @@ module.exports.test = function (setup, implType) {
 
         it('should pass', async function () {
           const mockData = [{ title: 2 }, { title: 3 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -917,7 +917,7 @@ module.exports.test = function (setup, implType) {
 
         it('should fail', async function () {
           const mockData = [{ title: 1 }, { title: 2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -929,7 +929,7 @@ module.exports.test = function (setup, implType) {
 
         it('should throw custom error', async function () {
           const mockData = [{ title: 1 }, { title: 2 }]
-          const request = await setup(this.typeDefs, formatError, resolvers(mockData))
+          const request = await setup({ typeDefs: this.typeDefs, formatError, resolvers: resolvers(mockData) })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')

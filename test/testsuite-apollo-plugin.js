@@ -16,4 +16,5 @@ describe('Server validator based implementation - Apollo plugin', function () {
   require('./float.test').test(setup, IMPL_TYPE)
   require('./int.test').test(setup, IMPL_TYPE)
   require('./string.test').test(setup, IMPL_TYPE)
+  require('./argument-dynamic.test').test(setup, IMPL_TYPE)
 })

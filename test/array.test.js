@@ -26,7 +26,7 @@ module.exports.test = function (setup, implType) {
             title: [Int!]! @constraint(min: 3)
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -70,7 +70,7 @@ module.exports.test = function (setup, implType) {
             title: [Int!] @constraint(max: 3)
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -115,7 +115,7 @@ module.exports.test = function (setup, implType) {
             title: [Int!] @constraint(multipleOf: 2)
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         if (!isServerValidatorEnvelop(implType)) {
@@ -174,7 +174,7 @@ module.exports.test = function (setup, implType) {
             title: [String!] @constraint(minLength: 3)
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -219,7 +219,7 @@ module.exports.test = function (setup, implType) {
             title: [String] @constraint(maxLength: 3)
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -264,7 +264,7 @@ module.exports.test = function (setup, implType) {
             title: [String!]! @constraint(format: "uri")
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
