@@ -142,45 +142,6 @@ function createApolloQueryValidationPlugin ({ schema }) {
   }
 }
 
-function createApollo4QueryValidationPlugin ({ schema }) {
-  return {
-    async requestDidStart () {
-      return ({
-        async didResolveOperation (requestContext) {
-          const { request, document } = requestContext
-          const query = request.operationName
-            ? separateOperations(document)[request.operationName]
-            : document
-
-          const errors = validateQuery(
-            schema,
-            query,
-            request.variables,
-            request.operationName
-          )
-          console.log('RC errors: ' + requestContext.errors)
-          if (errors.length > 0) {
-            const te = errors.map(err => {
-              return new GraphQLError(err.message, {
-                extensions: {
-                  field: err.fieldName,
-                  context: err.context,
-                  code: 'BAD_USER_INPUT',
-                  http: {
-                    status: 400
-                  }
-                }
-              })
-            })
-            requestContext.errors = te
-            throw te[0]
-          }
-        }
-      })
-    }
-  }
-}
-
 function createEnvelopQueryValidationPlugin () {
   return {
     onExecute ({ args, setResultAndStopExecution }) {
@@ -198,4 +159,4 @@ function createQueryValidationRule (options) {
   }
 }
 
-module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin, createApollo4QueryValidationPlugin, createEnvelopQueryValidationPlugin, createQueryValidationRule }
+module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin, createEnvelopQueryValidationPlugin, createQueryValidationRule }

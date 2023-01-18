@@ -5,7 +5,7 @@ const { makeExecutableSchema } = require('@graphql-tools/schema')
 const cors = require('cors')
 const { json } = require('body-parser')
 const request = require('supertest')
-const { createApollo4QueryValidationPlugin, constraintDirectiveTypeDefs } = require('..')
+const { createApollo4QueryValidationPlugin, constraintDirectiveTypeDefs } = require('../apollo4')
 
 module.exports = async function (typeDefs, formatError, resolvers) {
   const schema = makeExecutableSchema({
