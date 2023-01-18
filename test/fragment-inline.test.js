@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, isStatusCodeError } = require('./testutils')
+const { valueByImplType, isStatusCodeError, unwrapMoreValidationErrors } = require('./testutils')
 
 module.exports.test = function (setup, implType) {
   describe('Inline Fragment', function () {
@@ -70,13 +70,14 @@ module.exports.test = function (setup, implType) {
 
         // console.log(body)
         isStatusCodeError(statusCode, implType)
+        const errors = unwrapMoreValidationErrors(body.errors)
         strictEqual(
-          body.errors[0].message,
+          errors[0].message,
           valueByImplType(implType, 'Expected value of type "max_Int_min_5", found 4;', 'Argument "max" of "authors" got invalid value 4.') +
           ' Must be at least 5'
         )
         strictEqual(
-          body.errors[1].message,
+          errors[1].message,
           valueByImplType(implType, 'Expected value of type "min_Int_min_4", found 3;', 'Argument "min" of "volume" got invalid value 3.') +
           ' Must be at least 4'
         )
@@ -120,14 +121,15 @@ module.exports.test = function (setup, implType) {
 
         // console.log(body)
         isStatusCodeError(statusCode, implType)
+        const errors = unwrapMoreValidationErrors(body.errors)
         strictEqual(
-          body.errors[0].message,
+          errors[0].message,
           'Variable "$arg1" got invalid value 4' +
           valueByImplType(implType, '; Expected type "max_Int_min_5"') +
           '. Must be at least 5'
         )
         strictEqual(
-          body.errors[1].message,
+          errors[1].message,
           'Variable "$arg2" got invalid value 3' +
           valueByImplType(implType, '; Expected type "min_Int_min_4"') +
           '. Must be at least 4'

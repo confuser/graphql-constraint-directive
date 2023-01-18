@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError, isServerValidatorApollo4 } = require('./testutils')
 
 module.exports.test = function (setup, implType) {
   describe('@constraint Float in INPUT_FIELD_DEFINITION', function () {
@@ -339,7 +339,7 @@ module.exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: null } } })
 
-          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isServerValidatorApollo4(implType) ? strictEqual(statusCode, 200) : strictEqual(statusCode, 400) }
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "' + valueByImplType(implType, 'title_Float_NotNull_multipleOf_2', 'Float') + '!" not to be null.')
         })
@@ -350,7 +350,7 @@ module.exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: undefined } } })
 
-          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { strictEqual(statusCode, 400) }
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isServerValidatorApollo4(implType) ? strictEqual(statusCode, 200) : strictEqual(statusCode, 400) }
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_Float_NotNull_multipleOf_2', 'Float') + '!" was not provided.')
         })

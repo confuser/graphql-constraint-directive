@@ -7,11 +7,15 @@ const { json } = require('body-parser')
 const request = require('supertest')
 const { createApollo4QueryValidationPlugin, constraintDirectiveTypeDefs } = require('../apollo4')
 
-module.exports = async function (typeDefs, formatError, resolvers) {
-  const schema = makeExecutableSchema({
+module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreatedCallback }) {
+  let schema = makeExecutableSchema({
     typeDefs: [constraintDirectiveTypeDefs, typeDefs],
     resolvers
   })
+
+  if (schemaCreatedCallback) {
+    schema = schemaCreatedCallback(schema)
+  }
 
   const plugins = [
     createApollo4QueryValidationPlugin({
@@ -32,9 +36,7 @@ module.exports = async function (typeDefs, formatError, resolvers) {
     '/',
     cors(),
     json(),
-    expressMiddleware(server, {
-
-    })
+    expressMiddleware(server)
   )
 
   return request(app)

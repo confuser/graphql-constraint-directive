@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { formatError, valueByImplType, isSchemaWrapperImplType, isStatusCodeError } = require('./testutils')
+const { formatError, valueByImplType, isSchemaWrapperImplType, isStatusCodeError, unwrapMoreValidationErrors } = require('./testutils')
 
 module.exports.test = function (setup, implType) {
   const queryIntType = valueByImplType(implType, 'size_Int_max_3', 'Int')
@@ -73,8 +73,7 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { size: 100 } })
 
-        console.log('Body: ' + JSON.stringify(body))
-        console.log('SC: ' + statusCode)
+        // console.log('Body: ' + JSON.stringify(body))
         isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_3"') + '. Must be no greater than 3')
@@ -99,9 +98,10 @@ module.exports.test = function (setup, implType) {
 
         // console.log(body)
         isStatusCodeError(statusCode, implType)
-        strictEqual(body.errors[0].message,
+        const errors = unwrapMoreValidationErrors(body.errors)
+        strictEqual(errors[0].message,
           'Variable "$size" got invalid value 4' + valueByImplType(implType, '; Expected type "size_Int_max_3"') + '. Must be no greater than 3')
-        strictEqual(body.errors[1].message,
+        strictEqual(errors[1].message,
           'Variable "$sizeAuthors" got invalid value 5' + valueByImplType(implType, '; Expected type "size_Int_max_4"') + '. Must be no greater than 4')
       })
 
@@ -245,12 +245,13 @@ module.exports.test = function (setup, implType) {
 
         // console.log(body)
         isStatusCodeError(statusCode, implType)
-        strictEqual(body.errors[0].message,
+        const errors = unwrapMoreValidationErrors(body.errors)
+        strictEqual(errors[0].message,
           valueByImplType(implType,
             'Expected value of type "size_Int_NotNull_max_3!", found 100; Must be no greater than 3',
             'Argument "size" of "books" got invalid value 100. Must be no greater than 3')
         )
-        strictEqual(body.errors[1].message,
+        strictEqual(errors[1].message,
           valueByImplType(implType,
             'Expected value of type "size_Int_max_4", found 5; Must be no greater than 4',
             'Argument "size" of "authors" got invalid value 5. Must be no greater than 4')

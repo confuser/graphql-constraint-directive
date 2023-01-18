@@ -4,6 +4,7 @@ const {
 } = require('graphql')
 const { validateQuery } = require('./index')
 const { constraintDirectiveTypeDefs } = require('./lib/type-defs')
+const { gql } = require('graphql-tag')
 
 function createApollo4QueryValidationPlugin ({ schema }) {
   return {
@@ -21,7 +22,7 @@ function createApollo4QueryValidationPlugin ({ schema }) {
             request.variables,
             request.operationName
           )
-          console.log('RC errors: ' + requestContext.errors)
+
           if (errors.length > 0) {
             const te = errors.map(err => {
               return new GraphQLError(err.message, {
@@ -55,4 +56,6 @@ function createApollo4QueryValidationPlugin ({ schema }) {
   }
 }
 
-module.exports = { constraintDirectiveTypeDefs, createApollo4QueryValidationPlugin }
+const constraintDirectiveTypeDefsGql = gql(constraintDirectiveTypeDefs)
+
+module.exports = { constraintDirectiveTypeDefs, constraintDirectiveTypeDefsGql, createApollo4QueryValidationPlugin }
