@@ -29,7 +29,7 @@ module.exports.test = function (setup, implType) {
             }
           `
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -79,7 +79,7 @@ module.exports.test = function (setup, implType) {
           }
           `
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -142,7 +142,7 @@ module.exports.test = function (setup, implType) {
           }
           `
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -221,7 +221,7 @@ module.exports.test = function (setup, implType) {
           }
           `
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -264,7 +264,7 @@ module.exports.test = function (setup, implType) {
           }
           `
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -330,7 +330,7 @@ module.exports.test = function (setup, implType) {
           }
           `
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -381,7 +381,7 @@ module.exports.test = function (setup, implType) {
           }
           `
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {

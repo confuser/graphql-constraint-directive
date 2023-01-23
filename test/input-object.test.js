@@ -23,7 +23,7 @@ module.exports.test = function (setup, implType) {
         }
       `
 
-      this.request = await setup(this.typeDefs)
+      this.request = await setup({ typeDefs: this.typeDefs })
     })
 
     describe('Values provided over variables', function () {
@@ -82,7 +82,7 @@ module.exports.test = function (setup, implType) {
 
       if (isSchemaWrapperImplType(implType)) {
         it('should throw custom error', async function () {
-          const request = await setup(this.typeDefs, formatError)
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')
@@ -169,7 +169,7 @@ module.exports.test = function (setup, implType) {
 
       if (isSchemaWrapperImplType(implType)) {
         it('should throw custom error', async function () {
-          const request = await setup(this.typeDefs, formatError)
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
           const { body, statusCode } = await request
             .post('/graphql')
             .set('Accept', 'application/json')

@@ -14,7 +14,7 @@ module.exports.test = function (setup, implType) {
         }
       `
 
-      this.request = await setup(this.typeDefs)
+      this.request = await setup({ typeDefs: this.typeDefs })
     })
 
     describe('Inlined value', function () {

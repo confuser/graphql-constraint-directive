@@ -26,7 +26,7 @@ module.exports.test = function (setup, implType) {
             title: [Int!] @constraint(minItems: 3)
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -86,7 +86,7 @@ module.exports.test = function (setup, implType) {
             title: [Int!] @constraint(maxItems: 2)
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -140,7 +140,7 @@ module.exports.test = function (setup, implType) {
             createBook(input: [Int] @constraint(minItems: 3)): Book
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -212,7 +212,7 @@ module.exports.test = function (setup, implType) {
             createBook(input: [Int] @constraint(maxItems: 2, max: 100)): Book
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -307,7 +307,7 @@ module.exports.test = function (setup, implType) {
             createBook(input: [ID]! @constraint(minItems: 3)): Book
           }`
 
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
@@ -365,7 +365,7 @@ module.exports.test = function (setup, implType) {
             title: String @constraint(maxLength: 2)
           }
           `
-          this.request = await setup(this.typeDefs)
+          this.request = await setup({ typeDefs: this.typeDefs })
         })
 
         it('should pass', async function () {
