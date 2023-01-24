@@ -16,4 +16,5 @@ describe('Schema wrapper based implementation', function () {
   require('./int.test').test(setup, IMPL_TYPE)
   require('./string.test').test(setup, IMPL_TYPE)
   require('./argument-dynamic.test').test(setup, IMPL_TYPE)
+  require('./union.test').test(setup, IMPL_TYPE)
 })
