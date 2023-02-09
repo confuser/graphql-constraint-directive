@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, isStatusCodeError } = require('./testutils')
+const { valueByImplType, isStatusCodeError, unwrapMoreValidationErrors } = require('./testutils')
 
 module.exports.test = function (setup, implType) {
   describe('Array structures', function () {
@@ -100,20 +100,21 @@ module.exports.test = function (setup, implType) {
 
           // console.log(body)
           isStatusCodeError(statusCode, implType)
+          const errors = unwrapMoreValidationErrors(body.errors)
           strictEqual(
-            body.errors[0].message,
+            errors[0].message,
             'Variable "$input" got invalid value "asdsdd" at "input.authors[0].name"' +
             valueByImplType(implType, '; Expected type "name_String_NotNull_maxLength_5"') +
             '. Must be no more than 5 characters in length'
           )
           strictEqual(
-            body.errors[1].message,
+            errors[1].message,
             'Variable "$input" got invalid value 2 at "input.authors[0].age[1]"' +
             valueByImplType(implType, '; Expected type "age_List_ListNotNull_Int_NotNull_min_3"') +
             '. Must be at least 3'
           )
           strictEqual(
-            body.errors[2].message,
+            errors[2].message,
             'Variable "$input" got invalid value 1 at "input.authors[1].age[0]"' +
             valueByImplType(implType, '; Expected type "age_List_ListNotNull_Int_NotNull_min_3"') +
             '. Must be at least 3'
@@ -177,20 +178,21 @@ module.exports.test = function (setup, implType) {
             .send({ query })
 
           isStatusCodeError(statusCode, implType)
+          const errors = unwrapMoreValidationErrors(body.errors)
           strictEqual(
-            body.errors[0].message,
+            errors[0].message,
             valueByImplType(implType, 'Expected value of type "name_String_NotNull_maxLength_5!", found "asdsdd";',
               'Argument "input" of "createBook" got invalid value "asdsdd" at "authors[0].name".') +
             ' Must be no more than 5 characters in length'
           )
           strictEqual(
-            body.errors[1].message,
+            errors[1].message,
             valueByImplType(implType, 'Expected value of type "age_List_ListNotNull_Int_NotNull_min_3!", found 2;',
               'Argument "input" of "createBook" got invalid value 2 at "authors[0].age[1]".') +
             ' Must be at least 3'
           )
           strictEqual(
-            body.errors[2].message,
+            errors[2].message,
             valueByImplType(implType, 'Expected value of type "age_List_ListNotNull_Int_NotNull_min_3!", found 1;',
               'Argument "input" of "createBook" got invalid value 1 at "authors[1].age[0]".') +
             ' Must be at least 3'
@@ -351,8 +353,9 @@ module.exports.test = function (setup, implType) {
 
           // console.log(body)
           isStatusCodeError(statusCode, implType)
+          const errors = unwrapMoreValidationErrors(body.errors)
           strictEqual(
-            body.errors[0].message,
+            errors[0].message,
             'Variable "$input" got invalid value "asdfrs" at "input[0].title"' +
             valueByImplType(implType, '; Expected type "title_String_NotNull_maxLength_5"') +
             '. Must be no more than 5 characters in length'
@@ -412,8 +415,9 @@ module.exports.test = function (setup, implType) {
 
           // console.log(body)
           isStatusCodeError(statusCode, implType)
+          const errors = unwrapMoreValidationErrors(body.errors)
           strictEqual(
-            body.errors[0].message,
+            errors[0].message,
             valueByImplType(implType, 'Expected value of type "title_String_NotNull_maxLength_5!", found "asdfrs";',
               'Argument "input" of "createBook" got invalid value "asdfrs" at "[0].title".') +
             ' Must be no more than 5 characters in length'

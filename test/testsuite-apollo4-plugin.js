@@ -1,9 +1,9 @@
-const setup = require('./setup-apollo-plugin')
-const { IMPL_TYPE_SERVER_VALIDATOR_APOLLO } = require('./testutils')
+const setup = require('./setup-apollo4-plugin')
+const { IMPL_TYPE_SERVER_VALIDATOR_APOLLO4 } = require('./testutils')
 
-const IMPL_TYPE = IMPL_TYPE_SERVER_VALIDATOR_APOLLO
+const IMPL_TYPE = IMPL_TYPE_SERVER_VALIDATOR_APOLLO4
 
-describe('Server validator based implementation - Apollo plugin', function () {
+describe('Server validator based implementation - Apollo 4 plugin', function () {
   require('./introspection.test').test(setup, IMPL_TYPE)
   require('./argument.test').test(setup, IMPL_TYPE)
   require('./input-object.test').test(setup, IMPL_TYPE)

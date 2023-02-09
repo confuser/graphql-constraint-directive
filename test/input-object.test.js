@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType, isStatusCodeError } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isStatusCodeError, unwrapMoreValidationErrors } = require('./testutils')
 
 module.exports.test = function (setup, implType) {
   describe('@constraint in INPUT_OBJECT', function () {
@@ -73,10 +73,11 @@ module.exports.test = function (setup, implType) {
           .send({ query: queryVariables, variables: { input: { title: 2, author: { name: 'a' } } } })
 
         isStatusCodeError(statusCode, implType)
-        strictEqual(body.errors.length, 2)
-        strictEqual(body.errors[0].message,
+        const errors = unwrapMoreValidationErrors(body.errors)
+        strictEqual(errors.length, 2)
+        strictEqual(errors[0].message,
           'Variable "$input" got invalid value 2 at "input.title"' + valueByImplType(implType, '; Expected type "title_Int_NotNull_min_3"') + '. Must be at least 3')
-        strictEqual(body.errors[1].message,
+        strictEqual(errors[1].message,
           'Variable "$input" got invalid value "a" at "input.author.name"' + valueByImplType(implType, '; Expected type "name_String_NotNull_minLength_2"') + '. Must be at least 2 characters in length')
       })
 
@@ -154,13 +155,14 @@ module.exports.test = function (setup, implType) {
           .send({ query: queryInlineFailNested })
 
         isStatusCodeError(statusCode, implType)
-        strictEqual(body.errors.length, 2)
-        strictEqual(body.errors[0].message,
+        const errors = unwrapMoreValidationErrors(body.errors)
+        strictEqual(errors.length, 2)
+        strictEqual(errors[0].message,
           valueByImplType(implType,
             'Expected value of type "title_Int_NotNull_min_3!", found 2; Must be at least 3',
             'Argument "input" of "createBook" got invalid value 2 at "title". Must be at least 3')
         )
-        strictEqual(body.errors[1].message,
+        strictEqual(errors[1].message,
           valueByImplType(implType,
             'Expected value of type "name_String_NotNull_minLength_2!", found "a"; Must be at least 2 characters in length',
             'Argument "input" of "createBook" got invalid value "a" at "author.name". Must be at least 2 characters in length')

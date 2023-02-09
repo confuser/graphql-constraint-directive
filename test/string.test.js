@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError, isServerValidatorApollo4 } = require('./testutils')
 
 module.exports.test = function (setup, implType) {
   describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
@@ -1016,7 +1016,7 @@ module.exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: null } } })
 
-          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isStatusCodeError(statusCode, implType) }
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isServerValidatorApollo4(implType) ? strictEqual(statusCode, 200) : strictEqual(statusCode, 400) }
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value null at "input.title"; Expected non-nullable type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" not to be null.')
         })
@@ -1028,7 +1028,7 @@ module.exports.test = function (setup, implType) {
             .send({ query, variables: { input: { title: undefined } } })
 
           // console.log(JSON.stringify(body))
-          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isStatusCodeError(statusCode, implType) }
+          if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isServerValidatorApollo4(implType) ? strictEqual(statusCode, 200) : strictEqual(statusCode, 400) }
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" was not provided.')
         })
