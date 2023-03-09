@@ -1,13 +1,23 @@
 const {
   separateOperations,
+  buildSchema,
   GraphQLError
 } = require('graphql')
 const { validateQuery } = require('./index')
 const { constraintDirectiveTypeDefs } = require('./lib/type-defs')
 const { gql } = require('graphql-tag')
 
-function createApollo4QueryValidationPlugin ({ schema }) {
+let currentSchema
+
+function createApollo4QueryValidationPlugin () {
   return {
+    async serverWillStart () {
+      return {
+        schemaDidLoadOrUpdate ({ apiSchema, coreSupergraphSdl }) {
+          if (coreSupergraphSdl) { currentSchema = buildSchema(coreSupergraphSdl) } else { currentSchema = apiSchema }
+        }
+      }
+    },
     async requestDidStart () {
       return ({
         async didResolveOperation (requestContext) {
@@ -17,7 +27,7 @@ function createApollo4QueryValidationPlugin ({ schema }) {
             : document
 
           const errors = validateQuery(
-            schema,
+            currentSchema,
             query,
             request.variables,
             request.operationName
