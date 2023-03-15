@@ -1,0 +1,64 @@
+directive @constraint(minLength: Int, maxLength: Int, startsWith: String, endsWith: String, contains: String, notContains: String, pattern: String, format: String, min: Float, max: Float, exclusiveMin: Float, exclusiveMax: Float, multipleOf: Float, minItems: Int, maxItems: Int, uniqueTypeName: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+type Query {
+  """Query books field documented"""
+  books(
+    "*Constraints:*\n* Minimal value: `1`\n* Maximal value: `3`\n"
+    size: size_Int_min_1_max_3
+
+    " Query argument documented \n\n*Constraints:*\n* Minimal length: `1`\n"
+    first: first_String_minLength_1
+  ): [Book]
+
+  """ Query book field documented """
+  book: Book
+}
+
+scalar size_Int_min_1_max_3
+
+scalar first_String_minLength_1
+
+type Book {
+  "*Constraints:*\n* Maximal length: `10`\n"
+  title: title_String_maxLength_10
+
+  "Book description already documented\n\n*Constraints:*\n* Minimal length: `10`\n* Maximal length: `50`\n"
+  description: MyString
+  authors(
+    "Book authors argument documented\n\n*Constraints:*\n* Maximal value: `4`\n"
+    size: size_Int_max_4
+
+    """
+    Already documented
+    
+    *Constraints:*
+    * Minimal length as documented: 1
+    """
+    first: first_String_minLength_1
+  ): [String]
+}
+
+scalar title_String_maxLength_10
+
+scalar MyString
+
+scalar size_Int_max_4
+
+type Mutation {
+  createBook(input: BookInput): Book
+}
+
+input BookInput {
+  "*Constraints:*\n* Minimal value: `3`\n"
+  title: title_Int_NotNull_min_3!
+  author: AuthorInput
+}
+
+scalar title_Int_NotNull_min_3
+
+input AuthorInput {
+  "*Constraints:*\n* Minimal length: `2`\n"
+  name: name_String_NotNull_minLength_2!
+}
+
+scalar name_String_NotNull_minLength_2

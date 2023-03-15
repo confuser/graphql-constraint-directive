@@ -6,6 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-full.js",
+    "test-documentation": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-documentation.js",
     "test-schema-wrapper": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-schema-wrapper.js",
     "test-apollo-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-apollo-plugin.js",
     "test-apollo4-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-apollo4-plugin.js",
