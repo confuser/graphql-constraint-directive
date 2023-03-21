@@ -6,12 +6,13 @@ const {
   visit,
   visitWithTypeInfo,
   separateOperations,
-  GraphQLError
+  GraphQLError,
+  getDirectiveValues
 } = require('graphql')
 const QueryValidationVisitor = require('./lib/query-validation-visitor.js')
 const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
 const { getConstraintTypeObject, getScalarType } = require('./lib/type-utils')
-const { constraintDirectiveTypeDefs } = require('./lib/type-defs')
+const { constraintDirectiveTypeDefs, constraintDirectiveTypeDefsObj } = require('./lib/type-defs')
 
 function constraintDirective () {
   const constraintTypes = {}
@@ -146,7 +147,7 @@ function constraintDirectiveDocumentation (options) {
   return (schema) =>
     mapSchema(schema, {
       [MapperKind.FIELD]: (fieldConfig) => {
-        const directiveArgumentMap = getDirective(schema, fieldConfig, 'constraint')?.[0]
+        const directiveArgumentMap = getDirectiveValues(constraintDirectiveTypeDefsObj, fieldConfig.astNode)
 
         if (directiveArgumentMap) {
           documentConstraintDirective(fieldConfig, directiveArgumentMap)
@@ -155,7 +156,7 @@ function constraintDirectiveDocumentation (options) {
         }
       },
       [MapperKind.ARGUMENT]: (fieldConfig) => {
-        const directiveArgumentMap = getDirective(schema, fieldConfig, 'constraint')?.[0]
+        const directiveArgumentMap = getDirectiveValues(constraintDirectiveTypeDefsObj, fieldConfig.astNode)
 
         if (directiveArgumentMap) {
           documentConstraintDirective(fieldConfig, directiveArgumentMap)
