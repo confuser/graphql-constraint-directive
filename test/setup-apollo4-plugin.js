@@ -18,9 +18,7 @@ module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreat
   }
 
   const plugins = [
-    createApollo4QueryValidationPlugin({
-      schema
-    })
+    createApollo4QueryValidationPlugin()
   ]
 
   const app = express()

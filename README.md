@@ -22,10 +22,10 @@ There are multiple ways to make use of the constraint directive in your project.
 
 ### Schema wrapper
 
-Implementation based on schema wrappers - basic scalars are wrapped as custom scalars with validations. 
+Implementation based on schema wrappers - basic scalars are wrapped as custom scalars with validations.
 
 #### Benefits
-* based on `graphql` library, works everywhere 
+* based on `graphql` library, works everywhere
 * posibility to also validate GraphQL response data
 
 #### Caveats
@@ -81,6 +81,9 @@ function `validateQuery(schema, query, variables, operationName)` can be used to
 Use as an [Envelop plugin](https://www.envelop.dev) in supported frameworks, e.g. [GraphQL Yoga](https://www.graphql-yoga.com/).
 Functionality is plugged in `execute` phase
 
+This plugin requires the following dependencies installed in your project:
+* `@envelop/core` - `^2.0.0`
+
 ```js
 const { createEnvelopQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
@@ -122,6 +125,9 @@ app.listen(4000);
 
 As an [Apollo 3 Server](https://www.apollographql.com/docs/apollo-server/v3) plugin
 
+This plugin requires the following dependencies installed in your project:
+* dependencies required for your selected Apollo Server 3 variant
+
 ```js
 const { createApolloQueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
 const express = require('express')
@@ -153,7 +159,7 @@ const plugins = [
 ]
 
 const app = express()
-const server = new ApolloServer({ 
+const server = new ApolloServer({
   schema,
   plugins
 })
@@ -167,13 +173,15 @@ server.applyMiddleware({ app })
 
 As an [Apollo 4 Server](https://www.apollographql.com/docs/apollo-server/v4) plugin
 
+This plugin requires the following dependencies installed in your project:
+* `@apollo/server` - `^4.0.0`
+* `graphql-tag` - `^2.0.0`
+
 ```js
 const { createApollo4QueryValidationPlugin, constraintDirectiveTypeDefs } = require('graphql-constraint-directive/apollo4')
-const express = require('express')
 const { ApolloServer } = require('@apollo/server')
+const { startStandaloneServer } = require('@apollo/server/standalone');
 const { makeExecutableSchema } = require('@graphql-tools/schema')
-const cors = require('cors')
-const { json } = require('body-parser')
 
 const typeDefs = `
   type Query {
@@ -194,30 +202,24 @@ let schema = makeExecutableSchema({
 })
 
 const plugins = [
-  createApollo4QueryValidationPlugin({
-    schema
-  })
+  createApollo4QueryValidationPlugin()
 ]
 
-const app = express()
-const server = new ApolloServer({ 
+const server = new ApolloServer({
   schema,
   plugins
 })
 
-await server.start()
-
-app.use(
-    '/',
-    cors(),
-    json(),
-    expressMiddleware(server)
-  )
+await startStandaloneServer(server);
 ```
 #### Apollo 4 Subgraph server
 
 There is a small change required to make the Apollo Server quickstart work when trying to build an [Apollo Subgraph Server](https://www.apollographql.com/docs/federation/building-supergraphs/subgraphs-apollo-server/).
 We must use the `buildSubgraphSchema` function to build a schema that can be passed to an Apollo Gateway/supergraph, instead of `makeExecuteableSchema`. This uses `makeExecutableSchema` under the hood.
+
+This plugin requires the following dependencies installed in your project:
+* `@apollo/server` - `^4.0.0`
+* `graphql-tag` - `^2.0.0`
 
 ```ts
 import { ApolloServer } from '@apollo/server';
@@ -247,9 +249,7 @@ const schema = buildSubgraphSchema({
 });
 
 const plugins = [
-  createApollo4QueryValidationPlugin({
-    schema
-  })
+  createApollo4QueryValidationPlugin()
 ]
 
 const server = new ApolloServer({
@@ -262,9 +262,9 @@ await startStandaloneServer(server);
 
 #### Express
 
-*This implementation is untested now, as [`express-graphql` module](https://github.com/graphql/express-graphql) is not maintained anymore.* 
+*This implementation is untested now, as [`express-graphql` module](https://github.com/graphql/express-graphql) is not maintained anymore.*
 
-As a [Validation rule](https://graphql.org/graphql-js/validation/) when query `variables` are available 
+As a [Validation rule](https://graphql.org/graphql-js/validation/) when query `variables` are available
 
 ```js
 const { createQueryValidationRule, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
@@ -411,8 +411,8 @@ app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
 Throws a [`UserInputError`](https://www.apollographql.com/docs/apollo-server/data/errors/#bad_user_input) for each validation error.
 
 #### Apollo Server 4
-Throws a prefilled `GraphQLError` with `extensions.code` set to `BAD_USER_INPUT` and http status code `400`. 
-In case of more validation errors, top level error is generic with `Query is invalid, for details see extensions.validationErrors` message, 
+Throws a prefilled `GraphQLError` with `extensions.code` set to `BAD_USER_INPUT` and http status code `400`.
+In case of more validation errors, top level error is generic with `Query is invalid, for details see extensions.validationErrors` message,
 detailed errors are stored in `extensions.validationErrors` of this error.
 
 #### Envelop
@@ -420,5 +420,5 @@ The Envelop plugin throws a prefilled `GraphQLError` for each validation error.
 
 ### uniqueTypeName
 ```@constraint(uniqueTypeName: "Unique_Type_Name")```
-Override the unique type name generate by the library to the one passed as an argument. 
+Override the unique type name generate by the library to the one passed as an argument.
 Has meaning only for `Schema wrapper` implementation.
