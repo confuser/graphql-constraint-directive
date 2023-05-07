@@ -22,10 +22,10 @@ There are multiple ways to make use of the constraint directive in your project.
 
 ### Schema wrapper
 
-Implementation based on schema wrappers - basic scalars are wrapped as custom scalars with validations. 
+Implementation based on schema wrappers - basic scalars are wrapped as custom scalars with validations.
 
 #### Benefits
-* based on `graphql` library, works everywhere 
+* based on `graphql` library, works everywhere
 * posibility to also validate GraphQL response data
 
 #### Caveats
@@ -153,7 +153,7 @@ const plugins = [
 ]
 
 const app = express()
-const server = new ApolloServer({ 
+const server = new ApolloServer({
   schema,
   plugins
 })
@@ -200,7 +200,7 @@ const plugins = [
 ]
 
 const app = express()
-const server = new ApolloServer({ 
+const server = new ApolloServer({
   schema,
   plugins
 })
@@ -262,9 +262,9 @@ await startStandaloneServer(server);
 
 #### Express
 
-*This implementation is untested now, as [`express-graphql` module](https://github.com/graphql/express-graphql) is not maintained anymore.* 
+*This implementation is untested now, as [`express-graphql` module](https://github.com/graphql/express-graphql) is not maintained anymore.*
 
-As a [Validation rule](https://graphql.org/graphql-js/validation/) when query `variables` are available 
+As a [Validation rule](https://graphql.org/graphql-js/validation/) when query `variables` are available
 
 ```js
 const { createQueryValidationRule, constraintDirectiveTypeDefs } = require('graphql-constraint-directive')
@@ -308,8 +308,7 @@ app.listen(4000);
 ```
 ### Schema documentation
 
-You can use provided schema transformation to automatically add `@constraint` documentation into fields and arguments descriptions,
-so clients/users know them, as directive itself is typically not present in the exposed schema.
+You can use the provided schema transformation to automatically add `@constraint` documentation into fields and arguments descriptions. By default directives are not typically present in the exposed introspected schema
 
 ```js
 const { constraintDirectiveTypeDefs, constraintDirectiveDocumentation } = require('graphql-constraint-directive')
@@ -326,8 +325,7 @@ schema = constraintDirectiveDocumentation()(schema);
 // any constraint directive handler implementation
 ```
 
-This transformation appends `constraint documentation header`, and then list of `constraint conditions descriptions` to description 
-of each field and argument where `@constraint` directive is used. 
+This transformation appends `constraint documentation header`, and then a list of `constraint conditions descriptions` to the description of each field and argument where the `@constraint` directive is used.
 
 Original schema:
 ```graphql
@@ -343,19 +341,19 @@ Transformed schema:
 Existing field or argument description.
 
 *Constraints:*
-* Minimal length: `10`
-* Maximal length: `50`
+* Minimum length: `10`
+* Maximum length: `50`
 """
 fieldOrArgument: String @constraint(minLength: 10, maxLength: 50)
 ```
 
 [CommonMark](https://spec.commonmark.org) is used in the desccription for better readability.
 
-If `constraint documentation header` already exists in the field or argument description, then 
-constraint documentation is not appended. This allows you to override constraint description 
+If `constraint documentation header` already exists in the field or argument description, then
+constraint documentation is not appended. This allows you to override constraint description
 when necessary, or use this in a chain of subgraph/supergraph schemes.
 
-Both `constraint documentation header` and `constraint conditions descriptions` can be customized 
+Both `constraint documentation header` and `constraint conditions descriptions` can be customized
 during the transformation creation, eg. to localize them.
 
 ```js
@@ -363,21 +361,21 @@ schema = constraintDirectiveDocumentation(
   {
     header: '*Changed header:*',
     descriptionsMap: {
-      minLength: 'Changed Minimal length',
-      maxLength: 'Changed Maximal length',
+      minLength: 'Changed Minimum length',
+      maxLength: 'Changed Maximum length',
       startsWith: 'Changed Starts with',
       endsWith: 'Changed Ends with',
       contains: 'Changed Contains',
       notContains: 'Changed Doesn\'t contain',
       pattern: 'Changed Must match RegEx pattern',
       format: 'Changed Must match format',
-      min: 'Changed Minimal value',
-      max: 'Changed Maximal value',
+      min: 'Changed Minimum value',
+      max: 'Changed Maximum value',
       exclusiveMin: 'Changed Grater than',
       exclusiveMax: 'Changed Less than',
       multipleOf: 'Changed Must be a multiple of',
-      minItems: 'Changed Minimal number of items',
-      maxItems: 'Changed Maximal number of items'
+      minItems: 'Changed Minimum number of items',
+      maxItems: 'Changed Maximum number of items'
     }
   }
 )(schema);
@@ -488,8 +486,8 @@ app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, formatError }))
 Throws a [`UserInputError`](https://www.apollographql.com/docs/apollo-server/data/errors/#bad_user_input) for each validation error.
 
 #### Apollo Server 4
-Throws a prefilled `GraphQLError` with `extensions.code` set to `BAD_USER_INPUT` and http status code `400`. 
-In case of more validation errors, top level error is generic with `Query is invalid, for details see extensions.validationErrors` message, 
+Throws a prefilled `GraphQLError` with `extensions.code` set to `BAD_USER_INPUT` and http status code `400`.
+In case of more validation errors, top level error is generic with `Query is invalid, for details see extensions.validationErrors` message,
 detailed errors are stored in `extensions.validationErrors` of this error.
 
 #### Envelop
@@ -497,5 +495,5 @@ The Envelop plugin throws a prefilled `GraphQLError` for each validation error.
 
 ### uniqueTypeName
 ```@constraint(uniqueTypeName: "Unique_Type_Name")```
-Override the unique type name generate by the library to the one passed as an argument. 
+Override the unique type name generate by the library to the one passed as an argument.
 Has meaning only for `Schema wrapper` implementation.
