@@ -306,6 +306,81 @@ app.use(
 app.listen(4000);
 
 ```
+### Schema documentation
+
+You can use the provided schema transformation to automatically add `@constraint` documentation into fields and arguments descriptions. By default directives are not typically present in the exposed introspected schema
+
+```js
+const { constraintDirectiveTypeDefs, constraintDirectiveDocumentation } = require('graphql-constraint-directive')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+
+const typeDefs = ...
+
+let schema = makeExecutableSchema({
+      typeDefs: [constraintDirectiveTypeDefs, typeDefs]
+})
+
+schema = constraintDirectiveDocumentation()(schema);
+
+// any constraint directive handler implementation
+```
+
+This transformation appends `constraint documentation header`, and then a list of `constraint conditions descriptions` to the description of each field and argument where the `@constraint` directive is used.
+
+Original schema:
+```graphql
+"""
+Existing field or argument description.
+"""
+fieldOrArgument: String @constraint(minLength: 10, maxLength: 50)
+```
+
+Transformed schema:
+```graphql
+"""
+Existing field or argument description.
+
+*Constraints:*
+* Minimum length: `10`
+* Maximum length: `50`
+"""
+fieldOrArgument: String @constraint(minLength: 10, maxLength: 50)
+```
+
+[CommonMark](https://spec.commonmark.org) is used in the desccription for better readability.
+
+If `constraint documentation header` already exists in the field or argument description, then
+constraint documentation is not appended. This allows you to override constraint description
+when necessary, or use this in a chain of subgraph/supergraph schemes.
+
+Both `constraint documentation header` and `constraint conditions descriptions` can be customized
+during the transformation creation, eg. to localize them.
+
+```js
+schema = constraintDirectiveDocumentation(
+  {
+    header: '*Changed header:*',
+    descriptionsMap: {
+      minLength: 'Changed Minimum length',
+      maxLength: 'Changed Maximum length',
+      startsWith: 'Changed Starts with',
+      endsWith: 'Changed Ends with',
+      contains: 'Changed Contains',
+      notContains: 'Changed Doesn\'t contain',
+      pattern: 'Changed Must match RegEx pattern',
+      format: 'Changed Must match format',
+      min: 'Changed Minimum value',
+      max: 'Changed Maximum value',
+      exclusiveMin: 'Changed Grater than',
+      exclusiveMax: 'Changed Less than',
+      multipleOf: 'Changed Must be a multiple of',
+      minItems: 'Changed Minimum number of items',
+      maxItems: 'Changed Maximum number of items'
+    }
+  }
+)(schema);
+```
+
 
 ## API
 ### String

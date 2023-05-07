@@ -6,12 +6,13 @@ const {
   visit,
   visitWithTypeInfo,
   separateOperations,
-  GraphQLError
+  GraphQLError,
+  getDirectiveValues
 } = require('graphql')
 const QueryValidationVisitor = require('./lib/query-validation-visitor.js')
 const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
 const { getConstraintTypeObject, getScalarType } = require('./lib/type-utils')
-const { constraintDirectiveTypeDefs } = require('./lib/type-defs')
+const { constraintDirectiveTypeDefs, constraintDirectiveTypeDefsObj } = require('./lib/type-defs')
 
 function constraintDirective () {
   const constraintTypes = {}
@@ -95,6 +96,77 @@ function constraintDirective () {
     })
 }
 
+function constraintDirectiveDocumentation (options) {
+  // Default descriptions, can be changed through options
+  let DESCRIPTINS_MAP = {
+    minLength: 'Minimal length',
+    maxLength: 'Maximal length',
+    startsWith: 'Starts with',
+    endsWith: 'Ends with',
+    contains: 'Contains',
+    notContains: 'Doesn\'t contain',
+    pattern: 'Must match RegEx pattern',
+    format: 'Must match format',
+    min: 'Minimal value',
+    max: 'Maximal value',
+    exclusiveMin: 'Grater than',
+    exclusiveMax: 'Less than',
+    multipleOf: 'Must be a multiple of',
+    minItems: 'Minimal number of items',
+    maxItems: 'Maximal number of items'
+  }
+
+  if (options?.descriptionsMap) {
+    DESCRIPTINS_MAP = options.descriptionsMap
+  }
+
+  let HEADER = '*Constraints:*'
+  if (options?.header) {
+    HEADER = options.header
+  }
+
+  function documentConstraintDirective (fieldConfig, directiveArgumentMap) {
+    if (fieldConfig.description) {
+      // skip documentation if it is already here
+      if (fieldConfig.description.includes(HEADER)) return
+
+      // add two new lines to separate from previous description by paragraph
+      fieldConfig.description += '\n\n'
+    } else {
+      fieldConfig.description = ''
+    }
+
+    fieldConfig.description += HEADER + '\n'
+
+    Object.entries(directiveArgumentMap).forEach(([key, value]) => {
+      if (key === 'uniqueTypeName') return
+      fieldConfig.description += `* ${DESCRIPTINS_MAP[key] ? DESCRIPTINS_MAP[key] : key}: \`${value}\`\n`
+    })
+  }
+
+  return (schema) =>
+    mapSchema(schema, {
+      [MapperKind.FIELD]: (fieldConfig) => {
+        const directiveArgumentMap = getDirectiveValues(constraintDirectiveTypeDefsObj, fieldConfig.astNode)
+
+        if (directiveArgumentMap) {
+          documentConstraintDirective(fieldConfig, directiveArgumentMap)
+
+          return fieldConfig
+        }
+      },
+      [MapperKind.ARGUMENT]: (fieldConfig) => {
+        const directiveArgumentMap = getDirectiveValues(constraintDirectiveTypeDefsObj, fieldConfig.astNode)
+
+        if (directiveArgumentMap) {
+          documentConstraintDirective(fieldConfig, directiveArgumentMap)
+
+          return fieldConfig
+        }
+      }
+    })
+}
+
 function validateQuery (schema, query, variables, operationName) {
   const typeInfo = new TypeInfo(schema)
 
@@ -159,4 +231,4 @@ function createQueryValidationRule (options) {
   }
 }
 
-module.exports = { constraintDirective, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin, createEnvelopQueryValidationPlugin, createQueryValidationRule }
+module.exports = { constraintDirective, constraintDirectiveDocumentation, constraintDirectiveTypeDefs, validateQuery, createApolloQueryValidationPlugin, createEnvelopQueryValidationPlugin, createQueryValidationRule }

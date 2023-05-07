@@ -1,0 +1,45 @@
+directive @constraint(minLength: Int, maxLength: Int, startsWith: String, endsWith: String, contains: String, notContains: String, pattern: String, format: String, min: Float, max: Float, exclusiveMin: Float, exclusiveMax: Float, multipleOf: Float, minItems: Int, maxItems: Int, uniqueTypeName: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION | ARGUMENT_DEFINITION
+
+type Query {
+  """Query books field documented"""
+  books(
+    "My header:\n* A Minimal value: `1`\n* A Maximal value: `3`\n"
+    size: Int
+
+    " Query argument documented \n\nMy header:\n* A Minimal length: `1`\n"
+    first: String
+  ): [Book]
+
+  """ Query book field documented """
+  book: Book
+}
+
+type Book {
+  "My header:\n* A Maximal length: `10`\n"
+  title: String
+
+  "Book description already documented\n\nMy header:\n* A Minimal length: `10`\n* A Maximal length: `50`\n"
+  description: String
+  authors(
+    "Book authors argument documented\n\nMy header:\n* A Maximal value: `4`\n"
+    size: Int
+
+    "Already documented\n\n*Constraints:*\n* Minimal length as documented: 1\n\nMy header:\n* A Minimal length: `1`\n"
+    first: String
+  ): [String]
+}
+
+type Mutation {
+  createBook(input: BookInput): Book
+}
+
+input BookInput {
+  "My header:\n* A Minimal value: `3`\n"
+  title: Int!
+  author: AuthorInput
+}
+
+input AuthorInput {
+  "My header:\n* A Minimal length: `2`\n"
+  name: String!
+}
