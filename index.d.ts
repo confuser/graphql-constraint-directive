@@ -1,6 +1,15 @@
 import {GraphQLSchema, GraphQLError, DocumentNode, ValidationContext} from "graphql";
+import {OperationDefinitionNode, FragmentDefinitionNode, InlineFragmentNode, FieldNode} from 'graphql/language';
 import {PluginDefinition} from "apollo-server-core";
-import QueryValidationVisitor from "./lib/query-validation-visitor";
+
+export class QueryValidationVisitor {
+    onOperationDefinitionEnter (operation: OperationDefinitionNode);
+    onFragmentEnter (node: FragmentDefinitionNode | InlineFragmentNode);
+    onFragmentLeave (node: FragmentDefinitionNode | InlineFragmentNode);
+    onFieldEnter (node: FieldNode);
+    onFieldLeave (node: FieldNode);
+    onArgumentEnter (arg: ArgumentNode);
+}
 
 /**
  * Schema transformer which adds custom types performing validations based on the @constraint directives.
