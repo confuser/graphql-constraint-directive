@@ -1,8 +1,9 @@
 const { constraintDirectiveTypeDefs, constraintDirectiveDocumentation, constraintDirective } = require('..')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
-const { printSchema } = require('graphql')
+const { GraphQLString, GraphQLObjectType, printSchema } = require('graphql')
 const { equal } = require('assert')
 const fs = require('fs')
+const { mapSchema, MapperKind } = require('@graphql-tools/utils')
 
 /**
  * If `true` schema data are refreshed in the storage, if `false` schema is compared with the data in the storage
@@ -81,6 +82,33 @@ describe('Schema Documentation', function () {
 
     assertSchemaData('ws-1', schema)
   })
+
+  it('works - default options - modified schema', async function () {
+    let schema = makeExecutableSchema({
+      typeDefs: [constraintDirectiveTypeDefs, typeDefs]
+    })
+
+    schema = addFieldToSchema(schema)
+
+    schema = constraintDirectiveDocumentation()(schema)
+
+    assertSchemaData('ws-1-1', schema)
+  })
+
+  function addFieldToSchema (schema) {
+    return mapSchema(schema, {
+      [MapperKind.OBJECT_TYPE]: type => {
+        if (type.name === 'Query') {
+          const config = type.toConfig()
+          config.fields.addedField = {
+            type: GraphQLString,
+            args: {}
+          }
+          return new GraphQLObjectType(config)
+        }
+      }
+    })
+  }
 
   it('works - customized options', async function () {
     let schema = makeExecutableSchema({

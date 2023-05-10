@@ -147,21 +147,25 @@ function constraintDirectiveDocumentation (options) {
   return (schema) =>
     mapSchema(schema, {
       [MapperKind.FIELD]: (fieldConfig) => {
-        const directiveArgumentMap = getDirectiveValues(constraintDirectiveTypeDefsObj, fieldConfig.astNode)
+        if (fieldConfig?.astNode) {
+          const directiveArgumentMap = getDirectiveValues(constraintDirectiveTypeDefsObj, fieldConfig.astNode)
 
-        if (directiveArgumentMap) {
-          documentConstraintDirective(fieldConfig, directiveArgumentMap)
+          if (directiveArgumentMap) {
+            documentConstraintDirective(fieldConfig, directiveArgumentMap)
 
-          return fieldConfig
+            return fieldConfig
+          }
         }
       },
       [MapperKind.ARGUMENT]: (fieldConfig) => {
-        const directiveArgumentMap = getDirectiveValues(constraintDirectiveTypeDefsObj, fieldConfig.astNode)
+        if (fieldConfig?.astNode) {
+          const directiveArgumentMap = getDirectiveValues(constraintDirectiveTypeDefsObj, fieldConfig.astNode)
 
-        if (directiveArgumentMap) {
-          documentConstraintDirective(fieldConfig, directiveArgumentMap)
+          if (directiveArgumentMap) {
+            documentConstraintDirective(fieldConfig, directiveArgumentMap)
 
-          return fieldConfig
+            return fieldConfig
+          }
         }
       }
     })
