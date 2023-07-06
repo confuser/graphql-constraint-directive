@@ -22,7 +22,7 @@ module.exports.test = function (setup, implType) {
         createBook(input: BookInput): Book
       }
       input BookInput {
-        title: String! @constraint(minLength: 3)
+        title: String @constraint(minLength: 3)
       }`
 
         this.request = await setup({ typeDefs: this.typeDefs })
@@ -54,6 +54,17 @@ module.exports.test = function (setup, implType) {
           .post('/graphql')
           .set('Accept', 'application/json')
           .send({ query, variables: { input: { title: '' } } })
+
+        isStatusCodeError(statusCode, implType)
+        strictEqual(body.errors[0].message,
+          'Variable "$input" got invalid value "" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_minLength_3"') + '. Must be at least 3 characters in length')
+      })
+
+      it('should fail with null', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: null } } })
 
         isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
