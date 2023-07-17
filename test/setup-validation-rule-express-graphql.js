@@ -4,7 +4,7 @@ const { makeExecutableSchema } = require('@graphql-tools/schema')
 const request = require('supertest')
 const { createQueryValidationRule, constraintDirectiveTypeDefs } = require('..')
 
-module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreatedCallback }) {
+module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreatedCallback, pluginOptions = {} }) {
   let schema = makeExecutableSchema({
     typeDefs: [constraintDirectiveTypeDefs, typeDefs],
     resolvers
@@ -22,7 +22,8 @@ module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreat
       schema,
       validationRules: [
         createQueryValidationRule({
-          variables
+          variables,
+          pluginOptions
         })
       ]
     }))

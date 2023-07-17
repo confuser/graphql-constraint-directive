@@ -9,7 +9,7 @@ const { gql } = require('graphql-tag')
 
 let currentSchema
 
-function createApollo4QueryValidationPlugin () {
+function createApollo4QueryValidationPlugin (options = {}) {
   return {
     async serverWillStart () {
       return {
@@ -30,7 +30,8 @@ function createApollo4QueryValidationPlugin () {
             currentSchema,
             query,
             request.variables,
-            request.operationName
+            request.operationName,
+            options
           )
 
           if (errors.length > 0) {
