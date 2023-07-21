@@ -426,6 +426,32 @@ Supported formats:
 - uri
 - uuid
 
+#### Custom Format
+You can add your own custom formats by passing a `formats` object to the plugin options. See example below.
+
+```@constraint(format: "my-custom-format")```
+
+```js
+const formats = {
+  'my-custom-format': (value) => {
+    if (value === 'foo') {
+      return true
+    }
+
+    throw new GraphQLError('Value must be foo')
+  }
+};
+
+// Envelop
+createEnvelopQueryValidationPlugin({ formats })
+
+// Apollo 3 Server
+createApolloQueryValidationPlugin({ formats })
+
+// Apollo 4 Server
+createApollo4QueryValidationPlugin({ formats })
+```
+
 ### Int/Float
 #### min
 ```@constraint(min: 3)```

@@ -1,30 +1,30 @@
 const { GraphQLScalarType } = require('graphql')
 const { contains, isLength } = require('validator')
-const formats = require('./formats')
+const defaultFormats = require('./formats')
 const ValidationError = require('../lib/error')
 
 class ConstraintStringType extends GraphQLScalarType {
-  constructor (fieldName, uniqueTypeName, type, args) {
+  constructor (fieldName, uniqueTypeName, type, args, options = {}) {
     super({
       name: uniqueTypeName,
       serialize (value) {
         value = type.serialize(value)
 
-        validate(fieldName, args, value)
+        validate(fieldName, args, value, options)
 
         return value
       },
       parseValue (value) {
         value = type.serialize(value)
 
-        validate(fieldName, args, value)
+        validate(fieldName, args, value, options)
 
         return type.parseValue(value)
       },
       parseLiteral (ast) {
         const value = type.parseLiteral(ast)
 
-        validate(fieldName, args, value)
+        validate(fieldName, args, value, options)
 
         return value
       }
@@ -32,7 +32,7 @@ class ConstraintStringType extends GraphQLScalarType {
   }
 }
 
-function validate (fieldName, args, value) {
+function validate (fieldName, args, value, options = {}) {
   if (args.minLength && !isLength(value, { min: args.minLength })) {
     throw new ValidationError(fieldName,
       `Must be at least ${args.minLength} characters in length`,
@@ -75,6 +75,8 @@ function validate (fieldName, args, value) {
   }
 
   if (args.format) {
+    const pluginOptions = options.pluginOptions || {}
+    const formats = { ...defaultFormats, ...(pluginOptions.formats || {}) }
     const formatter = formats[args.format]
 
     if (!formatter) {
