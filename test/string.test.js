@@ -109,6 +109,16 @@ module.exports.test = function (setup, implType) {
         deepStrictEqual(body, { data: { createBook: null } })
       })
 
+      it('should pass with null', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: null } } })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
       it('should fail', async function () {
         const { body, statusCode } = await this.request
           .post('/graphql')
