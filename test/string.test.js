@@ -1,5 +1,6 @@
 const { deepStrictEqual, strictEqual } = require('assert')
 const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError, isServerValidatorApollo4 } = require('./testutils')
+const { GraphQLError } = require('graphql/error')
 
 module.exports.test = function (setup, implType) {
   describe('@constraint String in INPUT_FIELD_DEFINITION', function () {
@@ -874,6 +875,61 @@ module.exports.test = function (setup, implType) {
           })
         }
       })
+
+      if (!isSchemaWrapperImplType(implType)) {
+        describe('#custom', function () {
+          before(async function () {
+            this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String
+        }
+        type Mutation {
+          createBook(input: BookInput): Book
+        }
+        input BookInput {
+          title: String! @constraint(format: "test-format")
+        }`
+
+            const testFormat = (value) => {
+              if (value === 'this is a test value') return true
+
+              throw new GraphQLError('Must be in test format format')
+            }
+
+            const pluginOptions = { formats: { 'test-format': testFormat } }
+
+            this.request = await setup({ typeDefs: this.typeDefs, pluginOptions })
+          })
+
+          it('should pass', async function () {
+            const { body, statusCode } = await this.request
+              .post('/graphql')
+              .set('Accept', 'application/json')
+              .send({
+                query, variables: { input: { title: 'this is a test value' } }
+              })
+
+            strictEqual(statusCode, 200)
+            deepStrictEqual(body, { data: { createBook: null } })
+          })
+
+          it('should fail', async function () {
+            const { body, statusCode } = await this.request
+              .post('/graphql')
+              .set('Accept', 'application/json')
+              .send({
+                query, variables: { input: { title: 'a' } }
+              })
+
+            isStatusCodeError(statusCode, implType)
+            strictEqual(body.errors[0].message,
+              'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_test-format"') + '. Must be in test format format')
+          })
+        })
+      }
 
       describe('#uuid', function () {
         before(async function () {
@@ -2012,6 +2068,100 @@ module.exports.test = function (setup, implType) {
             })
           })
         })
+
+        if (!isSchemaWrapperImplType(implType)) {
+          describe('#custom', function () {
+            before(async function () {
+              this.typeDefs = `
+        type Query {
+          books: [Book]
+        }
+        type Book {
+          title: String @constraint(format: "test-format")
+        }`
+            })
+
+            it('should pass', async function () {
+              const testFormat = (value) => {
+                if (value === 'this is a test value') return true
+
+                throw new GraphQLError('Must be in test format format')
+              }
+
+              const pluginOptions = { formats: { 'test-format': testFormat } }
+
+              const mockData = [{ title: 'this is a test value' }]
+              const request = await setup({
+                typeDefs: this.typeDefs,
+                formatError,
+                resolvers: resolvers(mockData),
+                pluginOptions
+              })
+              const { body, statusCode } = await request
+                .post('/graphql')
+                .set('Accept', 'application/json')
+                .send({ query })
+
+              strictEqual(statusCode, 200)
+              deepStrictEqual(body, { data: { books: mockData } })
+            })
+
+            it('should fail', async function () {
+              const testFormat = (value) => {
+                if (value === 'this is a test value') return true
+
+                throw new GraphQLError('Must be in test format format')
+              }
+
+              const pluginOptions = { formats: { 'test-format': testFormat } }
+
+              const mockData = [{ title: 'a' }]
+              const request = await setup({
+                typeDefs: this.typeDefs,
+                formatError,
+                resolvers: resolvers(mockData),
+                pluginOptions
+              })
+              const { body, statusCode } = await request
+                .post('/graphql')
+                .set('Accept', 'application/json')
+                .send({ query })
+
+              strictEqual(statusCode, 200)
+              strictEqual(body.errors[0].message, 'Must be in test format format')
+            })
+
+            it('should throw custom error', async function () {
+              const testFormat = (value) => {
+                if (value === 'this is a test value') return true
+
+                throw new GraphQLError('Must be in test format format')
+              }
+
+              const pluginOptions = { formats: { 'test-format': testFormat } }
+
+              const mockData = [{ title: 'a' }]
+              const request = await setup({
+                typeDefs: this.typeDefs,
+                formatError,
+                resolvers: resolvers(mockData),
+                pluginOptions
+              })
+              const { body, statusCode } = await request
+                .post('/graphql')
+                .set('Accept', 'application/json')
+                .send({ query })
+
+              strictEqual(statusCode, 200)
+              deepStrictEqual(body.errors[0], {
+                message: 'Must be in test format format',
+                code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+                fieldName: 'title',
+                context: [{ arg: 'format', value: 'uuid' }]
+              })
+            })
+          })
+        }
 
         describe('#unknown', function () {
           before(async function () {

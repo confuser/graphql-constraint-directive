@@ -7,7 +7,7 @@ const { json } = require('body-parser')
 const request = require('supertest')
 const { createApollo4QueryValidationPlugin, constraintDirectiveTypeDefs } = require('../apollo4')
 
-module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreatedCallback }) {
+module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreatedCallback, pluginOptions = {} }) {
   let schema = makeExecutableSchema({
     typeDefs: [constraintDirectiveTypeDefs, typeDefs],
     resolvers
@@ -18,7 +18,7 @@ module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreat
   }
 
   const plugins = [
-    createApollo4QueryValidationPlugin()
+    createApollo4QueryValidationPlugin(pluginOptions)
   ]
 
   const app = express()

@@ -171,7 +171,7 @@ function constraintDirectiveDocumentation (options) {
     })
 }
 
-function validateQuery (schema, query, variables, operationName) {
+function validateQuery (schema, query, variables, operationName, pluginOptions = {}) {
   const typeInfo = new TypeInfo(schema)
 
   const errors = []
@@ -181,9 +181,11 @@ function validateQuery (schema, query, variables, operationName) {
     typeInfo,
     (error) => errors.push(error)
   )
+
   const visitor = new QueryValidationVisitor(context, {
     variables,
-    operationName
+    operationName,
+    pluginOptions
   })
 
   visit(query, visitWithTypeInfo(typeInfo, visitor))
@@ -191,7 +193,7 @@ function validateQuery (schema, query, variables, operationName) {
   return errors
 }
 
-function createApolloQueryValidationPlugin ({ schema }) {
+function createApolloQueryValidationPlugin ({ schema }, options = {}) {
   return {
     async requestDidStart () {
       return ({
@@ -204,7 +206,8 @@ function createApolloQueryValidationPlugin ({ schema }) {
             schema,
             query,
             request.variables,
-            request.operationName
+            request.operationName,
+            options
           )
           if (errors.length > 0) {
             throw errors.map(err => {
@@ -218,10 +221,10 @@ function createApolloQueryValidationPlugin ({ schema }) {
   }
 }
 
-function createEnvelopQueryValidationPlugin () {
+function createEnvelopQueryValidationPlugin (options = {}) {
   return {
     onExecute ({ args, setResultAndStopExecution }) {
-      const errors = validateQuery(args.schema, args.document, args.variableValues, args.operationName)
+      const errors = validateQuery(args.schema, args.document, args.variableValues, args.operationName, options)
       if (errors.length > 0) {
         setResultAndStopExecution({ errors: errors.map(err => { return new GraphQLError(err.message, err, { code: err.code, field: err.fieldName, context: err.context, exception: err.originalError }) }) })
       }
