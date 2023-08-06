@@ -1,6 +1,6 @@
 {
   "name": "graphql-constraint-directive",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "description": "Validate GraphQL fields",
   "main": "index.js",
   "types": "index.d.ts",
