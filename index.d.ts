@@ -39,6 +39,10 @@ interface DocumentationOptions {
     };
 }
 
+interface PluginOptions {
+    formats: Record<string, (value: unknown) => boolean>;
+}
+
 /**
  * Schema transformer which adds @constraint directives documentation to the fields and arguments descriptions.
  * Documentation not added if it already exists (`header` is present in the field or argument description)
@@ -65,7 +69,7 @@ export function validateQuery () : (schema: GraphQLSchema, query: DocumentNode, 
 /**
  * Create Apollo 3 plugin performing query validation.
  */
-export function createApolloQueryValidationPlugin ( options: { schema: GraphQLSchema } ) : PluginDefinition;
+export function createApolloQueryValidationPlugin ( options: { schema: GraphQLSchema }, pluginOptions?: PluginOptions ) : PluginDefinition;
 
 /**
  * Create JS GraphQL Validation Rule performing query validation.
@@ -75,4 +79,4 @@ export function createQueryValidationRule( options: { [key: string]: any }) : (c
 /**
  * Create Envelop plugin performing query validation.
  */
-export function createEnvelopQueryValidationPlugin() : object;
+export function createEnvelopQueryValidationPlugin( pluginOptions?: PluginOptions ) : { onExecute: Function };
