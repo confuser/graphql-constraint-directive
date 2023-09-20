@@ -142,6 +142,8 @@ function constraintDirectiveDocumentation (options) {
       if (key === 'uniqueTypeName') return
       fieldConfig.description += `* ${DESCRIPTINS_MAP[key] ? DESCRIPTINS_MAP[key] : key}: \`${value}\`\n`
     })
+
+    if (fieldConfig.astNode?.description) { fieldConfig.astNode.description.value = fieldConfig.description }
   }
 
   return (schema) =>
