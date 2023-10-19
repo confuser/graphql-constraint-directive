@@ -64,7 +64,7 @@ export const constraintDirectiveTypeDefs: string
  * @param variables used in the query to validate
  * @param operationName optional name of the GraphQL operation to validate
  */
-export function validateQuery () : (schema: GraphQLSchema, query: DocumentNode, variables: Record<string, any>, operationName?: string) => Array<GraphQLError>;
+export function validateQuery () : (schema: GraphQLSchema, query: DocumentNode, variables: Record<string, any>, operationName?: string, pluginOptions?: {}) => Array<GraphQLError>;
 
 /**
  * Create Apollo 3 plugin performing query validation.
