@@ -20,10 +20,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:koivumi79/graphql-constraint-directive.git"
+    "url": "git@github.com:confuser/graphql-constraint-directive.git"
   },
   "bugs": {
-    "url": "https://github.com/koivumi79/graphql-constraint-directive/issues"
+    "url": "https://github.com/confuser/graphql-constraint-directive/issues"
   },
   "keywords": [
     "graphql",
