@@ -1,4 +1,4 @@
-import {DocumentNode, GraphQLSchema} from "graphql";
+import {DocumentNode} from "graphql";
 import {ApolloServerPlugin} from '@apollo/server';
 
 /**
@@ -14,6 +14,6 @@ export const constraintDirectiveTypeDefsGql: DocumentNode;
 /**
  * Create Apollo 4 validation plugin.
  * 
- * @param options to setup plugin. `schema` is deprecated now, not used, as plugins gets schema from the Apollo Server.
+ * @param options to setup plugin.
  */
-export function createApollo4QueryValidationPlugin ( options: { schema?: GraphQLSchema } ) : ApolloServerPlugin;
+export function createApollo4QueryValidationPlugin ( options?: {} ) : ApolloServerPlugin;
