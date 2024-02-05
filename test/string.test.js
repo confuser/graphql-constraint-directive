@@ -147,6 +147,29 @@ module.exports.test = function (setup, implType) {
           })
         })
       }
+
+      if (isServerValidatorEnvelop(implType)) {
+        it('should throw custom error', async function () {
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
+          const { body } = await request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: 'fob💩' } } })
+
+          deepStrictEqual(body, {
+            errors: [
+              {
+                message: 'Variable "$input" got invalid value "fob💩" at "input.title". Must be no more than 3 characters in length',
+                extensions: {
+                  code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION',
+                  field: 'input.title',
+                  context: [{ arg: 'maxLength', value: 3 }]
+                }
+              }
+            ]
+          })
+        })
+      }
     })
 
     describe('#startsWith', function () {

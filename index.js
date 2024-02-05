@@ -228,7 +228,7 @@ function createEnvelopQueryValidationPlugin (options = {}) {
     onExecute ({ args, setResultAndStopExecution }) {
       const errors = validateQuery(args.schema, args.document, args.variableValues, args.operationName, options)
       if (errors.length > 0) {
-        setResultAndStopExecution({ errors: errors.map(err => { return new GraphQLError(err.message, err, { code: err.code, field: err.fieldName, context: err.context, exception: err.originalError }) }) })
+        setResultAndStopExecution({ errors: errors.map(err => { return new GraphQLError(err.message, { extensions: { code: err.code, field: err.fieldName, context: err.context } }) }) })
       }
     }
   }
