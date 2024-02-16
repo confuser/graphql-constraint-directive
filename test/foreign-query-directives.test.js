@@ -7,7 +7,11 @@ module.exports.test = function (setup, implType) {
         directive @component(name: String!) on QUERY | MUTATION | SUBSCRIPTION
 
         type Query {
-          getName: String!
+          books: [Book]
+        }
+        
+        type Book {
+          title: String
         }
       `
 
@@ -17,8 +21,8 @@ module.exports.test = function (setup, implType) {
     it("should not throw \"Cannot read properties of undefined (reading 'args')\" error when querying", async function () {
       const query = `
         query GetName @component(name: "exampleComponent") {
-          getName
-        }
+          books
+        }.
       `
       const { body, statusCode } = await this.request
         .post('/graphql')
