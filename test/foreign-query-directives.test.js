@@ -7,13 +7,7 @@ module.exports.test = function (setup, implType) {
         directive @component(name: String!) on QUERY | MUTATION | SUBSCRIPTION
 
         type Query {
-          getUsers: [User]
-        }
-
-        type User {
-          id: ID
-          name: String
-          email: String
+          getName: String!
         }
       `
 
@@ -22,12 +16,8 @@ module.exports.test = function (setup, implType) {
 
     it("should not throw \"Cannot read properties of undefined (reading 'args')\" error when querying", async function () {
       const query = `
-        query GetCurrentUser @component(name: "exampleComponent") {
-          getUsers {
-            id
-            name
-            email
-          }
+        query GetName @component(name: "exampleComponent") {
+          getName
         }
       `
       const { body, statusCode } = await this.request
