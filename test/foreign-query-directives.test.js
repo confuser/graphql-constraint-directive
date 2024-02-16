@@ -30,7 +30,6 @@ module.exports.test = function (setup, implType) {
           }
         }
       `
-      // Assuming this.request is a configured client to make GraphQL requests to your server
       const { body, statusCode } = await this.request
         .post('/graphql')
         .set('Accept', 'application/json')
