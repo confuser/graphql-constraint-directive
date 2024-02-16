@@ -9,7 +9,7 @@ module.exports.test = function (setup, implType) {
         type Query {
           books: [Book]
         }
-        
+
         type Book {
           title: String
         }
@@ -20,8 +20,10 @@ module.exports.test = function (setup, implType) {
 
     it("should not throw \"Cannot read properties of undefined (reading 'args')\" error when querying", async function () {
       const query = `
-        query GetName @component(name: "exampleComponent") {
-          books
+        query GetBooks @component(name: "exampleComponent") {
+          books {
+            title
+          }
         }.
       `
       const { body, statusCode } = await this.request
