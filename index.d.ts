@@ -1,4 +1,4 @@
-import {GraphQLSchema, GraphQLError, DocumentNode, ValidationContext} from "graphql";
+import {GraphQLSchema, GraphQLError, DocumentNode, ValidationContext, GraphQLScalarType} from "graphql";
 import {OperationDefinitionNode, FragmentDefinitionNode, InlineFragmentNode, FieldNode, ArgumentNode} from 'graphql/language';
 import {PluginDefinition} from "apollo-server-core";
 
@@ -40,7 +40,8 @@ interface DocumentationOptions {
 }
 
 interface PluginOptions {
-    formats: Record<string, (value: unknown) => boolean>;
+    formats?: Record<string, (value: unknown) => boolean>;
+    scalarTypeMappings?: Record<string, GraphQLScalarType>;
 }
 
 /**
@@ -64,7 +65,7 @@ export const constraintDirectiveTypeDefs: string
  * @param variables used in the query to validate
  * @param operationName optional name of the GraphQL operation to validate
  */
-export function validateQuery () : (schema: GraphQLSchema, query: DocumentNode, variables: Record<string, any>, operationName?: string, pluginOptions?: {}) => Array<GraphQLError>;
+export function validateQuery(schema: GraphQLSchema, query: DocumentNode, variables: Record<string, any>, operationName?: string, pluginOptions?: {}): Array<GraphQLError>;
 
 /**
  * Create Apollo 3 plugin performing query validation.
