@@ -1,7 +1,7 @@
 const { strictEqual } = require('assert')
 
 module.exports.test = function (setup, implType) {
-  describe('Union', function () {
+  describe('GraphQL schema setup', function () {
     before(async function () {
       this.typeDefs = /* GraphQL */`
         type Query {
@@ -9,15 +9,14 @@ module.exports.test = function (setup, implType) {
         }
         type Book {
             title: String
-            authors(max: Int @constraint(min: 5)): [String]
         }
       `
 
       this.request = await setup({ typeDefs: this.typeDefs })
     })
 
-    describe('Inlined value', function () {
-      it('should fail', async function () {
+    describe('Mutation operation failure', function () {
+      it('should fail but not throw "Cannot read properties of undefined (reading \'getFields\')"', async function () {
         const query = /* GraphQL */`
           mutation GetBook {
             book {
@@ -38,7 +37,8 @@ module.exports.test = function (setup, implType) {
         )
         strictEqual(
           body.errors[0].message,
-          'Schema is not configured to execute mutation operation.'
+          'Schema is not configured to execute mutation operation.',
+          'Expected error message indicating failure in mutation operation.'
         )
       })
     })

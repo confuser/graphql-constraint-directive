@@ -19,4 +19,5 @@ describe('Server validator based implementation - Apollo plugin', function () {
   require('./argument-dynamic.test').test(setup, IMPL_TYPE)
   require('./union.test').test(setup, IMPL_TYPE)
   require('./foreign-query-directives.test').test(setup, IMPL_TYPE)
+  require('./mutation-failure.test').test(setup, IMPL_TYPE)
 })
