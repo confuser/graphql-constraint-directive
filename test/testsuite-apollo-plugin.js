@@ -20,4 +20,5 @@ describe('Server validator based implementation - Apollo plugin', function () {
   require('./union.test').test(setup, IMPL_TYPE)
   require('./foreign-query-directives.test').test(setup, IMPL_TYPE)
   require('./mutation-failure.test').test(setup, IMPL_TYPE)
+  require('./custom-format.test').test(setup, IMPL_TYPE)
 })
