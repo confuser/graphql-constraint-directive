@@ -18,4 +18,5 @@ describe('Server validator based implementation - Envelop plugin', function () {
   require('./string.test').test(setup, IMPL_TYPE)
   require('./argument-dynamic.test').test(setup, IMPL_TYPE)
   require('./union.test').test(setup, IMPL_TYPE)
+  require('./custom-format.test').test(setup, IMPL_TYPE)
 })
