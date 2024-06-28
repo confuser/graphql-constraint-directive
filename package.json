@@ -41,7 +41,7 @@
     "graphql": "16.6.0",
     "mocha": "10.5.2",
     "nyc": "15.1.0",
-    "standard": "16.0.4",
+    "standard": "17.1.0",
     "supertest": "6.3.4",
     "@graphql-yoga/node": "2.13.13"
   },
