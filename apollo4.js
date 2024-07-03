@@ -3,9 +3,9 @@ const {
   buildSchema,
   GraphQLError
 } = require('graphql')
-const { validateQuery } = require('./index')
 const { constraintDirectiveTypeDefs } = require('./lib/type-defs')
 const { gql } = require('graphql-tag')
+const { validateQuery } = require('./lib/validate-query')
 
 let currentSchema
 
