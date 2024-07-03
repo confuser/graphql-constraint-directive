@@ -1,0 +1,35 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "baseUrl": ".",
+        "rootDir": ".",
+        "declaration": false,
+        "moduleResolution": "node",
+        "noEmit": true,
+        "importHelpers": true,
+        "target": "es2015",
+        "module": "esnext",
+        "lib": [
+            "es2020",
+        ],
+        "checkJs": true,
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "paths": {
+            "graphql-constraint-directive/apollo4": [
+                "apollo4.js",
+                "apollo4.d.ts",
+            ],
+            "apollo-server-errors": [
+                "./test/typescript/error.ts"
+            ]
+        }
+    },
+    "include": [
+        "./test/typescript/apollo4.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "tmp"
+    ]
+}
