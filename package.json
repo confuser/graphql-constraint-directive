@@ -11,6 +11,7 @@
     "test-apollo-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-apollo-plugin.js",
     "test-apollo4-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-apollo4-plugin.js",
     "test-envelop-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-envelop-plugin.js",
+    "test-typescript": "tsc --project tsconfig.apollo4.json && tsc --project tsconfig.apollo.json",
     "test-validation-rule-express-graphql": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-validation-rule-express-graphql.js"
   },
   "author": "James Mortemore (jamesmortemore@gmail.com)",
