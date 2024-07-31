@@ -1,0 +1,3 @@
+const errorFn: () => string = {
+
+}

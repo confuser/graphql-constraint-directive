@@ -1,15 +1,13 @@
 const {
   GraphQLNonNull,
   GraphQLList,
-  TypeInfo,
-  ValidationContext,
-  visit,
-  visitWithTypeInfo,
   separateOperations,
   GraphQLError,
   getDirectiveValues
 } = require('graphql')
 const QueryValidationVisitor = require('./lib/query-validation-visitor.js')
+const { validateQuery } = require('./lib/validate-query')
+
 const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
 const { getConstraintTypeObject, getScalarType } = require('./lib/type-utils')
 const { constraintDirectiveTypeDefs, constraintDirectiveTypeDefsObj } = require('./lib/type-defs')
@@ -171,28 +169,6 @@ function constraintDirectiveDocumentation (options) {
         }
       }
     })
-}
-
-function validateQuery (schema, query, variables, operationName, pluginOptions = {}) {
-  const typeInfo = new TypeInfo(schema)
-
-  const errors = []
-  const context = new ValidationContext(
-    schema,
-    query,
-    typeInfo,
-    (error) => errors.push(error)
-  )
-
-  const visitor = new QueryValidationVisitor(context, {
-    variables,
-    operationName,
-    pluginOptions
-  })
-
-  visit(query, visitWithTypeInfo(typeInfo, visitor))
-
-  return errors
 }
 
 function createApolloQueryValidationPlugin ({ schema }, options = {}) {
