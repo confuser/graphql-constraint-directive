@@ -42,7 +42,7 @@
     "express": "4.21.0",
     "graphql": "16.6.0",
     "mocha": "10.7.3",
-    "nyc": "15.1.0",
+    "nyc": "17.0.0",
     "standard": "16.0.4",
     "supertest": "7.0.0",
     "typescript": "^5.5.3"
