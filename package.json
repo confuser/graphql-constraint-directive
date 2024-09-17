@@ -11,6 +11,7 @@
     "test-apollo-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-apollo-plugin.js",
     "test-apollo4-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-apollo4-plugin.js",
     "test-envelop-plugin": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-envelop-plugin.js",
+    "test-typescript": "tsc --project tsconfig.apollo4.json && tsc --project tsconfig.apollo.json",
     "test-validation-rule-express-graphql": "standard && nyc --reporter=html --reporter=text --reporter=lcov mocha test/**/testsuite-validation-rule-express-graphql.js"
   },
   "author": "James Mortemore (jamesmortemore@gmail.com)",
@@ -34,8 +35,9 @@
     "constraint"
   ],
   "devDependencies": {
-    "apollo-server-express": "3.13.0",
     "@apollo/server": "4.9.5",
+    "@graphql-yoga/node": "2.13.13",
+    "apollo-server-express": "3.13.0",
     "coveralls": "3.1.1",
     "express": "4.21.0",
     "graphql": "16.6.0",
@@ -43,7 +45,7 @@
     "nyc": "15.1.0",
     "standard": "16.0.4",
     "supertest": "6.3.4",
-    "@graphql-yoga/node": "2.13.13"
+    "typescript": "^5.5.3"
   },
   "dependencies": {
     "@graphql-tools/schema": "^9.0.0",

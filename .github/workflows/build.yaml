@@ -32,6 +32,7 @@ jobs:
             ${{ runner.OS }}-node-
             ${{ runner.OS }}-
       - run: npm ci
+      - run: npm run test-typescript
       - run: npm test
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@master
