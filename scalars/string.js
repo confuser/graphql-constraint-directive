@@ -86,7 +86,7 @@ function validate (fieldName, args, value, options = {}) {
     }
 
     try {
-      formatter(value) // Will throw if invalid
+      formatter(value, args) // Will throw if invalid
     } catch (e) {
       throw new ValidationError(fieldName,
         e.message,

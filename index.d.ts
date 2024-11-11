@@ -39,14 +39,24 @@ interface DocumentationOptions {
     };
 }
 
+interface StringArguments {
+    maxLength?: number;
+    minLength?: number;
+    startsWith?: string;
+    endWith?: string;
+    contains?: string;
+    notContains?: string;
+    pattern?: string;
+}
+
 interface PluginOptions {
-    formats: Record<string, (value: unknown) => boolean>;
+    formats: Record<string, (value: string, args?: StringArguments) => boolean>;
 }
 
 /**
  * Schema transformer which adds @constraint directives documentation to the fields and arguments descriptions.
  * Documentation not added if it already exists (`header` is present in the field or argument description)
- * 
+ *
  * @param options options to customize the documentation process
  */
 export function constraintDirectiveDocumentation (options: DocumentationOptions) : (schema: GraphQLSchema) => GraphQLSchema;
@@ -58,7 +68,7 @@ export const constraintDirectiveTypeDefs: string
 
 /**
  * Method for query validation based on the @constraint directives defined in the schema.
- * 
+ *
  * @param schema GraphQL schema to look for directives
  * @param query GraphQL query to validate
  * @param variables used in the query to validate

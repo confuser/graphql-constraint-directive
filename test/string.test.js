@@ -923,13 +923,13 @@ module.exports.test = function (setup, implType) {
           createBook(input: BookInput): Book
         }
         input BookInput {
-          title: String! @constraint(format: "test-format")
+          title: String! @constraint(minLength: 1, format: "test-format")
         }`
 
-            const testFormat = (value) => {
+            const testFormat = (value, args) => {
               if (value === 'this is a test value') return true
 
-              throw new GraphQLError('Must be in test format format')
+              throw new GraphQLError(`Must be in test format format and have a minimum length of ${args.minLength}`)
             }
 
             const pluginOptions = { formats: { 'test-format': testFormat } }
@@ -959,7 +959,7 @@ module.exports.test = function (setup, implType) {
 
             isStatusCodeError(statusCode, implType)
             strictEqual(body.errors[0].message,
-              'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_test-format"') + '. Must be in test format format')
+              'Variable "$input" got invalid value "a" at "input.title"' + valueByImplType(implType, '; Expected type "title_String_NotNull_format_test-format"') + '. Must be in test format format and have a minimum length of 1')
           })
         })
       }
