@@ -427,7 +427,7 @@ Supported formats:
 - uuid
 
 #### Custom Format
-You can add your own custom formats by passing a `formats` object to the plugin options. See example below.
+You can add your own custom formats by passing a `formats` object to the plugin or wrapper options. See example below.
 
 ```@constraint(format: "my-custom-format")```
 
@@ -441,6 +441,8 @@ const formats = {
     throw new GraphQLError('Value must be foo')
   }
 };
+// Wrapper
+constraintDirective({ formats })(schema)
 
 // Envelop
 createEnvelopQueryValidationPlugin({ formats })

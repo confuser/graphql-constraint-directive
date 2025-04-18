@@ -12,7 +12,7 @@ const { getDirective, mapSchema, MapperKind } = require('@graphql-tools/utils')
 const { getConstraintTypeObject, getScalarType } = require('./lib/type-utils')
 const { constraintDirectiveTypeDefs, constraintDirectiveTypeDefsObj } = require('./lib/type-defs')
 
-function constraintDirective () {
+function constraintDirective (options = {}) {
   const constraintTypes = {}
 
   function getConstraintType (fieldName, type, notNull, directiveArgumentMap, list, listNotNull) {
@@ -43,7 +43,7 @@ function constraintDirective () {
     const key = Symbol.for(uniqueTypeName)
     let constraintType = constraintTypes[key]
     if (constraintType) return constraintType
-    constraintType = getConstraintTypeObject(fieldName, type, uniqueTypeName, directiveArgumentMap)
+    constraintType = getConstraintTypeObject(fieldName, type, uniqueTypeName, directiveArgumentMap, options)
     if (notNull) {
       constraintType = new GraphQLNonNull(constraintType)
     }
