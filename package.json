@@ -41,7 +41,7 @@
     "coveralls": "3.1.1",
     "express": "4.21.2",
     "graphql": "16.6.0",
-    "mocha": "10.8.2",
+    "mocha": "11.0.1",
     "nyc": "17.1.0",
     "standard": "16.0.4",
     "supertest": "7.1.1",
