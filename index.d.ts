@@ -14,7 +14,8 @@ export class QueryValidationVisitor {
 /**
  * Schema transformer which adds custom types performing validations based on the @constraint directives.
  */
-export function constraintDirective () : (schema: GraphQLSchema) => GraphQLSchema;
+export function constraintDirective (directiveOptions?: directiveOptions) : (schema: GraphQLSchema) => GraphQLSchema;
+interface directiveOptions implements pluginOptions {}
 
 interface DocumentationOptions {
     /** Header for the constraints documentation block in the field or argument description */
