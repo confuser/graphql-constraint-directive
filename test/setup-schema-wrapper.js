@@ -14,7 +14,7 @@ module.exports = async function ({ typeDefs, formatError, resolvers, schemaCreat
     schema = schemaCreatedCallback(schema)
   }
 
-  schema = constraintDirective()(schema)
+  schema = constraintDirective(pluginOptions)(schema)
 
   const app = express()
   const server = new ApolloServer({
