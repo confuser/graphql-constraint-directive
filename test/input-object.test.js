@@ -194,5 +194,96 @@ module.exports.test = function (setup, implType) {
         })
       }
     })
+
+    describe('Arrays with null values', function () {
+      const queryVariables = /* GraphQL */`
+        mutation createBook($input: BookInput) {
+          createBook(input: $input) {
+            title
+          }
+        }
+      `
+
+      before(async function () {
+        this.typeDefs = /* GraphQL */`
+          type Query {
+            books: [Book]
+          }
+          type Book {
+            title: String
+          }
+          type Mutation {
+            createBook(input: BookInput): Book
+          }
+          input BookInput {
+            title: Int! @constraint(min: 3)
+            options: [OptionInput]
+          }
+          input OptionInput {
+            id: ID
+            name: String @constraint(minLength: 2)
+          }
+        `
+
+        this.request = await setup({ typeDefs: this.typeDefs })
+      })
+
+      it('should handle null values in array of input objects', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({
+            query: queryVariables,
+            variables: {
+              input: {
+                title: 3,
+                options: [null, { id: '1', name: 'test' }, null]
+              }
+            }
+          })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
+      it('should handle array with only null values', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({
+            query: queryVariables,
+            variables: {
+              input: {
+                title: 3,
+                options: [null, null]
+              }
+            }
+          })
+
+        strictEqual(statusCode, 200)
+        deepStrictEqual(body, { data: { createBook: null } })
+      })
+
+      it('should still validate non-null elements when array contains nulls', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({
+            query: queryVariables,
+            variables: {
+              input: {
+                title: 3,
+                options: [null, { id: '1', name: 'a' }]
+              }
+            }
+          })
+
+        isStatusCodeError(statusCode, implType)
+        strictEqual(body.errors[0].message,
+          'Variable "$input" got invalid value "a" at "input.options[1].name"' +
+          valueByImplType(implType, '; Expected type "name_String_minLength_2"') +
+          '. Must be at least 2 characters in length')
+      })
+    })
   })
 }
