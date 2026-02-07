@@ -44,7 +44,7 @@
     "mocha": "10.8.2",
     "nyc": "17.1.0",
     "standard": "16.0.4",
-    "supertest": "7.1.4",
+    "supertest": "7.2.2",
     "typescript": "^5.5.3"
   },
   "dependencies": {
