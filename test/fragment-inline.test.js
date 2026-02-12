@@ -43,7 +43,6 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query })
 
-        // console.log(body)
         strictEqual(statusCode, 200)
         deepStrictEqual(body, { data: { search: null } })
       })
@@ -68,7 +67,6 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query })
 
-        // console.log(body)
         isStatusCodeError(statusCode, implType)
         const errors = unwrapMoreValidationErrors(body.errors)
         strictEqual(
@@ -108,7 +106,6 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { arg1: 5, arg2: 4 } })
 
-        // console.log(body)
         strictEqual(statusCode, 200)
         deepStrictEqual(body, { data: { search: null } })
       })
@@ -119,7 +116,6 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { arg1: 4, arg2: 3 } })
 
-        // console.log(body)
         isStatusCodeError(statusCode, implType)
         const errors = unwrapMoreValidationErrors(body.errors)
         strictEqual(

@@ -483,6 +483,10 @@ Restrict array/List to a minimum length
 ```@constraint(maxItems: 3)```
 Restrict array/List to a maximum length
 
+#### errorMessage
+```@constraint(minLength: 3, errorMessage: "Title must be at least 3 characters")```
+When validation fails, return this custom message instead of the default. Applies to all constraint types (string, number, array size).
+
 ### ConstraintDirectiveError
 Each validation error throws a `ConstraintDirectiveError`. Combined with a formatError function, this can be used to customise error messages.
 
