@@ -40,7 +40,7 @@
     "apollo-server-express": "3.13.0",
     "coveralls": "3.1.1",
     "express": "4.22.1",
-    "graphql": "16.6.0",
+    "graphql": "16.8.1",
     "mocha": "10.8.2",
     "nyc": "17.1.0",
     "standard": "16.0.4",
