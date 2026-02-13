@@ -98,7 +98,6 @@ module.exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { authors: [{ name: 'asdsdd', age: [5, 2] }, { name: 'fdgt', age: [1, 5] }] } } })
 
-          // console.log(body)
           isStatusCodeError(statusCode, implType)
           const errors = unwrapMoreValidationErrors(body.errors)
           strictEqual(
@@ -351,7 +350,6 @@ module.exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: [{ title: 'asdfrs', authors: [{ name: 'dfgds' }, { name: 'ytyuyd' }] }, { title: 'hgfgh', authors: [{ name: 'rertfs' }] }] } })
 
-          // console.log(body)
           isStatusCodeError(statusCode, implType)
           const errors = unwrapMoreValidationErrors(body.errors)
           strictEqual(
@@ -413,7 +411,6 @@ module.exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query })
 
-          // console.log(body)
           isStatusCodeError(statusCode, implType)
           const errors = unwrapMoreValidationErrors(body.errors)
           strictEqual(

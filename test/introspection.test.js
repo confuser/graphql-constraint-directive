@@ -31,7 +31,7 @@ module.exports.test = function (setup, implType) {
 
       strictEqual(statusCode, 200)
       const directive = body.data.__schema.directives.find(v => v.name === 'constraint')
-      strictEqual(directive.args.length, 16)
+      strictEqual(directive.args.length, 17)
 
       // `uniqueTypeName` not used in the server validator based implementation
       const type = body.data.__schema.types.find(t => t.name === 'BookInput_subTitle')

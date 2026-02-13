@@ -32,45 +32,49 @@ class ConstraintStringType extends GraphQLScalarType {
   }
 }
 
+function getMessage (args, defaultMessage) {
+  return args.errorMessage || defaultMessage
+}
+
 function validate (fieldName, args, value, options = {}) {
   if (args.minLength && !isLength(value, { min: args.minLength })) {
     throw new ValidationError(fieldName,
-      `Must be at least ${args.minLength} characters in length`,
+      getMessage(args, `Must be at least ${args.minLength} characters in length`),
       [{ arg: 'minLength', value: args.minLength }])
   }
   if (args.maxLength && !isLength(value, { max: args.maxLength })) {
     throw new ValidationError(fieldName,
-      `Must be no more than ${args.maxLength} characters in length`,
+      getMessage(args, `Must be no more than ${args.maxLength} characters in length`),
       [{ arg: 'maxLength', value: args.maxLength }])
   }
 
   if (args.startsWith && !value.startsWith(args.startsWith)) {
     throw new ValidationError(fieldName,
-      `Must start with ${args.startsWith}`,
+      getMessage(args, `Must start with ${args.startsWith}`),
       [{ arg: 'startsWith', value: args.startsWith }])
   }
 
   if (args.endsWith && !value.endsWith(args.endsWith)) {
     throw new ValidationError(fieldName,
-      `Must end with ${args.endsWith}`,
+      getMessage(args, `Must end with ${args.endsWith}`),
       [{ arg: 'endsWith', value: args.endsWith }])
   }
 
   if (args.contains && !contains(value, args.contains)) {
     throw new ValidationError(fieldName,
-      `Must contain ${args.contains}`,
+      getMessage(args, `Must contain ${args.contains}`),
       [{ arg: 'contains', value: args.contains }])
   }
 
   if (args.notContains && contains(value, args.notContains)) {
     throw new ValidationError(fieldName,
-      `Must not contain ${args.notContains}`,
+      getMessage(args, `Must not contain ${args.notContains}`),
       [{ arg: 'notContains', value: args.notContains }])
   }
 
   if (args.pattern && !new RegExp(args.pattern).test(value)) {
     throw new ValidationError(fieldName,
-      `Must match ${args.pattern}`,
+      getMessage(args, `Must match ${args.pattern}`),
       [{ arg: 'pattern', value: args.pattern }])
   }
 
@@ -81,7 +85,7 @@ function validate (fieldName, args, value, options = {}) {
 
     if (!formatter) {
       throw new ValidationError(fieldName,
-        `Invalid format type ${args.format}`,
+        getMessage(args, `Invalid format type ${args.format}`),
         [{ arg: 'format', value: args.format }])
     }
 
@@ -89,7 +93,7 @@ function validate (fieldName, args, value, options = {}) {
       formatter(value, args) // Will throw if invalid
     } catch (e) {
       throw new ValidationError(fieldName,
-        e.message,
+        getMessage(args, e.message),
         [{ arg: 'format', value: args.format }])
     }
   }
