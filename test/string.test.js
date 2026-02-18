@@ -1,5 +1,5 @@
-const { deepStrictEqual, strictEqual, ok } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError, isServerValidatorApollo4 } = require('./testutils')
+const { deepStrictEqual, strictEqual } = require('assert')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError, isServerValidatorApollo4, isValidExtensionError } = require('./testutils')
 const { GraphQLError } = require('graphql/error')
 
 module.exports.test = function (setup, implType) {
@@ -114,12 +114,7 @@ module.exports.test = function (setup, implType) {
           true,
           `Expected message to be or end with "${customMessage}", got: ${body.errors[0].message}`
         )
-        console.log(body.errors[0].extensions)
-        strictEqual(body.errors[0].extensions.code, 'BAD_USER_INPUT')
-        strictEqual(body.errors[0].extensions.field, 'input.title')
-        strictEqual(body.errors[0].extensions.context[0].arg, 'minLength')
-        strictEqual(body.errors[0].extensions.context[0].value, 3)
-        ok(Array.isArray(body.errors[0].extensions.exception.stacktrace))
+        isValidExtensionError(body.errors[0], implType)
       })
 
       if (isSchemaWrapperImplType(implType)) {

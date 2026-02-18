@@ -1,4 +1,4 @@
-const { strictEqual } = require('assert')
+const { strictEqual, ok } = require('assert')
 
 const formatError = (error) => {
   const { message, code, fieldName, context } = error?.originalError?.originalError || error?.originalError || error
@@ -93,6 +93,40 @@ function unwrapMoreValidationErrors (errors) {
   }
 }
 
+function isValidExtensionError (error, implType) {
+  if (implType === IMPL_TYPE_SERVER_VALIDATOR_APOLLO) {
+    strictEqual(error.extensions.code, 'BAD_USER_INPUT')
+    strictEqual(error.extensions.field, 'input.title')
+    strictEqual(error.extensions.context[0].arg, 'minLength')
+    strictEqual(error.extensions.context[0].value, 3)
+    ok(Array.isArray(error.extensions.exception.stacktrace))
+    strictEqual(error.extensions.exception.stacktrace[0], 'UserInputError: Title must be at least 3 characters')
+  } else if (implType === IMPL_TYPE_SERVER_VALIDATOR_APOLLO4) {
+    strictEqual(error.extensions.code, 'BAD_USER_INPUT')
+    strictEqual(error.extensions.field, 'input.title')
+    strictEqual(error.extensions.context[0].arg, 'minLength')
+    strictEqual(error.extensions.context[0].value, 3)
+    ok(Array.isArray(error.extensions.stacktrace))
+    strictEqual(error.extensions.stacktrace[0], 'GraphQLError: Title must be at least 3 characters')
+  } else if (implType === IMPL_TYPE_SERVER_VALIDATOR_ENVELOP) {
+    strictEqual(error.extensions.code, 'ERR_GRAPHQL_CONSTRAINT_VALIDATION')
+    strictEqual(error.extensions.field, 'input.title')
+    strictEqual(error.extensions.context[0].arg, 'minLength')
+    strictEqual(error.extensions.context[0].value, 3)
+  } else if (implType === IMPL_TYPE_SERVER_VALIDATOR_RULE) {
+    strictEqual(error.extensions.code, 'ERR_GRAPHQL_CONSTRAINT_VALIDATION')
+    strictEqual(error.extensions.field, 'input.title')
+    strictEqual(error.extensions.context[0].arg, 'minLength')
+    strictEqual(error.extensions.context[0].value, 3)
+    ok(Array.isArray(error.extensions.exception.stacktrace))
+  } else if (implType === IMPL_TYPE_SCHEMA_WRAPPER) {
+    strictEqual(error.extensions.code, 'BAD_USER_INPUT')
+    ok(Array.isArray(error.extensions.exception.stacktrace))
+    strictEqual(error.extensions.exception.stacktrace[0], 'ConstraintDirectiveError: Title must be at least 3 characters')
+  } else {
+    throw new Error(`Implementation type not supported: ${implType}`)
+  }
+}
 const IMPL_TYPE_SERVER_VALIDATOR_APOLLO = 'serverValidatorApollo'
 const IMPL_TYPE_SERVER_VALIDATOR_APOLLO4 = 'serverValidatorApollo4'
 const IMPL_TYPE_SERVER_VALIDATOR_ENVELOP = 'serverValidatorEnvelop'
@@ -113,5 +147,6 @@ module.exports = {
   isServerValidatorEnvelop,
   isServerValidatorRule,
   formatError,
-  unwrapMoreValidationErrors
+  unwrapMoreValidationErrors,
+  isValidExtensionError
 }
