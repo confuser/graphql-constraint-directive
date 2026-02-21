@@ -1,5 +1,5 @@
 const { deepStrictEqual, strictEqual } = require('assert')
-const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError, isServerValidatorApollo4 } = require('./testutils')
+const { valueByImplType, formatError, isSchemaWrapperImplType, isServerValidatorRule, isServerValidatorEnvelop, isStatusCodeError, isServerValidatorApollo4, isValidExtensionError } = require('./testutils')
 const { GraphQLError } = require('graphql/error')
 
 module.exports.test = function (setup, implType) {
@@ -76,6 +76,59 @@ module.exports.test = function (setup, implType) {
             fieldName: 'title',
             context: [{ arg: 'minLength', value: 3 }]
           })
+        })
+      }
+    })
+
+    describe('#errorMessage', function () {
+      const customMessage = 'Title must be at least 3 characters'
+      before(async function () {
+        this.typeDefs = `
+      type Query {
+        books: [Book]
+      }
+      type Book {
+        title: String
+      }
+      type Mutation {
+        createBook(input: BookInput): Book
+      }
+      input BookInput {
+        title: String! @constraint(minLength: 3, errorMessage: "${customMessage}")
+      }`
+
+        this.request = await setup({ typeDefs: this.typeDefs })
+      })
+
+      it('should return custom error message when validation fails', async function () {
+        const { body, statusCode } = await this.request
+          .post('/graphql')
+          .set('Accept', 'application/json')
+          .send({ query, variables: { input: { title: 'ab' } } })
+
+        isStatusCodeError(statusCode, implType)
+        // Error may be just the custom message (visitor path) or "Variable ... ; " + customMessage (coercion path)
+
+        strictEqual(
+          body.errors[0].message === customMessage || body.errors[0].message.endsWith(customMessage),
+          true,
+          `Expected message to be or end with "${customMessage}", got: ${body.errors[0].message}`
+        )
+        isValidExtensionError(body.errors[0], implType)
+      })
+
+      if (isSchemaWrapperImplType(implType)) {
+        it('should return custom error with formatError', async function () {
+          const request = await setup({ typeDefs: this.typeDefs, formatError })
+          const { body, statusCode } = await request
+            .post('/graphql')
+            .set('Accept', 'application/json')
+            .send({ query, variables: { input: { title: 'ab' } } })
+
+          strictEqual(statusCode, 400)
+          strictEqual(body.errors[0].message, customMessage)
+          strictEqual(body.errors[0].code, 'ERR_GRAPHQL_CONSTRAINT_VALIDATION')
+          strictEqual(body.errors[0].fieldName, 'title')
         })
       }
     })
@@ -1116,7 +1169,6 @@ module.exports.test = function (setup, implType) {
             .set('Accept', 'application/json')
             .send({ query, variables: { input: { title: undefined } } })
 
-          // console.log(JSON.stringify(body))
           if (isServerValidatorRule(implType)) { strictEqual(statusCode, 500) } else { isServerValidatorApollo4(implType) ? strictEqual(statusCode, 200) : strictEqual(statusCode, 400) }
           strictEqual(body.errors[0].message,
             'Variable "$input" got invalid value {}; Field "title" of required type "' + valueByImplType(implType, 'title_String_NotNull_minLength_3', 'String') + '!" was not provided.')

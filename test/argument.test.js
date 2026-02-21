@@ -73,7 +73,6 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query, variables: { size: 100 } })
 
-        // console.log('Body: ' + JSON.stringify(body))
         isStatusCodeError(statusCode, implType)
         strictEqual(body.errors[0].message,
           'Variable "$size" got invalid value 100' + valueByImplType(implType, '; Expected type "size_Int_max_3"') + '. Must be no greater than 3')
@@ -96,7 +95,6 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryTwoVariables, variables: { size: 4, sizeAuthors: 5 } })
 
-        // console.log(body)
         isStatusCodeError(statusCode, implType)
         const errors = unwrapMoreValidationErrors(body.errors)
         strictEqual(errors[0].message,
@@ -215,7 +213,6 @@ module.exports.test = function (setup, implType) {
           .send({ query: queryFailing })
 
         isStatusCodeError(statusCode, implType)
-        // console.log(body.errors)
         strictEqual(body.errors[0].message,
           valueByImplType(implType,
             'Expected value of type "size_Int_NotNull_max_3!", found 100; Must be no greater than 3',
@@ -230,7 +227,6 @@ module.exports.test = function (setup, implType) {
           .send({ query: queryDeeperFailing })
 
         isStatusCodeError(statusCode, implType)
-        // console.log(body.errors)
         strictEqual(body.errors[0].message,
           valueByImplType(implType,
             'Expected value of type "size_Int_max_4", found 5; Must be no greater than 4',
@@ -243,7 +239,6 @@ module.exports.test = function (setup, implType) {
           .set('Accept', 'application/json')
           .send({ query: queryFailingTwoTimes })
 
-        // console.log(body)
         isStatusCodeError(statusCode, implType)
         const errors = unwrapMoreValidationErrors(body.errors)
         strictEqual(errors[0].message,

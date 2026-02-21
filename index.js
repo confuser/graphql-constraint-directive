@@ -26,6 +26,7 @@ function constraintDirective () {
                   type.name
                 }_${notNull ? 'NotNull_' : ''}` +
                 Object.entries(directiveArgumentMap)
+                  .filter(([key]) => key !== 'errorMessage')
                   .map(([key, value]) => {
                     if (
                       key === 'min' ||
@@ -137,7 +138,7 @@ function constraintDirectiveDocumentation (options) {
     fieldConfig.description += HEADER + '\n'
 
     Object.entries(directiveArgumentMap).forEach(([key, value]) => {
-      if (key === 'uniqueTypeName') return
+      if (key === 'uniqueTypeName' || key === 'errorMessage') return
       fieldConfig.description += `* ${DESCRIPTINS_MAP[key] ? DESCRIPTINS_MAP[key] : key}: \`${value}\`\n`
     })
 
