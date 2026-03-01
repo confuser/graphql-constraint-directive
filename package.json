@@ -37,7 +37,7 @@
   "devDependencies": {
     "@apollo/server": "4.13.0",
     "@graphql-yoga/node": "2.13.13",
-    "apollo-server-express": "3.13.0",
+    "@apollo/server": "4.0.0",
     "coveralls": "3.1.1",
     "express": "4.22.1",
     "graphql": "16.6.0",
