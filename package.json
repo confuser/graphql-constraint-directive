@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.0",
-    "@graphql-tools/utils": "^10.0.0",
+    "@graphql-tools/utils": "^11.0.0",
     "validator": "^13.6.0"
   },
   "peerDependencies": {
