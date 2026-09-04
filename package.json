@@ -45,7 +45,7 @@
     "nyc": "17.1.0",
     "standard": "16.0.4",
     "supertest": "7.2.2",
-    "typescript": "^5.5.3"
+    "typescript": "^7.0.0"
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.0",
