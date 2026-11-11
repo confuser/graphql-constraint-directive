@@ -17,13 +17,14 @@
         "skipDefaultLibCheck": true,
         "paths": {
             "graphql-constraint-directive": [
-                "index.js",
                 "index.d.ts",
+                "index.js"
             ]
         }
     },
     "include": [
-        "./test/typescript/apollo.ts"
+        "./test/typescript/apollo.ts",
+        "./test/typescript/constraint-directive-error.ts"
     ],
     "exclude": [
         "node_modules",

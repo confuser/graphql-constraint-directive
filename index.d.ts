@@ -1,4 +1,4 @@
-import {GraphQLSchema, GraphQLError, DocumentNode, ValidationContext} from "graphql";
+import {GraphQLSchema, DocumentNode, ValidationContext} from "graphql";
 import {OperationDefinitionNode, FragmentDefinitionNode, InlineFragmentNode, FieldNode, ArgumentNode} from 'graphql/language';
 import {PluginDefinition} from "apollo-server-core";
 
@@ -53,6 +53,57 @@ interface PluginOptions {
     formats: Record<string, (value: string, args?: StringArguments) => boolean>;
 }
 
+export type StringConstraint<T extends string, V = string> = {
+    arg: T;
+    value: V;
+};
+
+export type NumberConstraint<T extends string> = {
+    arg: T;
+    value: number;
+};
+
+/** Built-in `format` constraint values. Custom formats use plain `string`. */
+export type ConstraintDirectiveFormat =
+    | 'byte'
+    | 'date-time'
+    | 'date'
+    | 'email'
+    | 'ipv4'
+    | 'ipv6'
+    | 'uri'
+    | 'uuid';
+
+export type ConstraintDirectiveContextEntry =
+    | NumberConstraint<'min'>
+    | NumberConstraint<'max'>
+    | NumberConstraint<'exclusiveMin'>
+    | NumberConstraint<'exclusiveMax'>
+    | NumberConstraint<'multipleOf'>
+    | NumberConstraint<'minItems'>
+    | NumberConstraint<'maxItems'>
+    | StringConstraint<'minLength', number>
+    | StringConstraint<'maxLength', number>
+    | StringConstraint<'startsWith'>
+    | StringConstraint<'endsWith'>
+    | StringConstraint<'contains'>
+    | StringConstraint<'notContains'>
+    | StringConstraint<'pattern'>
+    | StringConstraint<'format', ConstraintDirectiveFormat | (string & {})>;
+
+/**
+ * Validation error thrown when a @constraint directive fails.
+ *
+ * @see README.md#constraintdirectiveerror
+ */
+export class ConstraintDirectiveError extends Error {
+    code: 'ERR_GRAPHQL_CONSTRAINT_VALIDATION';
+    fieldName: string;
+    context: ConstraintDirectiveContextEntry[];
+    originalError: Error | undefined;
+    constructor(fieldName: string, message: string, context: ConstraintDirectiveContextEntry[]);
+}
+
 /**
  * Schema transformer which adds @constraint directives documentation to the fields and arguments descriptions.
  * Documentation not added if it already exists (`header` is present in the field or argument description)
@@ -74,7 +125,7 @@ export const constraintDirectiveTypeDefs: string
  * @param variables used in the query to validate
  * @param operationName optional name of the GraphQL operation to validate
  */
-export function validateQuery () : (schema: GraphQLSchema, query: DocumentNode, variables: Record<string, any>, operationName?: string, pluginOptions?: {}) => Array<GraphQLError>;
+export function validateQuery () : (schema: GraphQLSchema, query: DocumentNode, variables: Record<string, any>, operationName?: string, pluginOptions?: {}) => Array<ConstraintDirectiveError>;
 
 /**
  * Create Apollo 3 plugin performing query validation.
